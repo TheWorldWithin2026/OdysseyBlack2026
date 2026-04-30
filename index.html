@@ -85,6 +85,23 @@ textarea { resize:vertical; min-height:75px; }
 .empty { text-align:center; color:var(--muted); font-size:13px; padding:3rem 0; display:none; }
 .notif { position:fixed; bottom:20px; right:20px; background:var(--card); border:1px solid rgba(201,168,76,0.4); color:var(--gold); padding:10px 18px; font-size:11px; letter-spacing:1px; z-index:999; opacity:0; transform:translateY(6px); transition:all 0.25s; pointer-events:none; border-radius:2px; }
 .notif.show { opacity:1; transform:translateY(0); }
+.import-drop { border:2px dashed var(--border); padding:40px; text-align:center; cursor:pointer; transition:border-color 0.2s; border-radius:2px; }
+.import-drop:hover,.import-drop.over { border-color:var(--gold); }
+.import-drop-icon { font-size:32px; margin-bottom:12px; }
+.import-drop-text { font-size:13px; color:var(--muted); }
+.import-drop-sub { font-size:11px; color:var(--muted); margin-top:6px; opacity:0.6; }
+.bulk-table { width:100%; border-collapse:collapse; margin-top:16px; font-size:12px; }
+.bulk-table th { font-size:9px; letter-spacing:2px; text-transform:uppercase; color:var(--muted); padding:10px 12px; border-bottom:1px solid var(--border); text-align:left; }
+.bulk-table td { padding:10px 12px; border-bottom:1px solid rgba(30,30,30,0.5); vertical-align:middle; }
+.bulk-table tr:hover td { background:rgba(255,255,255,0.02); }
+.tier-hot { color:var(--gold); font-weight:600; }
+.tier-strong { color:#2ecc71; font-weight:600; }
+.tier-qualified { color:#3498db; font-weight:600; }
+.tier-low { color:var(--muted); }
+.bulk-actions { display:flex; gap:10px; align-items:center; margin-top:16px; flex-wrap:wrap; }
+.bulk-filter { display:flex; gap:8px; flex-wrap:wrap; }
+.filter-btn { background:none; border:1px solid var(--border); color:var(--muted); padding:5px 14px; font-size:9px; letter-spacing:2px; text-transform:uppercase; cursor:pointer; font-family:'Montserrat',sans-serif; border-radius:1px; }
+.filter-btn.on { border-color:var(--gold); color:var(--gold); background:var(--gold-dim); }
 @media(max-width:640px) { .g2,.g3 { grid-template-columns:1fr; } .stats { grid-template-columns:repeat(2,1fr); } .pipe { grid-template-columns:1fr; } .tabs { overflow-x:auto; } header { padding:16px 20px; } }
 </style>
 </head>
@@ -104,6 +121,7 @@ textarea { resize:vertical; min-height:75px; }
     <button class="tab" onclick="switchTab('outreach',this)">AI Outreach</button>
     <button class="tab" onclick="switchTab('pipeline',this)">Pipeline</button>
     <button class="tab" onclick="switchTab('script',this)">Call Script</button>
+    <button class="tab" onclick="switchTab('import',this)">Apollo Import</button>
   </div>
 
   <!-- PROSPECT BUILDER -->
@@ -303,6 +321,61 @@ textarea { resize:vertical; min-height:75px; }
       <div class="ai-text" id="script-ai"></div>
     </div>
   </div>
+
+  <!-- APOLLO IMPORT -->
+  <div class="panel" id="panel-import">
+    <div class="sec-tag">Apollo Integration</div>
+    <div class="sec-h">Bulk Import & Score</div>
+    <div class="sec-d">Export your Apollo search as CSV and drop it here. The app scores everyone instantly and shows your HOT prospects at the top.</div>
+
+    <div class="card">
+      <div class="sec-tag" style="margin-bottom:12px;">How to export from Apollo</div>
+      <div style="font-size:12px;color:var(--muted);line-height:2;">
+        1. In Apollo → People search → set your filters (CEO/CFO/COO + Atlanta + 1000+ employees)<br>
+        2. Check the box next to the first result to select all 25 visible<br>
+        3. Click <strong style="color:var(--text)">Export</strong> in the toolbar that appears → Export to CSV<br>
+        4. Drop the downloaded CSV file into the box below
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="import-drop" id="drop-zone" onclick="document.getElementById('csv-input').click()" ondragover="event.preventDefault();this.classList.add('over')" ondragleave="this.classList.remove('over')" ondrop="handleDrop(event)">
+        <div class="import-drop-icon">📋</div>
+        <div class="import-drop-text">Drop Apollo CSV here or click to browse</div>
+        <div class="import-drop-sub">Accepts Apollo people export CSV</div>
+      </div>
+      <input type="file" id="csv-input" accept=".csv" style="display:none" onchange="handleFile(this.files[0])">
+    </div>
+
+    <div id="import-results" style="display:none;">
+      <div class="bulk-actions">
+        <div style="font-size:12px;color:var(--muted);" id="import-summary"></div>
+        <div class="bulk-filter">
+          <button class="filter-btn on" onclick="filterBulk('all',this)">All</button>
+          <button class="filter-btn" onclick="filterBulk('hot',this)">HOT Only</button>
+          <button class="filter-btn" onclick="filterBulk('strong',this)">Strong+</button>
+        </div>
+        <button class="btn btn-outline" onclick="addAllHot()" style="margin-left:auto;">Add HOT to Pipeline</button>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden;">
+        <table class="bulk-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Title</th>
+              <th>Company</th>
+              <th>Score</th>
+              <th>Tier</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="bulk-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+
 </div>
 
 <div class="notif" id="notif"></div>
@@ -515,6 +588,144 @@ function clearProspect() {
 function copyText(id) {
   var text = document.getElementById(id).textContent;
   navigator.clipboard.writeText(text).then(function(){ notify('Copied to clipboard'); });
+}
+
+var bulkProspects = [];
+var bulkFilter = 'all';
+
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('drop-zone').classList.remove('over');
+  var file = e.dataTransfer.files[0];
+  if (file) handleFile(file);
+}
+
+function handleFile(file) {
+  if (!file || !file.name.endsWith('.csv')) { notify('Please upload a CSV file'); return; }
+  var reader = new FileReader();
+  reader.onload = function(e) { parseApolloCSV(e.target.result); };
+  reader.readAsText(file);
+}
+
+function parseApolloCSV(text) {
+  var lines = text.split('\n').filter(function(l){ return l.trim(); });
+  if (lines.length < 2) { notify('CSV appears empty'); return; }
+  
+  // Parse header - find column indexes
+  var headers = lines[0].split(',').map(function(h){ return h.replace(/"/g,'').trim().toLowerCase(); });
+  var nameIdx = headers.findIndex(function(h){ return h.includes('first') || h==='name'; });
+  var lastIdx = headers.findIndex(function(h){ return h.includes('last'); });
+  var titleIdx = headers.findIndex(function(h){ return h.includes('title') || h.includes('job'); });
+  var companyIdx = headers.findIndex(function(h){ return h.includes('company') || h.includes('account'); });
+  
+  // If no first/last split, try full name
+  if (nameIdx === -1) nameIdx = headers.findIndex(function(h){ return h.includes('name'); });
+
+  bulkProspects = [];
+  for (var i = 1; i < lines.length; i++) {
+    var cols = parseCSVLine(lines[i]);
+    if (cols.length < 2) continue;
+    
+    var firstName = nameIdx >= 0 ? cols[nameIdx] : '';
+    var lastName = lastIdx >= 0 ? cols[lastIdx] : '';
+    var fullName = (firstName + ' ' + lastName).trim();
+    if (!fullName) fullName = nameIdx >= 0 ? cols[nameIdx] : 'Unknown';
+    
+    var title = titleIdx >= 0 ? cols[titleIdx] : '';
+    var company = companyIdx >= 0 ? cols[companyIdx] : '';
+    
+    if (!fullName || fullName === 'Unknown') continue;
+    
+    var scored = bulkScore(fullName, title, company);
+    bulkProspects.push(scored);
+  }
+  
+  // Sort by score descending
+  bulkProspects.sort(function(a,b){ return b.score - a.score; });
+  renderBulkTable();
+  notify('Scored ' + bulkProspects.length + ' prospects from Apollo');
+}
+
+function parseCSVLine(line) {
+  var result = [];
+  var current = '';
+  var inQuotes = false;
+  for (var i = 0; i < line.length; i++) {
+    var ch = line[i];
+    if (ch === '"') { inQuotes = !inQuotes; }
+    else if (ch === ',' && !inQuotes) { result.push(current.trim()); current = ''; }
+    else { current += ch; }
+  }
+  result.push(current.trim());
+  return result;
+}
+
+function bulkScore(name, title, company) {
+  var tl = (title || '').toLowerCase();
+  var score = 0;
+  if (/\b(ceo|chief executive|president|chairman)\b/.test(tl)) score+=10;
+  else if (/\b(cfo|coo|cto|ciso|cmo|chief)\b/.test(tl)) score+=8;
+  else if (/\b(evp|svp|executive vice|senior vice)\b/.test(tl)) score+=7;
+  else if (/\b(vp|vice president|managing director|managing partner)\b/.test(tl)) score+=6;
+  else if (/\b(director|partner|principal)\b/.test(tl)) score+=4;
+  else score+=2;
+  // Default Atlanta HQ assumption since we filtered for Atlanta in Apollo
+  score+=8;
+  // Default heavy travel for C-suite/VP
+  if (score >= 14) score+=7; else score+=4;
+  // Apollo source
+  score+=1;
+  return { name:name, title:title, company:company, score:score, id:Date.now()+Math.random(), stage:'identified', hq:'yes', travel:'heavy', source:'linkedin', industry:'', notes:'' };
+}
+
+function renderBulkTable() {
+  var results = document.getElementById('import-results');
+  var tbody = document.getElementById('bulk-tbody');
+  var summary = document.getElementById('import-summary');
+  results.style.display = 'block';
+  
+  var hot = bulkProspects.filter(function(p){ return p.score>=28; }).length;
+  var strong = bulkProspects.filter(function(p){ return p.score>=24&&p.score<28; }).length;
+  summary.textContent = bulkProspects.length + ' prospects scored — ' + hot + ' HOT, ' + strong + ' Strong';
+  
+  var filtered = bulkProspects;
+  if (bulkFilter === 'hot') filtered = bulkProspects.filter(function(p){ return p.score>=28; });
+  if (bulkFilter === 'strong') filtered = bulkProspects.filter(function(p){ return p.score>=24; });
+  
+  tbody.innerHTML = filtered.map(function(p){
+    var tierClass = p.score>=28?'tier-hot':p.score>=24?'tier-strong':p.score>=20?'tier-qualified':'tier-low';
+    var tierText = p.score>=28?'🔥 HOT':p.score>=24?'✓ STRONG':p.score>=20?'QUALIFIED':'LOW';
+    return '<tr><td style="font-family:'Cormorant Garamond',serif;font-size:15px;">' + p.name + '</td><td style="color:var(--muted)">' + (p.title||'—') + '</td><td>' + (p.company||'—') + '</td><td style="font-weight:600;color:var(--gold)">' + p.score + '</td><td class="' + tierClass + '">' + tierText + '</td><td><button class="btn btn-ghost" style="padding:5px 12px;font-size:9px;" onclick="addBulkToPipeline(' + JSON.stringify(p.id) + ')">Add</button></td></tr>';
+  }).join('');
+}
+
+function filterBulk(f, el) {
+  bulkFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(function(b){ b.classList.remove('on'); });
+  el.classList.add('on');
+  renderBulkTable();
+}
+
+function addBulkToPipeline(id) {
+  var p = bulkProspects.find(function(x){ return x.id===id; });
+  if (!p) return;
+  if (pipeline.find(function(x){ return x.name===p.name && x.company===p.company; })) { notify('Already in pipeline'); return; }
+  pipeline.push(Object.assign({}, p));
+  localStorage.setItem('ob-pipeline', JSON.stringify(pipeline));
+  notify(p.name + ' added to pipeline');
+}
+
+function addAllHot() {
+  var hot = bulkProspects.filter(function(p){ return p.score>=28; });
+  var added = 0;
+  hot.forEach(function(p){
+    if (!pipeline.find(function(x){ return x.name===p.name && x.company===p.company; })) {
+      pipeline.push(Object.assign({}, p));
+      added++;
+    }
+  });
+  localStorage.setItem('ob-pipeline', JSON.stringify(pipeline));
+  notify('Added ' + added + ' HOT prospects to pipeline');
 }
 
 function notify(msg) {
