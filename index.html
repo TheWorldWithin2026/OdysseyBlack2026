@@ -240,12 +240,18 @@ textarea { resize:vertical; min-height:75px; }
           </select>
         </div>
       </div>
-      <div class="g1"><label>Context / Hook</label><textarea id="o-ctx" placeholder="e.g. Travels ATL-NYC weekly, uses Uber Black, attends ATL CEO Summit..."></textarea></div>
+      <div class="g1"><label>Context / Hook <span style="color:var(--gold);font-size:9px;margin-left:8px;">← AI will research this automatically</span></label><textarea id="o-ctx" placeholder="Optional — leave blank and click Research First to auto-fill with verified facts..."></textarea></div>
       <div class="btns">
+        <button class="btn btn-outline" onclick="researchExecutive()">Research Executive <div class="spin" id="sp-research"></div></button>
         <button class="btn btn-gold" onclick="generateOutreach()">Generate Message <div class="spin" id="sp3"></div></button>
       </div>
     </div>
-    <div class="ai-box" id="out-box" style="margin-top:0;">
+    <div class="ai-box" id="research-box" style="margin-top:0;">
+      <span class="ai-label">Executive Research</span>
+      <button class="copy-btn" onclick="copyText('research-ai')">Copy</button>
+      <div class="ai-text" id="research-ai"></div>
+    </div>
+    <div class="ai-box" id="out-box" style="margin-top:12px;">
       <span class="ai-label">Generated Outreach</span>
       <button class="copy-btn" onclick="copyText('out-ai')">Copy</button>
       <div class="ai-text" id="out-ai"></div>
@@ -486,6 +492,50 @@ async function generateStrategy() {
   sp.classList.remove('on');
 }
 
+async function researchExecutive() {
+  var name = document.getElementById('o-name').value.trim();
+  var title = document.getElementById('o-title').value.trim();
+  if (!name || !title) { notify('Fill in name and title first'); return; }
+
+  var sp = document.getElementById('sp-research');
+  var box = document.getElementById('research-box');
+  var out = document.getElementById('research-ai');
+  sp.classList.add('on');
+  box.classList.remove('show');
+
+  var prompt = 'You are a research assistant. Search your knowledge for current, verified facts about this executive for a business development team.
+
+Executive: ' + name + '
+Role: ' + title + '
+
+Provide ONLY verified facts you are confident about. If you are not sure about something, do NOT include it.
+
+Return a structured brief covering:
+1. CURRENT ROLE & COMPANY — confirmed current position, how long in role, company HQ location
+2. CAREER BACKGROUND — previous companies and roles (verified only)
+3. BUSINESS FOCUS — known priorities, recent initiatives, public statements or interviews
+4. TRAVEL INDICATORS — known travel patterns, office locations, frequent destinations
+5. OUTREACH HOOK — one specific, verified fact that makes a compelling connection to executive ground transportation needs
+
+IMPORTANT: Flag any fact you are less than 90% confident about with [VERIFY]. Never invent specifics like company names, earnings calls, or events. If you lack current verified data, say so clearly rather than guessing.';
+
+  try {
+    var research = await callAI(prompt, 800);
+    out.textContent = research;
+    box.classList.add('show');
+    // Auto-populate context field with the hook
+    var hookMatch = research.match(/OUTREACH HOOK[^:]*:(.*?)(?=\n[0-9]|\n[A-Z]|$)/s);
+    if (hookMatch) {
+      document.getElementById('o-ctx').value = hookMatch[1].trim();
+    }
+    notify('Research complete — context auto-filled');
+  } catch(e) {
+    out.textContent = 'Error: ' + e.message;
+    box.classList.add('show');
+  }
+  sp.classList.remove('on');
+}
+
 async function generateOutreach() {
   var name = document.getElementById('o-name').value.trim();
   var title = document.getElementById('o-title').value.trim();
@@ -502,7 +552,8 @@ async function generateOutreach() {
 
   var chMap = {email:'a cold email',linkedin:'a LinkedIn DM (max 150 words)',referral:'a warm referral introduction email',event:'a post-event follow-up email',voicemail:'a 30-second voicemail script'};
   var tMap = {luxury:'luxury and exclusivity positioning',peer:'executive peer-to-peer tone',concise:'ultra-concise and respectful of their time',warm:'warm and personal referral-based tone'};
-  var prompt = 'You write outreach for Odyssey Black VIP Transportation in Atlanta — premium black car service for Fortune 500 executives. Differentiators: reliability, discretion, professional chauffeurs, flight tracking, last-minute availability.\n\nWrite ' + chMap[channel] + ' for:\nName: ' + name + '\nRole: ' + title + '\nTone: ' + tMap[tone] + '\nContext: ' + (ctx || 'Use general executive travel pain points') + '\n\nDo not sound like a mass email. Reference specific pain points. Include a soft call to action.' + (channel==='email' ? ' Include a subject line.' : '');
+  var researchText = document.getElementById('research-ai').textContent;
+  var prompt = 'You write outreach for Odyssey Black VIP Transportation in Atlanta — premium black car service for Fortune 500 executives. Differentiators: reliability, discretion, professional chauffeurs, flight tracking, last-minute availability.\n\nWrite ' + chMap[channel] + ' for:\nName: ' + name + '\nRole: ' + title + '\nTone: ' + tMap[tone] + '\nVerified Research: ' + (researchText || 'None') + '\nAdditional Context: ' + (ctx || 'None') + '\n\nCRITICAL: Only reference facts from the Verified Research above. Do NOT invent specific details like company names, earnings calls, events, or initiatives that are not in the research. If research is limited, write a strong general executive travel email without fake specifics. Do not sound like a mass email. Reference specific pain points. Include a soft call to action.' + (channel==='email' ? ' Include a subject line.' : '');
 
   try {
     out.textContent = await callAI(prompt, 1000);
