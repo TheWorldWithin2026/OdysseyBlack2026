@@ -695,7 +695,7 @@ function renderBulkTable() {
   tbody.innerHTML = filtered.map(function(p){
     var tierClass = p.score>=28?'tier-hot':p.score>=24?'tier-strong':p.score>=20?'tier-qualified':'tier-low';
     var tierText = p.score>=28?'🔥 HOT':p.score>=24?'✓ STRONG':p.score>=20?'QUALIFIED':'LOW';
-    return '<tr><td style="font-family:'Cormorant Garamond',serif;font-size:15px;">' + p.name + '</td><td style="color:var(--muted)">' + (p.title||'—') + '</td><td>' + (p.company||'—') + '</td><td style="font-weight:600;color:var(--gold)">' + p.score + '</td><td class="' + tierClass + '">' + tierText + '</td><td><button class="btn btn-ghost" style="padding:5px 12px;font-size:9px;" onclick="addBulkToPipeline(' + JSON.stringify(p.id) + ')">Add</button></td></tr>';
+    return '<tr><td style="font-family:serif;font-size:15px;">' + p.name + '</td><td style="color:var(--muted)">' + (p.title||'—') + '</td><td>' + (p.company||'—') + '</td><td style="font-weight:600;color:var(--gold)">' + p.score + '</td><td class="' + tierClass + '">' + tierText + '</td><td><button class="btn btn-ghost" style="padding:5px 12px;font-size:9px;" onclick="addBulkToPipeline(' + JSON.stringify(p.id) + ')">Add</button></td></tr>';
   }).join('');
 }
 
