@@ -23,8 +23,8 @@ header { display:flex; align-items:center; justify-content:space-between; paddin
 .logo-sub { font-size:9px; letter-spacing:4px; color:var(--muted); text-transform:uppercase; margin-top:2px; }
 .badge { font-size:10px; letter-spacing:2px; color:var(--gold); border:1px solid rgba(201,168,76,0.3); padding:5px 12px; text-transform:uppercase; }
 .wrap { max-width:1000px; margin:0 auto; padding:36px 24px 80px; }
-.tabs { display:flex; border-bottom:1px solid var(--border); margin-bottom:36px; }
-.tab { background:none; border:none; border-bottom:2px solid transparent; padding:12px 24px; font-size:10px; letter-spacing:3px; text-transform:uppercase; color:var(--muted); cursor:pointer; font-family:'Montserrat',sans-serif; transition:all 0.2s; }
+.tabs { display:flex; border-bottom:1px solid var(--border); margin-bottom:36px; overflow-x:auto; }
+.tab { background:none; border:none; border-bottom:2px solid transparent; padding:12px 20px; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--muted); cursor:pointer; font-family:'Montserrat',sans-serif; transition:all 0.2s; white-space:nowrap; }
 .tab:hover { color:var(--text); }
 .tab.active { color:var(--gold); border-bottom-color:var(--gold); }
 .panel { display:none; }
@@ -82,27 +82,32 @@ textarea { resize:vertical; min-height:75px; }
 .pipe-name { font-family:'Cormorant Garamond',serif; font-size:15px; margin-bottom:2px; }
 .pipe-co { font-size:11px; color:var(--muted); }
 .pipe-sc { font-size:11px; font-weight:600; margin-top:5px; }
-.empty { text-align:center; color:var(--muted); font-size:13px; padding:3rem 0; display:none; }
+.empty-msg { text-align:center; color:var(--muted); font-size:13px; padding:3rem 0; }
 .notif { position:fixed; bottom:20px; right:20px; background:var(--card); border:1px solid rgba(201,168,76,0.4); color:var(--gold); padding:10px 18px; font-size:11px; letter-spacing:1px; z-index:999; opacity:0; transform:translateY(6px); transition:all 0.25s; pointer-events:none; border-radius:2px; }
 .notif.show { opacity:1; transform:translateY(0); }
 .import-drop { border:2px dashed var(--border); padding:40px; text-align:center; cursor:pointer; transition:border-color 0.2s; border-radius:2px; }
-.import-drop:hover,.import-drop.over { border-color:var(--gold); }
-.import-drop-icon { font-size:32px; margin-bottom:12px; }
-.import-drop-text { font-size:13px; color:var(--muted); }
-.import-drop-sub { font-size:11px; color:var(--muted); margin-top:6px; opacity:0.6; }
-.bulk-table { width:100%; border-collapse:collapse; margin-top:16px; font-size:12px; }
+.import-drop:hover, .import-drop.over { border-color:var(--gold); }
+.import-icon { font-size:32px; margin-bottom:12px; }
+.import-text { font-size:13px; color:var(--muted); }
+.import-sub { font-size:11px; color:var(--muted); margin-top:6px; opacity:0.6; }
+.bulk-table { width:100%; border-collapse:collapse; font-size:12px; }
 .bulk-table th { font-size:9px; letter-spacing:2px; text-transform:uppercase; color:var(--muted); padding:10px 12px; border-bottom:1px solid var(--border); text-align:left; }
 .bulk-table td { padding:10px 12px; border-bottom:1px solid rgba(30,30,30,0.5); vertical-align:middle; }
 .bulk-table tr:hover td { background:rgba(255,255,255,0.02); }
-.tier-hot { color:var(--gold); font-weight:600; }
-.tier-strong { color:#2ecc71; font-weight:600; }
-.tier-qualified { color:#3498db; font-weight:600; }
-.tier-low { color:var(--muted); }
-.bulk-actions { display:flex; gap:10px; align-items:center; margin-top:16px; flex-wrap:wrap; }
-.bulk-filter { display:flex; gap:8px; flex-wrap:wrap; }
-.filter-btn { background:none; border:1px solid var(--border); color:var(--muted); padding:5px 14px; font-size:9px; letter-spacing:2px; text-transform:uppercase; cursor:pointer; font-family:'Montserrat',sans-serif; border-radius:1px; }
-.filter-btn.on { border-color:var(--gold); color:var(--gold); background:var(--gold-dim); }
-@media(max-width:640px) { .g2,.g3 { grid-template-columns:1fr; } .stats { grid-template-columns:repeat(2,1fr); } .pipe { grid-template-columns:1fr; } .tabs { overflow-x:auto; } header { padding:16px 20px; } }
+.t-hot { color:var(--gold); font-weight:600; }
+.t-strong { color:#2ecc71; font-weight:600; }
+.t-qual { color:#3498db; font-weight:600; }
+.t-low { color:var(--muted); }
+.filter-row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:16px; }
+.fbtn { background:none; border:1px solid var(--border); color:var(--muted); padding:5px 14px; font-size:9px; letter-spacing:2px; text-transform:uppercase; cursor:pointer; font-family:'Montserrat',sans-serif; border-radius:1px; }
+.fbtn.on { border-color:var(--gold); color:var(--gold); background:var(--gold-dim); }
+.rnote { font-size:10px; color:var(--gold); margin-left:8px; opacity:0.8; font-weight:400; letter-spacing:1px; }
+@media(max-width:640px) {
+  .g2,.g3 { grid-template-columns:1fr; }
+  .stats { grid-template-columns:repeat(2,1fr); }
+  .pipe { grid-template-columns:1fr; }
+  header { padding:16px 20px; }
+}
 </style>
 </head>
 <body>
@@ -127,11 +132,11 @@ textarea { resize:vertical; min-height:75px; }
   <!-- PROSPECT BUILDER -->
   <div class="panel active" id="panel-prospect">
     <div class="sec-tag">Step 01</div>
-    <div class="sec-h">Score & Qualify a Prospect</div>
+    <div class="sec-h">Score and Qualify a Prospect</div>
     <div class="sec-d">Enter executive details to calculate their OD Black acquisition score and generate your approach strategy.</div>
     <div class="card">
       <div class="g2">
-        <div><label>Executive Name</label><input type="text" id="p-name" placeholder="e.g. Carol Tomé"></div>
+        <div><label>Executive Name</label><input type="text" id="p-name" placeholder="e.g. Carol Tome"></div>
         <div><label>Title / Role</label><input type="text" id="p-title" placeholder="e.g. Chief Executive Officer"></div>
       </div>
       <div class="g2">
@@ -165,7 +170,7 @@ textarea { resize:vertical; min-height:75px; }
         <div><label>Travel Frequency</label>
           <select id="p-travel">
             <option value="heavy">Heavy (weekly flights)</option>
-            <option value="moderate">Moderate (2–3x/month)</option>
+            <option value="moderate">Moderate (2-3x per month)</option>
             <option value="light">Light (occasional)</option>
           </select>
         </div>
@@ -178,13 +183,12 @@ textarea { resize:vertical; min-height:75px; }
           </select>
         </div>
       </div>
-      <div class="g1"><label>Notes (intel, context, mutual connections)</label><textarea id="p-notes" placeholder="e.g. Seen at ATL airport frequently, uses rideshare..."></textarea></div>
+      <div class="g1"><label>Notes</label><textarea id="p-notes" placeholder="Intel, context, mutual connections..."></textarea></div>
       <div class="btns">
         <button class="btn btn-gold" onclick="scoreProspect()">Calculate Score <div class="spin" id="sp1"></div></button>
         <button class="btn btn-ghost" onclick="clearProspect()">Clear</button>
       </div>
     </div>
-
     <div class="card" id="score-card" style="display:none;">
       <div class="score-row">
         <div>
@@ -215,11 +219,11 @@ textarea { resize:vertical; min-height:75px; }
   <div class="panel" id="panel-outreach">
     <div class="sec-tag">Step 02</div>
     <div class="sec-h">AI-Powered Outreach</div>
-    <div class="sec-d">Generate personalized emails, LinkedIn messages, or follow-ups for any executive target.</div>
+    <div class="sec-d">Click Research Executive first to gather verified facts, then generate a personalized message.</div>
     <div class="card">
       <div class="g2">
-        <div><label>Executive Name</label><input type="text" id="o-name" placeholder="e.g. Sarah Chen"></div>
-        <div><label>Title & Company</label><input type="text" id="o-title" placeholder="e.g. VP of Operations, Coca-Cola"></div>
+        <div><label>Executive Name</label><input type="text" id="o-name" placeholder="e.g. Carol Tome"></div>
+        <div><label>Title and Company</label><input type="text" id="o-title" placeholder="e.g. CEO, UPS"></div>
       </div>
       <div class="g2">
         <div><label>Channel</label>
@@ -233,25 +237,28 @@ textarea { resize:vertical; min-height:75px; }
         </div>
         <div><label>Tone</label>
           <select id="o-tone">
-            <option value="luxury">Luxury & exclusive</option>
+            <option value="luxury">Luxury and exclusive</option>
             <option value="peer">Executive peer-to-peer</option>
-            <option value="concise">Concise & respectful</option>
-            <option value="warm">Warm & referral-based</option>
+            <option value="concise">Concise and respectful</option>
+            <option value="warm">Warm and referral-based</option>
           </select>
         </div>
       </div>
-      <div class="g1"><label>Context / Hook <span style="color:var(--gold);font-size:9px;margin-left:8px;">← AI will research this automatically</span></label><textarea id="o-ctx" placeholder="Optional — leave blank and click Research First to auto-fill with verified facts..."></textarea></div>
+      <div class="g1">
+        <label>Additional Context <span class="rnote">auto-filled after research</span></label>
+        <textarea id="o-ctx" placeholder="Click Research Executive first, or add your own context here..."></textarea>
+      </div>
       <div class="btns">
-        <button class="btn btn-outline" onclick="researchExecutive()">Research Executive <div class="spin" id="sp-research"></div></button>
+        <button class="btn btn-outline" onclick="researchExecutive()">Research Executive <div class="spin" id="sp-res"></div></button>
         <button class="btn btn-gold" onclick="generateOutreach()">Generate Message <div class="spin" id="sp3"></div></button>
       </div>
     </div>
-    <div class="ai-box" id="research-box" style="margin-top:0;">
+    <div class="ai-box" id="research-box">
       <span class="ai-label">Executive Research</span>
       <button class="copy-btn" onclick="copyText('research-ai')">Copy</button>
       <div class="ai-text" id="research-ai"></div>
     </div>
-    <div class="ai-box" id="out-box" style="margin-top:12px;">
+    <div class="ai-box" id="out-box">
       <span class="ai-label">Generated Outreach</span>
       <button class="copy-btn" onclick="copyText('out-ai')">Copy</button>
       <div class="ai-text" id="out-ai"></div>
@@ -265,9 +272,9 @@ textarea { resize:vertical; min-height:75px; }
     <div class="sec-d">Click a prospect card to advance their stage.</div>
     <div class="stats">
       <div class="stat"><div class="stat-n" id="st-total">0</div><div class="stat-l">Total</div></div>
-      <div class="stat"><div class="stat-n" id="st-hot">0</div><div class="stat-l">HOT (28+)</div></div>
-      <div class="stat"><div class="stat-n" id="st-strong">0</div><div class="stat-l">Strong (24–27)</div></div>
-      <div class="stat"><div class="stat-n" id="st-qual">0</div><div class="stat-l">Qualified (20–23)</div></div>
+      <div class="stat"><div class="stat-n" id="st-hot">0</div><div class="stat-l">HOT 28+</div></div>
+      <div class="stat"><div class="stat-n" id="st-strong">0</div><div class="stat-l">Strong 24-27</div></div>
+      <div class="stat"><div class="stat-n" id="st-qual">0</div><div class="stat-l">Qualified 20-23</div></div>
     </div>
     <div class="pipe">
       <div class="pipe-col">
@@ -283,7 +290,7 @@ textarea { resize:vertical; min-height:75px; }
         <div id="col-booked"></div>
       </div>
     </div>
-    <div class="empty" id="pipe-empty">No prospects yet. Score a prospect and add them to the pipeline.</div>
+    <div class="empty-msg" id="pipe-empty">No prospects yet. Score a prospect and add them to the pipeline.</div>
   </div>
 
   <!-- CALL SCRIPT -->
@@ -294,15 +301,15 @@ textarea { resize:vertical; min-height:75px; }
     <div class="card">
       <div class="g2">
         <div><label>Executive Name</label><input type="text" id="c-name" placeholder="e.g. David Williams"></div>
-        <div><label>Company & Role</label><input type="text" id="c-title" placeholder="e.g. CFO, NCR Corporation"></div>
+        <div><label>Company and Role</label><input type="text" id="c-title" placeholder="e.g. CFO, NCR Corporation"></div>
       </div>
       <div class="g2">
         <div><label>Call Type</label>
           <select id="c-type">
-            <option value="cold">Cold call — first touch</option>
-            <option value="followup">Follow-up — already emailed</option>
+            <option value="cold">Cold call - first touch</option>
+            <option value="followup">Follow-up - already emailed</option>
             <option value="referral">Referral introduction</option>
-            <option value="close">Trial close — ready to book</option>
+            <option value="close">Trial close - ready to book</option>
           </select>
         </div>
         <div><label>Anticipated Objection</label>
@@ -311,8 +318,8 @@ textarea { resize:vertical; min-height:75px; }
             <option value="price">Too expensive</option>
             <option value="uber">Already use Uber Black</option>
             <option value="have">Already have a car service</option>
-            <option value="need">Don't travel enough</option>
-            <option value="contract">Don't want a contract</option>
+            <option value="need">Do not travel enough</option>
+            <option value="contract">Do not want a contract</option>
           </select>
         </div>
       </div>
@@ -321,7 +328,7 @@ textarea { resize:vertical; min-height:75px; }
         <button class="btn btn-gold" onclick="generateScript()">Build Call Script <div class="spin" id="sp4"></div></button>
       </div>
     </div>
-    <div class="ai-box" id="script-box" style="margin-top:0;">
+    <div class="ai-box" id="script-box">
       <span class="ai-label">Call Script</span>
       <button class="copy-btn" onclick="copyText('script-ai')">Copy</button>
       <div class="ai-text" id="script-ai"></div>
@@ -331,56 +338,45 @@ textarea { resize:vertical; min-height:75px; }
   <!-- APOLLO IMPORT -->
   <div class="panel" id="panel-import">
     <div class="sec-tag">Apollo Integration</div>
-    <div class="sec-h">Bulk Import & Score</div>
-    <div class="sec-d">Export your Apollo search as CSV and drop it here. The app scores everyone instantly and shows your HOT prospects at the top.</div>
-
+    <div class="sec-h">Bulk Import and Score</div>
+    <div class="sec-d">Export your Apollo search as CSV and drop it here. All prospects are scored instantly with HOT leads at the top.</div>
     <div class="card">
       <div class="sec-tag" style="margin-bottom:12px;">How to export from Apollo</div>
-      <div style="font-size:12px;color:var(--muted);line-height:2;">
-        1. In Apollo → People search → set your filters (CEO/CFO/COO + Atlanta + 1000+ employees)<br>
-        2. Check the box next to the first result to select all 25 visible<br>
-        3. Click <strong style="color:var(--text)">Export</strong> in the toolbar that appears → Export to CSV<br>
-        4. Drop the downloaded CSV file into the box below
+      <div style="font-size:12px;color:var(--muted);line-height:2.2;">
+        1. Apollo people search, set filters: CEO / CFO / COO plus Atlanta plus 1000+ employees<br>
+        2. Check the top checkbox to select all visible records<br>
+        3. Click Export in the toolbar, then Export to CSV<br>
+        4. Drop the downloaded CSV file in the box below
       </div>
     </div>
-
     <div class="card">
-      <div class="import-drop" id="drop-zone" onclick="document.getElementById('csv-input').click()" ondragover="event.preventDefault();this.classList.add('over')" ondragleave="this.classList.remove('over')" ondrop="handleDrop(event)">
-        <div class="import-drop-icon">📋</div>
-        <div class="import-drop-text">Drop Apollo CSV here or click to browse</div>
-        <div class="import-drop-sub">Accepts Apollo people export CSV</div>
+      <div class="import-drop" id="drop-zone"
+        onclick="document.getElementById('csv-file').click()"
+        ondragover="event.preventDefault();this.classList.add('over')"
+        ondragleave="this.classList.remove('over')"
+        ondrop="handleDrop(event)">
+        <div class="import-icon">📋</div>
+        <div class="import-text">Drop Apollo CSV here or click to browse</div>
+        <div class="import-sub">Accepts Apollo people export CSV</div>
       </div>
-      <input type="file" id="csv-input" accept=".csv" style="display:none" onchange="handleFile(this.files[0])">
+      <input type="file" id="csv-file" accept=".csv" style="display:none" onchange="handleFile(this.files[0])">
     </div>
-
     <div id="import-results" style="display:none;">
-      <div class="bulk-actions">
-        <div style="font-size:12px;color:var(--muted);" id="import-summary"></div>
-        <div class="bulk-filter">
-          <button class="filter-btn on" onclick="filterBulk('all',this)">All</button>
-          <button class="filter-btn" onclick="filterBulk('hot',this)">HOT Only</button>
-          <button class="filter-btn" onclick="filterBulk('strong',this)">Strong+</button>
-        </div>
-        <button class="btn btn-outline" onclick="addAllHot()" style="margin-left:auto;">Add HOT to Pipeline</button>
+      <div class="filter-row">
+        <div id="import-summary" style="font-size:12px;color:var(--muted);flex:1;"></div>
+        <button class="fbtn on" onclick="filterTable('all',this)">All</button>
+        <button class="fbtn" onclick="filterTable('hot',this)">HOT Only</button>
+        <button class="fbtn" onclick="filterTable('strong',this)">Strong Plus</button>
+        <button class="btn btn-outline" style="padding:6px 16px;font-size:9px;" onclick="addAllHot()">Add HOT to Pipeline</button>
       </div>
-      <div class="card" style="padding:0;overflow:hidden;">
+      <div class="card" style="padding:0;overflow:auto;">
         <table class="bulk-table">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Title</th>
-              <th>Company</th>
-              <th>Score</th>
-              <th>Tier</th>
-              <th>Action</th>
-            </tr>
-          </thead>
+          <thead><tr><th>Name</th><th>Title</th><th>Company</th><th>Score</th><th>Tier</th><th>Action</th></tr></thead>
           <tbody id="bulk-tbody"></tbody>
         </table>
       </div>
     </div>
   </div>
-
 
 </div>
 
@@ -389,13 +385,39 @@ textarea { resize:vertical; min-height:75px; }
 <script>
 var pipeline = JSON.parse(localStorage.getItem('ob-pipeline') || '[]');
 var currentP = null;
+var bulkData = [];
+var bulkFilter = 'all';
 
 function switchTab(name, el) {
-  document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
-  document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+  document.querySelectorAll('.panel').forEach(function(p) { p.classList.remove('active'); });
   el.classList.add('active');
   document.getElementById('panel-' + name).classList.add('active');
-  if (name === 'pipeline') renderPipeline();
+  if (name === 'pipeline') { renderPipeline(); }
+}
+
+function getTier(score) {
+  if (score >= 28) { return 'HOT'; }
+  if (score >= 24) { return 'STRONG'; }
+  if (score >= 20) { return 'QUALIFIED'; }
+  return 'LOW';
+}
+
+function getTierClass(score) {
+  if (score >= 28) { return 't-hot'; }
+  if (score >= 24) { return 't-strong'; }
+  if (score >= 20) { return 't-qual'; }
+  return 't-low';
+}
+
+function titleScore(title) {
+  var tl = (title || '').toLowerCase();
+  if (/\b(ceo|chief executive|president|chairman)\b/.test(tl)) { return 10; }
+  if (/\b(cfo|coo|cto|ciso|cmo|chief)\b/.test(tl)) { return 8; }
+  if (/\b(evp|svp|executive vice|senior vice)\b/.test(tl)) { return 7; }
+  if (/\b(vp|vice president|managing director|managing partner)\b/.test(tl)) { return 6; }
+  if (/\b(director|partner|principal)\b/.test(tl)) { return 4; }
+  return 2;
 }
 
 function scoreProspect() {
@@ -404,86 +426,100 @@ function scoreProspect() {
   var company = document.getElementById('p-company').value.trim();
   if (!name || !title || !company) { notify('Please fill in Name, Title, and Company'); return; }
 
-  var tl = title.toLowerCase();
   var hq = document.getElementById('p-hq').value;
   var travel = document.getElementById('p-travel').value;
   var industry = document.getElementById('p-industry').value;
   var source = document.getElementById('p-source').value;
-
   var score = 0;
   var bd = [];
 
-  if (/\b(ceo|chief executive|president|chairman)\b/.test(tl)) { score+=10; bd.push('C-Suite CEO/President: +10'); }
-  else if (/\b(cfo|coo|cto|ciso|cmo|chief)\b/.test(tl)) { score+=8; bd.push('C-Suite Other: +8'); }
-  else if (/\b(evp|svp|executive vice|senior vice)\b/.test(tl)) { score+=7; bd.push('EVP/SVP: +7'); }
-  else if (/\b(vp|vice president|managing director|managing partner)\b/.test(tl)) { score+=6; bd.push('VP/MD: +6'); }
-  else if (/\b(director|partner|principal)\b/.test(tl)) { score+=4; bd.push('Director/Partner: +4'); }
-  else { score+=2; bd.push('Manager/Other: +2'); }
+  var ts = titleScore(title);
+  score += ts;
+  var tl = title.toLowerCase();
+  if (/\b(ceo|chief executive|president|chairman)\b/.test(tl)) { bd.push('C-Suite CEO: +' + ts); }
+  else if (/\b(cfo|coo|cto|ciso|cmo|chief)\b/.test(tl)) { bd.push('C-Suite Other: +' + ts); }
+  else if (/\b(evp|svp|executive vice|senior vice)\b/.test(tl)) { bd.push('EVP/SVP: +' + ts); }
+  else if (/\b(vp|vice president|managing director|managing partner)\b/.test(tl)) { bd.push('VP/MD: +' + ts); }
+  else if (/\b(director|partner|principal)\b/.test(tl)) { bd.push('Director: +' + ts); }
+  else { bd.push('Manager: +' + ts); }
 
-  if (hq==='yes') { score+=8; bd.push('Atlanta HQ: +8'); }
-  else if (hq==='regional') { score+=5; bd.push('ATL Regional: +5'); }
-  else { score+=3; bd.push('Visiting/Remote: +3'); }
+  if (hq === 'yes') { score += 8; bd.push('Atlanta HQ: +8'); }
+  else if (hq === 'regional') { score += 5; bd.push('ATL Regional: +5'); }
+  else { score += 3; bd.push('Visiting: +3'); }
 
-  if (travel==='heavy') { score+=7; bd.push('Heavy Travel: +7'); }
-  else if (travel==='moderate') { score+=4; bd.push('Moderate Travel: +4'); }
-  else { score+=1; bd.push('Light Travel: +1'); }
+  if (travel === 'heavy') { score += 7; bd.push('Heavy Travel: +7'); }
+  else if (travel === 'moderate') { score += 4; bd.push('Moderate Travel: +4'); }
+  else { score += 1; bd.push('Light Travel: +1'); }
 
-  var premIndustry = ['Airline / Aviation','Financial Services / Banking','Private Equity / VC','Legal / Law Firm','Consulting'];
-  if (premIndustry.indexOf(industry) >= 0) { score+=5; bd.push('Premium Industry: +5'); }
-  else if (industry) { score+=3; bd.push('Fortune 500 Industry: +3'); }
+  var premIndustry = ['Airline / Aviation', 'Financial Services / Banking', 'Private Equity / VC', 'Legal / Law Firm', 'Consulting'];
+  if (premIndustry.indexOf(industry) >= 0) { score += 5; bd.push('Premium Industry: +5'); }
+  else if (industry) { score += 3; bd.push('Fortune 500: +3'); }
 
-  if (source==='referral') { score+=5; bd.push('Referral Source: +5'); }
-  else if (source==='event') { score+=3; bd.push('Event Source: +3'); }
-  else { score+=1; bd.push('Cold/Other: +1'); }
+  if (source === 'referral') { score += 5; bd.push('Referral: +5'); }
+  else if (source === 'event') { score += 3; bd.push('Event: +3'); }
+  else { score += 1; bd.push('Cold: +1'); }
 
-  currentP = { name:name, title:title, company:company, industry:industry, hq:hq, travel:travel, source:source, score:score, notes:document.getElementById('p-notes').value, stage:'identified', id:Date.now() };
+  currentP = { name: name, title: title, company: company, industry: industry, hq: hq, travel: travel, source: source, score: score, notes: document.getElementById('p-notes').value, stage: 'identified', id: Date.now() };
 
   document.getElementById('r-name').textContent = name;
   document.getElementById('r-sub').textContent = title + ' · ' + company;
   document.getElementById('score-num').textContent = score;
 
   var badge = document.getElementById('score-badge');
-  var tier = document.getElementById('score-tier');
+  var tierEl = document.getElementById('score-tier');
   badge.className = 'score-box';
-  if (score >= 28) { badge.classList.add('hot'); tier.textContent = 'HOT'; }
-  else if (score >= 24) { badge.classList.add('strong'); tier.textContent = 'STRONG'; }
-  else if (score >= 20) { badge.classList.add('qualified'); tier.textContent = 'QUALIFIED'; }
-  else { badge.classList.add('low'); tier.textContent = 'LOW'; }
+  if (score >= 28) { badge.classList.add('hot'); }
+  else if (score >= 24) { badge.classList.add('strong'); }
+  else if (score >= 20) { badge.classList.add('qualified'); }
+  else { badge.classList.add('low'); }
+  tierEl.textContent = getTier(score);
 
-  document.getElementById('breakdown').innerHTML = bd.map(function(b){ return '<span style="display:inline-block;margin-right:14px;">◆ ' + b + '</span>'; }).join('');
+  document.getElementById('breakdown').innerHTML = bd.map(function(b) {
+    return '<span style="display:inline-block;margin-right:14px;">&#9670; ' + b + '</span>';
+  }).join('');
   document.getElementById('score-card').style.display = 'block';
   document.getElementById('strat-box').classList.remove('show');
 }
 
-async function callAI(prompt, maxTokens) {
+async function callAI(lines, maxTokens) {
+  var prompt = lines.join('\n');
   var res = await fetch('/.netlify/functions/claude', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: 'claude-haiku-4-5',
+      model: 'claude-haiku-4-5-20251001',
       max_tokens: maxTokens || 1000,
       messages: [{ role: 'user', content: prompt }]
     })
   });
   var data = await res.json();
-  if (data.error) throw new Error(JSON.stringify(data.error));
-  if (!data.content || !data.content[0]) throw new Error('Response: ' + JSON.stringify(data).substring(0,300));
+  if (data.error) { throw new Error(JSON.stringify(data.error)); }
+  if (!data.content || !data.content[0]) { throw new Error('Bad response: ' + JSON.stringify(data).substring(0, 200)); }
   return data.content[0].text;
 }
 
 async function generateStrategy() {
-  if (!currentP) return;
+  if (!currentP) { return; }
   var sp = document.getElementById('sp2');
   var box = document.getElementById('strat-box');
   var out = document.getElementById('strat-ai');
   sp.classList.add('on');
   box.classList.remove('show');
-
-  var tier = currentP.score>=28?'HOT':currentP.score>=24?'STRONG':'QUALIFIED';
-  var prompt = 'You are a business development advisor for Odyssey Black VIP Transportation in Atlanta — a luxury black car service for Fortune 500 executives.\n\nProspect: ' + currentP.name + ', ' + currentP.title + ' at ' + currentP.company + '\nIndustry: ' + currentP.industry + ' | Atlanta: ' + currentP.hq + ' | Travel: ' + currentP.travel + ' | Source: ' + currentP.source + '\nScore: ' + currentP.score + '/40 (' + tier + ')\nNotes: ' + (currentP.notes || 'None') + '\n\nWrite a sharp acquisition strategy with these 5 sections:\n1. WHY THEY ARE A FIT\n2. APPROACH ANGLE\n3. BEST CHANNEL AND TIMING\n4. VALUE PROPOSITION\n5. FIRST MOVE TODAY\n\nBe specific and concise. Executive-level language.';
-
   try {
-    out.textContent = await callAI(prompt, 1000);
+    out.textContent = await callAI([
+      'You are a business development advisor for Odyssey Black VIP Transportation in Atlanta, a luxury black car service for Fortune 500 executives.',
+      'Prospect: ' + currentP.name + ', ' + currentP.title + ' at ' + currentP.company,
+      'Industry: ' + currentP.industry + ' | Atlanta: ' + currentP.hq + ' | Travel: ' + currentP.travel + ' | Source: ' + currentP.source,
+      'Score: ' + currentP.score + '/40 (' + getTier(currentP.score) + ')',
+      'Notes: ' + (currentP.notes || 'None'),
+      'Write a sharp acquisition strategy with these 5 sections:',
+      '1. WHY THEY ARE A FIT',
+      '2. APPROACH ANGLE',
+      '3. BEST CHANNEL AND TIMING',
+      '4. VALUE PROPOSITION',
+      '5. FIRST MOVE TODAY',
+      'Be specific and concise. Executive-level language.'
+    ], 1000);
     box.classList.add('show');
   } catch(e) {
     out.textContent = 'Error: ' + e.message;
@@ -496,39 +532,38 @@ async function researchExecutive() {
   var name = document.getElementById('o-name').value.trim();
   var title = document.getElementById('o-title').value.trim();
   if (!name || !title) { notify('Fill in name and title first'); return; }
-
-  var sp = document.getElementById('sp-research');
+  var sp = document.getElementById('sp-res');
   var box = document.getElementById('research-box');
   var out = document.getElementById('research-ai');
   sp.classList.add('on');
   box.classList.remove('show');
-
-  var prompt = 'You are a research assistant. Search your knowledge for current, verified facts about this executive for a business development team.
-
-Executive: ' + name + '
-Role: ' + title + '
-
-Provide ONLY verified facts you are confident about. If you are not sure about something, do NOT include it.
-
-Return a structured brief covering:
-1. CURRENT ROLE & COMPANY — confirmed current position, how long in role, company HQ location
-2. CAREER BACKGROUND — previous companies and roles (verified only)
-3. BUSINESS FOCUS — known priorities, recent initiatives, public statements or interviews
-4. TRAVEL INDICATORS — known travel patterns, office locations, frequent destinations
-5. OUTREACH HOOK — one specific, verified fact that makes a compelling connection to executive ground transportation needs
-
-IMPORTANT: Flag any fact you are less than 90% confident about with [VERIFY]. Never invent specifics like company names, earnings calls, or events. If you lack current verified data, say so clearly rather than guessing.';
-
   try {
-    var research = await callAI(prompt, 800);
+    var research = await callAI([
+      'You are a research assistant providing verified facts about an executive for a sales team.',
+      'Executive: ' + name + ', ' + title,
+      'Provide ONLY facts you are highly confident about.',
+      'Flag anything uncertain with the word VERIFY in brackets.',
+      'Never invent company names, events, quotes, or initiatives you are not sure about.',
+      'Cover these 5 sections:',
+      '1. CURRENT ROLE AND COMPANY: confirmed current position and company HQ location',
+      '2. CAREER BACKGROUND: previous verified roles and companies',
+      '3. BUSINESS FOCUS: known priorities or public statements',
+      '4. TRAVEL INDICATORS: known travel patterns or multiple office locations',
+      '5. OUTREACH HOOK: one specific verified fact connecting to executive ground transportation needs',
+      'If you lack verified current data on any section say so clearly rather than guessing.'
+    ], 800);
     out.textContent = research;
     box.classList.add('show');
-    // Auto-populate context field with the hook
-    var hookMatch = research.match(/OUTREACH HOOK[^:]*:(.*?)(?=\n[0-9]|\n[A-Z]|$)/s);
-    if (hookMatch) {
-      document.getElementById('o-ctx').value = hookMatch[1].trim();
+    var hookIdx = research.indexOf('OUTREACH HOOK');
+    if (hookIdx >= 0) {
+      var hookLine = research.substring(hookIdx + 13).replace(/^[:\s\-]+/, '').split('\n')[0].trim();
+      if (hookLine.length > 10) {
+        document.getElementById('o-ctx').value = hookLine;
+        notify('Research complete - context auto-filled');
+      }
+    } else {
+      notify('Research complete');
     }
-    notify('Research complete — context auto-filled');
   } catch(e) {
     out.textContent = 'Error: ' + e.message;
     box.classList.add('show');
@@ -540,23 +575,37 @@ async function generateOutreach() {
   var name = document.getElementById('o-name').value.trim();
   var title = document.getElementById('o-title').value.trim();
   if (!name || !title) { notify('Fill in name and title'); return; }
-
   var channel = document.getElementById('o-channel').value;
   var tone = document.getElementById('o-tone').value;
   var ctx = document.getElementById('o-ctx').value.trim();
+  var research = document.getElementById('research-ai').textContent.trim();
   var sp = document.getElementById('sp3');
   var box = document.getElementById('out-box');
   var out = document.getElementById('out-ai');
   sp.classList.add('on');
   box.classList.remove('show');
 
-  var chMap = {email:'a cold email',linkedin:'a LinkedIn DM (max 150 words)',referral:'a warm referral introduction email',event:'a post-event follow-up email',voicemail:'a 30-second voicemail script'};
-  var tMap = {luxury:'luxury and exclusivity positioning',peer:'executive peer-to-peer tone',concise:'ultra-concise and respectful of their time',warm:'warm and personal referral-based tone'};
-  var researchText = document.getElementById('research-ai').textContent;
-  var prompt = 'You write outreach for Odyssey Black VIP Transportation in Atlanta — premium black car service for Fortune 500 executives. Differentiators: reliability, discretion, professional chauffeurs, flight tracking, last-minute availability.\n\nWrite ' + chMap[channel] + ' for:\nName: ' + name + '\nRole: ' + title + '\nTone: ' + tMap[tone] + '\nVerified Research: ' + (researchText || 'None') + '\nAdditional Context: ' + (ctx || 'None') + '\n\nCRITICAL: Only reference facts from the Verified Research above. Do NOT invent specific details like company names, earnings calls, events, or initiatives that are not in the research. If research is limited, write a strong general executive travel email without fake specifics. Do not sound like a mass email. Reference specific pain points. Include a soft call to action.' + (channel==='email' ? ' Include a subject line.' : '');
+  var chLabels = { email: 'a cold email', linkedin: 'a LinkedIn DM under 150 words', referral: 'a warm referral introduction email', event: 'a post-event follow-up email', voicemail: 'a 30-second voicemail script' };
+  var tLabels = { luxury: 'luxury and exclusivity positioning', peer: 'executive peer-to-peer tone not salesy', concise: 'ultra-concise respectful of their time', warm: 'warm personal referral-based tone' };
+
+  var lines = [
+    'You write outreach for Odyssey Black VIP Transportation in Atlanta, premium black car service for Fortune 500 executives.',
+    'Differentiators: reliability, discretion, professional chauffeurs, flight tracking, last-minute availability.',
+    'Write ' + chLabels[channel] + ' for:',
+    'Name: ' + name,
+    'Role: ' + title,
+    'Tone: ' + tLabels[tone],
+    'Verified Research: ' + (research || 'None available'),
+    'Additional Context: ' + (ctx || 'None'),
+    'IMPORTANT: Only reference facts from the Verified Research above.',
+    'Do NOT invent specific details like company names, earnings calls, events, or initiatives not in the research.',
+    'If research is limited write a strong general executive travel email without fake specifics.',
+    'Do not sound like a mass email. Reference real pain points. Include a soft call to action.'
+  ];
+  if (channel === 'email') { lines.push('Include a compelling subject line.'); }
 
   try {
-    out.textContent = await callAI(prompt, 1000);
+    out.textContent = await callAI(lines, 1000);
     box.classList.add('show');
   } catch(e) {
     out.textContent = 'Error: ' + e.message;
@@ -569,7 +618,6 @@ async function generateScript() {
   var name = document.getElementById('c-name').value.trim();
   var title = document.getElementById('c-title').value.trim();
   if (!name || !title) { notify('Fill in name and role'); return; }
-
   var type = document.getElementById('c-type').value;
   var obj = document.getElementById('c-obj').value;
   var ctx = document.getElementById('c-ctx').value.trim();
@@ -578,11 +626,23 @@ async function generateScript() {
   var out = document.getElementById('script-ai');
   sp.classList.add('on');
   box.classList.remove('show');
-
-  var prompt = 'You are a sales coach for Odyssey Black VIP Transportation, Atlanta\'s premium executive black car service.\n\nExecutive: ' + name + ' — ' + title + '\nCall type: ' + type + '\nObjection: ' + obj + '\nContext: ' + (ctx || 'None') + '\n\nWrite a complete call script with:\n- OPENER\n- VALUE HOOK\n- DISCOVERY QUESTION\n- ' + (obj !== 'none' ? 'OBJECTION HANDLER for "' + obj + '"' : 'DIFFERENTIATOR vs rideshare') + '\n- CLOSE\n- VOICEMAIL VERSION\n\nSound like a peer not a salesperson. Under 3 minutes to read.';
-
+  var objSection = obj !== 'none' ? 'OBJECTION HANDLER: address the objection: ' + obj : 'DIFFERENTIATOR: what separates Odyssey Black from rideshare';
   try {
-    out.textContent = await callAI(prompt, 1200);
+    out.textContent = await callAI([
+      'You are a sales coach for Odyssey Black VIP Transportation, Atlanta premium executive black car service.',
+      'Executive: ' + name + ', ' + title,
+      'Call type: ' + type,
+      'Objection to handle: ' + obj,
+      'Context: ' + (ctx || 'None'),
+      'Write a complete call script with these labeled sections:',
+      'OPENER',
+      'VALUE HOOK tailored to their role',
+      'DISCOVERY QUESTION',
+      objSection,
+      'CLOSE',
+      'VOICEMAIL VERSION if they do not answer',
+      'Sound like a peer not a salesperson. Readable in under 3 minutes.'
+    ], 1200);
     box.classList.add('show');
   } catch(e) {
     out.textContent = 'Error: ' + e.message;
@@ -592,185 +652,163 @@ async function generateScript() {
 }
 
 function addToPipeline() {
-  if (!currentP) return;
-  if (pipeline.find(function(p){ return p.name===currentP.name && p.company===currentP.company; })) { notify('Already in pipeline'); return; }
+  if (!currentP) { return; }
+  if (pipeline.find(function(p) { return p.name === currentP.name && p.company === currentP.company; })) { notify('Already in pipeline'); return; }
   pipeline.push(Object.assign({}, currentP));
   localStorage.setItem('ob-pipeline', JSON.stringify(pipeline));
   notify(currentP.name + ' added to pipeline');
 }
 
 function renderPipeline() {
-  var cols = { identified:[], outreach:[], booked:[] };
-  pipeline.forEach(function(p){ if(cols[p.stage]) cols[p.stage].push(p); });
-  ['identified','outreach','booked'].forEach(function(stage){
+  var cols = { identified: [], outreach: [], booked: [] };
+  pipeline.forEach(function(p) { if (cols[p.stage]) { cols[p.stage].push(p); } });
+  ['identified', 'outreach', 'booked'].forEach(function(stage) {
     var el = document.getElementById('col-' + stage);
-    el.innerHTML = cols[stage].map(function(p){
-      var color = p.score>=28?'var(--gold)':p.score>=24?'#2ecc71':'#3498db';
-      var tier = p.score>=28?'HOT':p.score>=24?'STRONG':'QUALIFIED';
-      return '<div class="pipe-card" onclick="moveStage(' + p.id + ')"><div class="pipe-name">' + p.name + '</div><div class="pipe-co">' + p.title + ' · ' + p.company + '</div><div class="pipe-sc" style="color:' + color + '">' + p.score + ' — ' + tier + '</div></div>';
+    el.innerHTML = cols[stage].map(function(p) {
+      return '<div class="pipe-card" onclick="moveStage(' + p.id + ')">' +
+        '<div class="pipe-name">' + p.name + '</div>' +
+        '<div class="pipe-co">' + p.title + ' · ' + p.company + '</div>' +
+        '<div class="pipe-sc ' + getTierClass(p.score) + '">' + p.score + ' - ' + getTier(p.score) + '</div>' +
+        '</div>';
     }).join('');
     document.getElementById('cnt-' + stage).textContent = cols[stage].length;
   });
   document.getElementById('st-total').textContent = pipeline.length;
-  document.getElementById('st-hot').textContent = pipeline.filter(function(p){ return p.score>=28; }).length;
-  document.getElementById('st-strong').textContent = pipeline.filter(function(p){ return p.score>=24 && p.score<28; }).length;
-  document.getElementById('st-qual').textContent = pipeline.filter(function(p){ return p.score>=20 && p.score<24; }).length;
-  var empty = document.getElementById('pipe-empty');
-  empty.style.display = pipeline.length ? 'none' : 'block';
+  document.getElementById('st-hot').textContent = pipeline.filter(function(p) { return p.score >= 28; }).length;
+  document.getElementById('st-strong').textContent = pipeline.filter(function(p) { return p.score >= 24 && p.score < 28; }).length;
+  document.getElementById('st-qual').textContent = pipeline.filter(function(p) { return p.score >= 20 && p.score < 24; }).length;
+  document.getElementById('pipe-empty').style.display = pipeline.length ? 'none' : 'block';
 }
 
 function moveStage(id) {
-  var stages = ['identified','outreach','booked'];
-  var p = pipeline.find(function(x){ return x.id===id; });
-  if (!p) return;
-  p.stage = stages[(stages.indexOf(p.stage)+1) % stages.length];
+  var stages = ['identified', 'outreach', 'booked'];
+  var p = pipeline.find(function(x) { return x.id === id; });
+  if (!p) { return; }
+  p.stage = stages[(stages.indexOf(p.stage) + 1) % stages.length];
   localStorage.setItem('ob-pipeline', JSON.stringify(pipeline));
   renderPipeline();
   notify('Moved to ' + p.stage);
 }
 
 function clearProspect() {
-  ['p-name','p-title','p-company','p-notes'].forEach(function(id){ document.getElementById(id).value=''; });
+  ['p-name', 'p-title', 'p-company', 'p-notes'].forEach(function(id) { document.getElementById(id).value = ''; });
   document.getElementById('score-card').style.display = 'none';
   document.getElementById('strat-box').classList.remove('show');
   currentP = null;
 }
 
-function copyText(id) {
-  var text = document.getElementById(id).textContent;
-  navigator.clipboard.writeText(text).then(function(){ notify('Copied to clipboard'); });
-}
-
-var bulkProspects = [];
-var bulkFilter = 'all';
-
 function handleDrop(e) {
   e.preventDefault();
   document.getElementById('drop-zone').classList.remove('over');
   var file = e.dataTransfer.files[0];
-  if (file) handleFile(file);
+  if (file) { handleFile(file); }
 }
 
 function handleFile(file) {
   if (!file || !file.name.endsWith('.csv')) { notify('Please upload a CSV file'); return; }
   var reader = new FileReader();
-  reader.onload = function(e) { parseApolloCSV(e.target.result); };
+  reader.onload = function(e) { parseCSV(e.target.result); };
   reader.readAsText(file);
-}
-
-function parseApolloCSV(text) {
-  var lines = text.split('\n').filter(function(l){ return l.trim(); });
-  if (lines.length < 2) { notify('CSV appears empty'); return; }
-  
-  // Parse header - find column indexes
-  var headers = lines[0].split(',').map(function(h){ return h.replace(/"/g,'').trim().toLowerCase(); });
-  var nameIdx = headers.findIndex(function(h){ return h.includes('first') || h==='name'; });
-  var lastIdx = headers.findIndex(function(h){ return h.includes('last'); });
-  var titleIdx = headers.findIndex(function(h){ return h.includes('title') || h.includes('job'); });
-  var companyIdx = headers.findIndex(function(h){ return h.includes('company') || h.includes('account'); });
-  
-  // If no first/last split, try full name
-  if (nameIdx === -1) nameIdx = headers.findIndex(function(h){ return h.includes('name'); });
-
-  bulkProspects = [];
-  for (var i = 1; i < lines.length; i++) {
-    var cols = parseCSVLine(lines[i]);
-    if (cols.length < 2) continue;
-    
-    var firstName = nameIdx >= 0 ? cols[nameIdx] : '';
-    var lastName = lastIdx >= 0 ? cols[lastIdx] : '';
-    var fullName = (firstName + ' ' + lastName).trim();
-    if (!fullName) fullName = nameIdx >= 0 ? cols[nameIdx] : 'Unknown';
-    
-    var title = titleIdx >= 0 ? cols[titleIdx] : '';
-    var company = companyIdx >= 0 ? cols[companyIdx] : '';
-    
-    if (!fullName || fullName === 'Unknown') continue;
-    
-    var scored = bulkScore(fullName, title, company);
-    bulkProspects.push(scored);
-  }
-  
-  // Sort by score descending
-  bulkProspects.sort(function(a,b){ return b.score - a.score; });
-  renderBulkTable();
-  notify('Scored ' + bulkProspects.length + ' prospects from Apollo');
 }
 
 function parseCSVLine(line) {
   var result = [];
-  var current = '';
-  var inQuotes = false;
+  var cur = '';
+  var inQ = false;
   for (var i = 0; i < line.length; i++) {
     var ch = line[i];
-    if (ch === '"') { inQuotes = !inQuotes; }
-    else if (ch === ',' && !inQuotes) { result.push(current.trim()); current = ''; }
-    else { current += ch; }
+    if (ch === '"') { inQ = !inQ; }
+    else if (ch === ',' && !inQ) { result.push(cur.trim()); cur = ''; }
+    else { cur += ch; }
   }
-  result.push(current.trim());
+  result.push(cur.trim());
   return result;
 }
 
-function bulkScore(name, title, company) {
-  var tl = (title || '').toLowerCase();
-  var score = 0;
-  if (/\b(ceo|chief executive|president|chairman)\b/.test(tl)) score+=10;
-  else if (/\b(cfo|coo|cto|ciso|cmo|chief)\b/.test(tl)) score+=8;
-  else if (/\b(evp|svp|executive vice|senior vice)\b/.test(tl)) score+=7;
-  else if (/\b(vp|vice president|managing director|managing partner)\b/.test(tl)) score+=6;
-  else if (/\b(director|partner|principal)\b/.test(tl)) score+=4;
-  else score+=2;
-  // Default Atlanta HQ assumption since we filtered for Atlanta in Apollo
-  score+=8;
-  // Default heavy travel for C-suite/VP
-  if (score >= 14) score+=7; else score+=4;
-  // Apollo source
-  score+=1;
-  return { name:name, title:title, company:company, score:score, id:Date.now()+Math.random(), stage:'identified', hq:'yes', travel:'heavy', source:'linkedin', industry:'', notes:'' };
+function parseCSV(text) {
+  var lines = text.split('\n').filter(function(l) { return l.trim(); });
+  if (lines.length < 2) { notify('CSV appears empty'); return; }
+  var headers = lines[0].split(',').map(function(h) { return h.replace(/"/g, '').trim().toLowerCase(); });
+  var firstIdx = -1, lastIdx = -1, nameIdx = -1, titleIdx = -1, companyIdx = -1;
+  headers.forEach(function(h, i) {
+    if (h === 'first name' || h === 'firstname') { firstIdx = i; }
+    else if (h === 'last name' || h === 'lastname') { lastIdx = i; }
+    else if (h === 'name' || h === 'full name') { nameIdx = i; }
+    if (h.includes('title') || h === 'job title') { titleIdx = i; }
+    if (h === 'company' || h === 'company name' || h === 'account name') { companyIdx = i; }
+  });
+  if (firstIdx === -1 && nameIdx === -1) {
+    headers.forEach(function(h, i) {
+      if (h.includes('first') && firstIdx === -1) { firstIdx = i; }
+      if (h.includes('last') && !h.includes('latest') && lastIdx === -1) { lastIdx = i; }
+      if (h.includes('name') && nameIdx === -1) { nameIdx = i; }
+      if (h.includes('title') && titleIdx === -1) { titleIdx = i; }
+      if ((h.includes('company') || h.includes('account') || h.includes('organization')) && companyIdx === -1) { companyIdx = i; }
+    });
+  }
+  bulkData = [];
+  for (var i = 1; i < lines.length; i++) {
+    var cols = parseCSVLine(lines[i]);
+    var fullName = '';
+    if (firstIdx >= 0 && lastIdx >= 0) {
+      fullName = ((cols[firstIdx] || '') + ' ' + (cols[lastIdx] || '')).trim();
+    } else if (nameIdx >= 0) {
+      fullName = (cols[nameIdx] || '').replace(/"/g, '').trim();
+    }
+    if (!fullName || fullName.length < 2) { continue; }
+    var title = titleIdx >= 0 ? (cols[titleIdx] || '').replace(/"/g, '').trim() : '';
+    var company = companyIdx >= 0 ? (cols[companyIdx] || '').replace(/"/g, '').trim() : '';
+    var ts = titleScore(title);
+    var total = ts + 8 + 7 + 1;
+    bulkData.push({ name: fullName, title: title, company: company, score: total, id: Date.now() + Math.random(), stage: 'identified', hq: 'yes', travel: 'heavy', source: 'linkedin', industry: '', notes: '' });
+  }
+  bulkData.sort(function(a, b) { return b.score - a.score; });
+  renderBulkTable();
+  notify('Scored ' + bulkData.length + ' prospects');
 }
 
 function renderBulkTable() {
-  var results = document.getElementById('import-results');
-  var tbody = document.getElementById('bulk-tbody');
-  var summary = document.getElementById('import-summary');
-  results.style.display = 'block';
-  
-  var hot = bulkProspects.filter(function(p){ return p.score>=28; }).length;
-  var strong = bulkProspects.filter(function(p){ return p.score>=24&&p.score<28; }).length;
-  summary.textContent = bulkProspects.length + ' prospects scored — ' + hot + ' HOT, ' + strong + ' Strong';
-  
-  var filtered = bulkProspects;
-  if (bulkFilter === 'hot') filtered = bulkProspects.filter(function(p){ return p.score>=28; });
-  if (bulkFilter === 'strong') filtered = bulkProspects.filter(function(p){ return p.score>=24; });
-  
-  tbody.innerHTML = filtered.map(function(p){
-    var tierClass = p.score>=28?'tier-hot':p.score>=24?'tier-strong':p.score>=20?'tier-qualified':'tier-low';
-    var tierText = p.score>=28?'🔥 HOT':p.score>=24?'✓ STRONG':p.score>=20?'QUALIFIED':'LOW';
-    return '<tr><td style="font-family:serif;font-size:15px;">' + p.name + '</td><td style="color:var(--muted)">' + (p.title||'—') + '</td><td>' + (p.company||'—') + '</td><td style="font-weight:600;color:var(--gold)">' + p.score + '</td><td class="' + tierClass + '">' + tierText + '</td><td><button class="btn btn-ghost" style="padding:5px 12px;font-size:9px;" onclick="addBulkToPipeline(' + JSON.stringify(p.id) + ')">Add</button></td></tr>';
+  document.getElementById('import-results').style.display = 'block';
+  var hot = bulkData.filter(function(p) { return p.score >= 28; }).length;
+  var strong = bulkData.filter(function(p) { return p.score >= 24 && p.score < 28; }).length;
+  document.getElementById('import-summary').textContent = bulkData.length + ' prospects scored - ' + hot + ' HOT, ' + strong + ' Strong';
+  var filtered = bulkData;
+  if (bulkFilter === 'hot') { filtered = bulkData.filter(function(p) { return p.score >= 28; }); }
+  if (bulkFilter === 'strong') { filtered = bulkData.filter(function(p) { return p.score >= 24; }); }
+  document.getElementById('bulk-tbody').innerHTML = filtered.map(function(p) {
+    var safeId = String(p.id).replace('.', '_');
+    return '<tr>' +
+      '<td style="font-weight:500;">' + p.name + '</td>' +
+      '<td style="color:var(--muted);font-size:11px;">' + (p.title || '') + '</td>' +
+      '<td style="font-size:12px;">' + (p.company || '') + '</td>' +
+      '<td style="font-weight:600;color:var(--gold);">' + p.score + '</td>' +
+      '<td class="' + getTierClass(p.score) + '">' + getTier(p.score) + '</td>' +
+      '<td><button class="btn btn-ghost" style="padding:5px 12px;font-size:9px;" onclick="addBulkOne(\'' + safeId + '\')">Add</button></td>' +
+      '</tr>';
   }).join('');
 }
 
-function filterBulk(f, el) {
+function filterTable(f, el) {
   bulkFilter = f;
-  document.querySelectorAll('.filter-btn').forEach(function(b){ b.classList.remove('on'); });
+  document.querySelectorAll('.fbtn').forEach(function(b) { b.classList.remove('on'); });
   el.classList.add('on');
   renderBulkTable();
 }
 
-function addBulkToPipeline(id) {
-  var p = bulkProspects.find(function(x){ return x.id===id; });
-  if (!p) return;
-  if (pipeline.find(function(x){ return x.name===p.name && x.company===p.company; })) { notify('Already in pipeline'); return; }
+function addBulkOne(safeId) {
+  var p = bulkData.find(function(x) { return String(x.id).replace('.', '_') === safeId; });
+  if (!p) { return; }
+  if (pipeline.find(function(x) { return x.name === p.name && x.company === p.company; })) { notify('Already in pipeline'); return; }
   pipeline.push(Object.assign({}, p));
   localStorage.setItem('ob-pipeline', JSON.stringify(pipeline));
   notify(p.name + ' added to pipeline');
 }
 
 function addAllHot() {
-  var hot = bulkProspects.filter(function(p){ return p.score>=28; });
+  var hot = bulkData.filter(function(p) { return p.score >= 28; });
   var added = 0;
-  hot.forEach(function(p){
-    if (!pipeline.find(function(x){ return x.name===p.name && x.company===p.company; })) {
+  hot.forEach(function(p) {
+    if (!pipeline.find(function(x) { return x.name === p.name && x.company === p.company; })) {
       pipeline.push(Object.assign({}, p));
       added++;
     }
@@ -779,11 +817,16 @@ function addAllHot() {
   notify('Added ' + added + ' HOT prospects to pipeline');
 }
 
+function copyText(id) {
+  var text = document.getElementById(id).textContent;
+  navigator.clipboard.writeText(text).then(function() { notify('Copied to clipboard'); });
+}
+
 function notify(msg) {
   var el = document.getElementById('notif');
   el.textContent = msg;
   el.classList.add('show');
-  setTimeout(function(){ el.classList.remove('show'); }, 2500);
+  setTimeout(function() { el.classList.remove('show'); }, 2500);
 }
 </script>
 </body>
