@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Odyssey Black | Executive Acquisition</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #080808;
+    --deep: #0d0d0d;
+    --card: #111111;
+    --border: #1e1e1e;
+    --gold: #c9a84c;
+    --gold-light: #e2c47a;
+    --gold-dim: rgba(201,168,76,0.15);
+    --text: #e8e0d0;
+    --muted: #7a7060;
+    --danger: #c0392b;
+    --success: #2ecc71;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--black);
+    color: var(--text);
+    font-family: 'Montserrat', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Background texture */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: 
+      radial-gradient(ellipse 80% 50% at 50% -20%, rgba(201,168,76,0.07) 0%, transparent 60%),
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  header {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 40px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(8,8,8,0.95);
+    backdrop-filter: blur(12px);
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .logo-icon {
+    width: 36px;
+    height: 36px;
+    background: var(--gold);
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: var(--black);
+    font-weight: 700;
+  }
+
+  .logo-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 500;
+    letter-spacing: 3px;
+    color: var(--gold-light);
+    text-transform: uppercase;
+  }
+
+  .logo-sub {
+    font-size: 9px;
+    letter-spacing: 4px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  .header-badge {
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--gold);
+    border: 1px solid var(--gold-dim);
+    padding: 5px 12px;
+    text-transform: uppercase;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 40px;
+  }
+
+  .tab {
+    padding: 14px 28px;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s;
+    background: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    font-family: 'Montserrat', sans-serif;
+  }
+
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+  /* Panels */
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* Section title */
+  .section-label {
+    font-size: 9px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 32px;
+    font-weight: 300;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .section-desc {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 32px;
+    letter-spacing: 0.5px;
+  }
+
+  /* Cards */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 28px;
+    margin-bottom: 20px;
+  }
+
+  .card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  /* Form elements */
+  .field-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .field-group.single { grid-template-columns: 1fr; }
+  .field-group.triple { grid-template-columns: 1fr 1fr 1fr; }
+
+  label {
+    display: block;
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  input, select, textarea {
+    width: 100%;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 12px 14px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--gold);
+  }
+
+  select option { background: #111; }
+
+  textarea { resize: vertical; min-height: 80px; }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 13px 28px;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-family: 'Montserrat', sans-serif;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+    font-weight: 600;
+  }
+
+  .btn-gold {
+    background: var(--gold);
+    color: var(--black);
+  }
+
+  .btn-gold:hover { background: var(--gold-light); }
+
+  .btn-outline {
+    background: transparent;
+    border: 1px solid var(--gold);
+    color: var(--gold);
+  }
+
+  .btn-outline:hover { background: var(--gold-dim); }
+
+  .btn-ghost {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+  }
+
+  .btn-ghost:hover { border-color: var(--text); color: var(--text); }
+
+  .btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  /* Score badge */
+  .score-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    font-size: 18px;
+    font-weight: 700;
+    font-family: 'Cormorant Garamond', serif;
+  }
+
+  .score-hot { background: rgba(201,168,76,0.2); color: var(--gold); border: 1px solid var(--gold); }
+  .score-strong { background: rgba(46,204,113,0.1); color: #2ecc71; border: 1px solid rgba(46,204,113,0.3); }
+  .score-qualified { background: rgba(52,152,219,0.1); color: #3498db; border: 1px solid rgba(52,152,219,0.3); }
+  .score-low { background: rgba(122,112,96,0.1); color: var(--muted); border: 1px solid var(--border); }
+
+  .tier-label {
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  /* AI Output */
+  .ai-output {
+    background: rgba(201,168,76,0.04);
+    border: 1px solid rgba(201,168,76,0.2);
+    padding: 24px;
+    margin-top: 20px;
+    font-size: 13px;
+    line-height: 1.8;
+    color: var(--text);
+    white-space: pre-wrap;
+    display: none;
+    position: relative;
+  }
+
+  .ai-output.visible { display: block; }
+
+  .ai-output-label {
+    position: absolute;
+    top: -9px;
+    left: 20px;
+    background: var(--black);
+    padding: 0 8px;
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+
+  /* Spinner */
+  .spinner {
+    display: none;
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(201,168,76,0.2);
+    border-top-color: var(--gold);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+
+  .spinner.visible { display: inline-block; }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Target list */
+  .target-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 20px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+
+  .target-item:hover { border-color: var(--gold); }
+
+  .target-info { flex: 1; }
+
+  .target-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .target-sub {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 3px;
+    letter-spacing: 0.5px;
+  }
+
+  .target-tags {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+  }
+
+  .tag {
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 3px 9px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+  }
+
+  .tag-gold { border-color: rgba(201,168,76,0.4); color: var(--gold); }
+
+  /* Divider */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 32px 0;
+  }
+
+  /* Copy button */
+  .copy-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 5px 12px;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    font-family: 'Montserrat', sans-serif;
+    transition: all 0.2s;
+  }
+
+  .copy-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+  /* Stat row */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 20px;
+    text-align: center;
+  }
+
+  .stat-number {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 36px;
+    font-weight: 300;
+    color: var(--gold);
+  }
+
+  .stat-label {
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  /* Prospect pipeline */
+  .pipeline {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+
+  .pipeline-col {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 16px;
+  }
+
+  .pipeline-title {
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .pipeline-count {
+    background: var(--gold-dim);
+    color: var(--gold);
+    font-size: 10px;
+    padding: 2px 8px;
+  }
+
+  .pipeline-card {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    padding: 12px;
+    margin-bottom: 8px;
+    font-size: 12px;
+  }
+
+  .pipeline-card-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 15px;
+    margin-bottom: 4px;
+  }
+
+  .pipeline-card-co {
+    font-size: 10px;
+    color: var(--muted);
+  }
+
+  /* Fade in animation */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .fade-in { animation: fadeIn 0.4s ease forwards; }
+
+  /* Responsive */
+  @media (max-width: 700px) {
+    header { padding: 16px 20px; }
+    .container { padding: 24px 16px 60px; }
+    .field-group { grid-template-columns: 1fr; }
+    .field-group.triple { grid-template-columns: 1fr; }
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+    .pipeline { grid-template-columns: 1fr; }
+    .tabs { overflow-x: auto; }
+  }
+
+  /* Notification */
+  .notif {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--card);
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    padding: 12px 20px;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    z-index: 1000;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s;
+  }
+
+  .notif.show { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">OB</div>
+    <div>
+      <div class="logo-text">Odyssey Black</div>
+      <div class="logo-sub">Executive Acquisition Suite</div>
+    </div>
+  </div>
+  <div class="header-badge">Atlanta · Premium Ground</div>
+</header>
+
+<div class="container">
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('prospect')">Prospect Builder</button>
+    <button class="tab" onclick="switchTab('outreach')">AI Outreach</button>
+    <button class="tab" onclick="switchTab('pipeline')">Pipeline</button>
+    <button class="tab" onclick="switchTab('script')">Call Script</button>
+  </div>
+
+  <!-- PANEL: PROSPECT BUILDER -->
+  <div class="panel active" id="panel-prospect">
+    <div class="section-label">Step 01</div>
+    <div class="section-title">Score & Qualify a Prospect</div>
+    <div class="section-desc">Enter executive details to calculate their OD Black acquisition score and generate your approach strategy.</div>
+
+    <div class="card">
+      <div class="field-group">
+        <div>
+          <label>Executive Name</label>
+          <input type="text" id="exec-name" placeholder="e.g. Marcus Johnson">
+        </div>
+        <div>
+          <label>Title / Role</label>
+          <input type="text" id="exec-title" placeholder="e.g. Chief Operations Officer">
+        </div>
+      </div>
+      <div class="field-group">
+        <div>
+          <label>Company</label>
+          <input type="text" id="exec-company" placeholder="e.g. Delta Air Lines">
+        </div>
+        <div>
+          <label>Industry</label>
+          <select id="exec-industry">
+            <option value="">Select industry...</option>
+            <option>Airline / Aviation</option>
+            <option>Financial Services / Banking</option>
+            <option>Technology</option>
+            <option>Healthcare / Pharma</option>
+            <option>Real Estate / Development</option>
+            <option>Legal / Law Firm</option>
+            <option>Private Equity / VC</option>
+            <option>Consulting</option>
+            <option>Energy / Utilities</option>
+            <option>Entertainment / Media</option>
+            <option>Manufacturing / Logistics</option>
+            <option>Other Fortune 500</option>
+          </select>
+        </div>
+      </div>
+      <div class="field-group triple">
+        <div>
+          <label>Company HQ in Atlanta?</label>
+          <select id="exec-hq">
+            <option value="yes">Yes — headquartered here</option>
+            <option value="regional">Regional / major office</option>
+            <option value="no">Visiting / remote</option>
+          </select>
+        </div>
+        <div>
+          <label>Travel Frequency</label>
+          <select id="exec-travel">
+            <option value="heavy">Heavy (weekly flights)</option>
+            <option value="moderate">Moderate (2–3x/month)</option>
+            <option value="light">Light (occasional)</option>
+          </select>
+        </div>
+        <div>
+          <label>Estimated Lead Source</label>
+          <select id="exec-source">
+            <option value="linkedin">LinkedIn</option>
+            <option value="referral">Referral</option>
+            <option value="event">Event / Conference</option>
+            <option value="cold">Cold Outreach</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="field-group single">
+        <div>
+          <label>Notes (optional — any intel, context, mutual connections)</label>
+          <textarea id="exec-notes" placeholder="e.g. Seen at ATL airport frequently, uses rideshare, connected via John Smith at Deloitte..."></textarea>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:12px; margin-top:8px; align-items:center;">
+        <button class="btn btn-gold" onclick="scoreProspect()">
+          <span>Calculate Score</span>
+          <div class="spinner" id="score-spinner"></div>
+        </button>
+        <button class="btn btn-ghost" onclick="clearForm()">Clear</button>
+      </div>
+    </div>
+
+    <div id="score-result" style="display:none;" class="card fade-in">
+      <div class="card-header">
+        <div>
+          <div class="section-label">Acquisition Score</div>
+          <div id="result-name" style="font-family:'Cormorant Garamond',serif; font-size:24px; font-weight:500;"></div>
+          <div id="result-co" style="font-size:12px; color:var(--muted); margin-top:4px;"></div>
+        </div>
+        <div style="text-align:center;">
+          <div class="score-badge" id="score-badge">--</div>
+          <div class="tier-label" id="tier-label" style="color:var(--muted);"></div>
+        </div>
+      </div>
+
+      <div id="score-breakdown" style="font-size:12px; color:var(--muted); line-height:2;"></div>
+
+      <div class="divider"></div>
+
+      <div style="display:flex; gap:12px; flex-wrap:wrap;">
+        <button class="btn btn-gold" onclick="generateStrategy()">
+          Generate Approach Strategy
+          <div class="spinner" id="strategy-spinner"></div>
+        </button>
+        <button class="btn btn-outline" onclick="saveToPipeline()">Add to Pipeline</button>
+      </div>
+
+      <div class="ai-output" id="strategy-output">
+        <span class="ai-output-label">AI Strategy</span>
+        <button class="copy-btn" onclick="copyOutput('strategy-output')">Copy</button>
+        <div id="strategy-text"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PANEL: OUTREACH -->
+  <div class="panel" id="panel-outreach">
+    <div class="section-label">Step 02</div>
+    <div class="section-title">AI-Powered Outreach</div>
+    <div class="section-desc">Generate personalized emails, LinkedIn messages, or event follow-ups for any executive target.</div>
+
+    <div class="card">
+      <div class="field-group">
+        <div>
+          <label>Executive Name</label>
+          <input type="text" id="out-name" placeholder="e.g. Sarah Chen">
+        </div>
+        <div>
+          <label>Title & Company</label>
+          <input type="text" id="out-title" placeholder="e.g. VP of Operations, Coca-Cola">
+        </div>
+      </div>
+      <div class="field-group">
+        <div>
+          <label>Channel</label>
+          <select id="out-channel">
+            <option value="email">Email (cold)</option>
+            <option value="linkedin">LinkedIn DM</option>
+            <option value="referral-email">Referral Introduction Email</option>
+            <option value="event-followup">Post-Event Follow-Up</option>
+            <option value="voicemail">Voicemail Script</option>
+          </select>
+        </div>
+        <div>
+          <label>Tone</label>
+          <select id="out-tone">
+            <option value="luxury">Luxury & Exclusive</option>
+            <option value="executive">Executive Peer</option>
+            <option value="concise">Concise & Respectful</option>
+            <option value="warm">Warm & Referral-Based</option>
+          </select>
+        </div>
+      </div>
+      <div class="field-group single">
+        <div>
+          <label>Context / Hook (what do you know about them or their needs?)</label>
+          <textarea id="out-context" placeholder="e.g. Traveling to NYC weekly, currently uses Uber Black, attends the ATL CEO Summit..."></textarea>
+        </div>
+      </div>
+
+      <button class="btn btn-gold" onclick="generateOutreach()">
+        Generate Message
+        <div class="spinner" id="out-spinner"></div>
+      </button>
+    </div>
+
+    <div class="ai-output" id="outreach-output" style="margin-top:0;">
+      <span class="ai-output-label">Generated Outreach</span>
+      <button class="copy-btn" onclick="copyOutput('outreach-output')">Copy</button>
+      <div id="outreach-text"></div>
+    </div>
+  </div>
+
+  <!-- PANEL: PIPELINE -->
+  <div class="panel" id="panel-pipeline">
+    <div class="section-label">Your Prospects</div>
+    <div class="section-title">Acquisition Pipeline</div>
+    <div class="section-desc">Saved prospects organized by stage. Click any prospect to generate outreach.</div>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-number" id="stat-total">0</div>
+        <div class="stat-label">Total Prospects</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="stat-hot">0</div>
+        <div class="stat-label">HOT (28+)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="stat-strong">0</div>
+        <div class="stat-label">Strong (24–27)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="stat-qualified">0</div>
+        <div class="stat-label">Qualified (20–23)</div>
+      </div>
+    </div>
+
+    <div class="pipeline" id="pipeline-board">
+      <div class="pipeline-col">
+        <div class="pipeline-title">
+          Identified
+          <span class="pipeline-count" id="count-identified">0</span>
+        </div>
+        <div id="col-identified"></div>
+      </div>
+      <div class="pipeline-col">
+        <div class="pipeline-title">
+          Outreach Sent
+          <span class="pipeline-count" id="count-outreach">0</span>
+        </div>
+        <div id="col-outreach"></div>
+      </div>
+      <div class="pipeline-col">
+        <div class="pipeline-title">
+          Engaged / Booked
+          <span class="pipeline-count" id="count-booked">0</span>
+        </div>
+        <div id="col-booked"></div>
+      </div>
+    </div>
+
+    <div style="margin-top:24px; text-align:center; color:var(--muted); font-size:12px;" id="pipeline-empty">
+      No prospects yet. Score a prospect and add them to the pipeline.
+    </div>
+  </div>
+
+  <!-- PANEL: CALL SCRIPT -->
+  <div class="panel" id="panel-script">
+    <div class="section-label">Live Conversations</div>
+    <div class="section-title">Executive Call Script Builder</div>
+    <div class="section-desc">Generate a custom phone or in-person script tailored to the executive's profile and objections.</div>
+
+    <div class="card">
+      <div class="field-group">
+        <div>
+          <label>Executive Name</label>
+          <input type="text" id="cs-name" placeholder="e.g. David Williams">
+        </div>
+        <div>
+          <label>Company & Role</label>
+          <input type="text" id="cs-title" placeholder="e.g. CFO, NCR Corporation">
+        </div>
+      </div>
+      <div class="field-group">
+        <div>
+          <label>Call Type</label>
+          <select id="cs-type">
+            <option value="cold-call">Cold Call — first touch</option>
+            <option value="followup">Follow-Up — already emailed</option>
+            <option value="referral">Referral Introduction</option>
+            <option value="objection">Objection Handling</option>
+            <option value="close">Trial Close — ready to book</option>
+          </select>
+        </div>
+        <div>
+          <label>Anticipated Objection</label>
+          <select id="cs-objection">
+            <option value="none">None / unknown</option>
+            <option value="price">Too expensive</option>
+            <option value="have-service">Already have a car service</option>
+            <option value="use-uber">Use Uber Black / rideshare</option>
+            <option value="no-need">Don't travel enough to need it</option>
+            <option value="contract">Don't want a contract</option>
+          </select>
+        </div>
+      </div>
+      <div class="field-group single">
+        <div>
+          <label>Any context about this prospect</label>
+          <textarea id="cs-context" placeholder="e.g. Referred by John Doe, travels ATL-NYC weekly, previously used competitor service..."></textarea>
+        </div>
+      </div>
+
+      <button class="btn btn-gold" onclick="generateScript()">
+        Build Call Script
+        <div class="spinner" id="cs-spinner"></div>
+      </button>
+    </div>
+
+    <div class="ai-output" id="script-output" style="margin-top:0;">
+      <span class="ai-output-label">Call Script</span>
+      <button class="copy-btn" onclick="copyOutput('script-output')">Copy</button>
+      <div id="script-text"></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="notif" id="notif"></div>
+
+<script>
+// ─── State ───────────────────────────────────────────────
+let pipeline = JSON.parse(localStorage.getItem('ob-pipeline') || '[]');
+let currentProspect = null;
+
+// ─── Tab switching ────────────────────────────────────────
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  event.target.classList.add('active');
+  if (name === 'pipeline') renderPipeline();
+}
+
+// ─── Score Calculation ────────────────────────────────────
+function scoreProspect() {
+  const name = document.getElementById('exec-name').value.trim();
+  const title = document.getElementById('exec-title').value.trim();
+  const company = document.getElementById('exec-company').value.trim();
+  if (!name || !title || !company) { notify('Please fill in Name, Title, and Company'); return; }
+
+  const titleLower = title.toLowerCase();
+  const hq = document.getElementById('exec-hq').value;
+  const travel = document.getElementById('exec-travel').value;
+  const industry = document.getElementById('exec-industry').value;
+  const source = document.getElementById('exec-source').value;
+
+  let score = 0;
+  let breakdown = [];
+
+  // Title scoring
+  if (/\b(ceo|chief executive|president|chairman)\b/.test(titleLower)) { score += 10; breakdown.push('C-Suite (CEO/President): +10'); }
+  else if (/\b(cfo|coo|cto|ciso|cmo|chief)\b/.test(titleLower)) { score += 8; breakdown.push('C-Suite (Other): +8'); }
+  else if (/\b(evp|svp|executive vice|senior vice)\b/.test(titleLower)) { score += 7; breakdown.push('EVP/SVP: +7'); }
+  else if (/\b(vp|vice president|managing director|managing partner)\b/.test(titleLower)) { score += 6; breakdown.push('VP/MD: +6'); }
+  else if (/\b(director|partner|principal)\b/.test(titleLower)) { score += 4; breakdown.push('Director/Partner: +4'); }
+  else { score += 2; breakdown.push('Manager/Other: +2'); }
+
+  // HQ scoring
+  if (hq === 'yes') { score += 8; breakdown.push('Atlanta HQ: +8'); }
+  else if (hq === 'regional') { score += 5; breakdown.push('ATL Regional Office: +5'); }
+  else { score += 3; breakdown.push('Visiting/Remote: +3'); }
+
+  // Travel frequency
+  if (travel === 'heavy') { score += 7; breakdown.push('Heavy Travel: +7'); }
+  else if (travel === 'moderate') { score += 4; breakdown.push('Moderate Travel: +4'); }
+  else { score += 1; breakdown.push('Light Travel: +1'); }
+
+  // Industry
+  const premIndustry = ['Airline / Aviation','Financial Services / Banking','Private Equity / VC','Legal / Law Firm','Consulting'];
+  if (premIndustry.includes(industry)) { score += 5; breakdown.push('Premium Industry: +5'); }
+  else if (industry) { score += 3; breakdown.push('Fortune 500 Industry: +3'); }
+
+  // Source
+  if (source === 'referral') { score += 5; breakdown.push('Referral Source: +5'); }
+  else if (source === 'event') { score += 3; breakdown.push('Event Source: +3'); }
+  else { score += 1; breakdown.push('Cold/Other Source: +1'); }
+
+  // Store current
+  currentProspect = { name, title, company, industry, hq, travel, source, score,
+    notes: document.getElementById('exec-notes').value, stage: 'identified' };
+
+  renderScore(score, breakdown, name, title + ' · ' + company);
+}
+
+function renderScore(score, breakdown, name, sub) {
+  const el = document.getElementById('score-result');
+  el.style.display = 'block';
+  el.classList.add('fade-in');
+  document.getElementById('result-name').textContent = name;
+  document.getElementById('result-co').textContent = sub;
+
+  const badge = document.getElementById('score-badge');
+  const tier = document.getElementById('tier-label');
+  badge.textContent = score;
+
+  badge.className = 'score-badge';
+  if (score >= 28) { badge.classList.add('score-hot'); tier.textContent = '🔥 HOT'; tier.style.color = 'var(--gold)'; }
+  else if (score >= 24) { badge.classList.add('score-strong'); tier.textContent = '✓ STRONG'; tier.style.color = '#2ecc71'; }
+  else if (score >= 20) { badge.classList.add('score-qualified'); tier.textContent = 'QUALIFIED'; tier.style.color = '#3498db'; }
+  else { badge.classList.add('score-low'); tier.textContent = 'LOW'; tier.style.color = 'var(--muted)'; }
+
+  document.getElementById('score-breakdown').innerHTML = breakdown.map(b =>
+    `<span style="display:inline-block; margin-right:16px;">◆ ${b}</span>`
+  ).join('');
+}
+
+// ─── AI: Generate Approach Strategy ──────────────────────
+async function generateStrategy() {
+  if (!currentProspect) return;
+  const spinner = document.getElementById('strategy-spinner');
+  const output = document.getElementById('strategy-output');
+  const text = document.getElementById('strategy-text');
+  spinner.classList.add('visible');
+
+  const p = currentProspect;
+  const tier = p.score >= 28 ? 'HOT' : p.score >= 24 ? 'STRONG' : 'QUALIFIED';
+
+  const prompt = `You are a premium black car transportation business development advisor for Odyssey Black VIP Transportation in Atlanta, Georgia — a luxury ground transportation service targeting Fortune 500 executives.
+
+Prospect Profile:
+- Name: ${p.name}
+- Title: ${p.title}
+- Company: ${p.company}
+- Industry: ${p.industry}
+- Atlanta presence: ${p.hq}
+- Travel frequency: ${p.travel}
+- Lead source: ${p.source}
+- Acquisition score: ${p.score}/40 (${tier} tier)
+- Notes: ${p.notes || 'None'}
+
+Generate a concise, actionable acquisition strategy with these sections:
+1. WHY THEY'RE A FIT — 2-3 specific reasons this executive needs premium ground transportation
+2. APPROACH ANGLE — the single strongest hook to lead with
+3. BEST CHANNEL & TIMING — where and when to reach out
+4. VALUE PROPOSITION — personalized to their role/industry
+5. FIRST MOVE — one specific action to take today
+
+Keep it sharp, executive-level language. No fluff.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': 'YOUR_API_KEY', 'anthropic-version': '2023-06-01' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await res.json();
+    const content = data.content?.[0]?.text || 'Unable to generate strategy.';
+    text.textContent = content;
+    output.classList.add('visible');
+  } catch (e) {
+    text.textContent = 'Error generating strategy. Please try again.';
+    output.classList.add('visible');
+  }
+  spinner.classList.remove('visible');
+}
+
+// ─── AI: Generate Outreach ────────────────────────────────
+async function generateOutreach() {
+  const name = document.getElementById('out-name').value.trim();
+  const title = document.getElementById('out-title').value.trim();
+  const channel = document.getElementById('out-channel').value;
+  const tone = document.getElementById('out-tone').value;
+  const context = document.getElementById('out-context').value.trim();
+
+  if (!name || !title) { notify('Please fill in Name and Title'); return; }
+
+  const spinner = document.getElementById('out-spinner');
+  const output = document.getElementById('outreach-output');
+  const textEl = document.getElementById('outreach-text');
+  spinner.classList.add('visible');
+  output.classList.remove('visible');
+
+  const channelMap = {
+    'email': 'a cold email',
+    'linkedin': 'a LinkedIn direct message (150 words max)',
+    'referral-email': 'a warm referral introduction email',
+    'event-followup': 'a post-event follow-up email',
+    'voicemail': 'a 30-second voicemail script'
+  };
+  const toneMap = {
+    'luxury': 'luxury and exclusivity positioning',
+    'executive': 'executive peer-to-peer tone (not salesy)',
+    'concise': 'ultra-concise and respectful of their time',
+    'warm': 'warm, personal, referral-based'
+  };
+
+  const prompt = `You are writing outreach for Odyssey Black VIP Transportation — Atlanta's premium black car service for Fortune 500 executives. The service differentiates on: reliability, discretion, professional chauffeurs, flight tracking, last-minute availability, and a concierge-level experience that rideshare cannot match.
+
+Write ${channelMap[channel]} for this executive:
+- Name: ${name}
+- Title/Company: ${title}
+- Tone: ${toneMap[tone]}
+- Context/Hook: ${context || 'No specific context provided — use general executive travel pain points'}
+
+Requirements:
+- Do NOT sound like a mass marketing email
+- Reference specific executive pain points (time, reliability, image, productivity in transit)
+- Include a soft, clear call to action
+- Feel personally written, not templated
+${channel === 'email' ? '- Include a compelling subject line' : ''}
+${channel === 'linkedin' ? '- Keep under 150 words' : ''}`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': 'YOUR_API_KEY', 'anthropic-version': '2023-06-01' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await res.json();
+    textEl.textContent = data.content?.[0]?.text || 'Error generating message.';
+    output.classList.add('visible');
+  } catch (e) {
+    textEl.textContent = 'Error generating outreach. Please try again.';
+    output.classList.add('visible');
+  }
+  spinner.classList.remove('visible');
+}
+
+// ─── AI: Generate Call Script ─────────────────────────────
+async function generateScript() {
+  const name = document.getElementById('cs-name').value.trim();
+  const title = document.getElementById('cs-title').value.trim();
+  const type = document.getElementById('cs-type').value;
+  const objection = document.getElementById('cs-objection').value;
+  const context = document.getElementById('cs-context').value.trim();
+
+  if (!name || !title) { notify('Please fill in Name and Company/Role'); return; }
+
+  const spinner = document.getElementById('cs-spinner');
+  const output = document.getElementById('script-output');
+  const textEl = document.getElementById('script-text');
+  spinner.classList.add('visible');
+  output.classList.remove('visible');
+
+  const prompt = `You are a sales coach for Odyssey Black VIP Transportation, Atlanta's premium executive black car service. Create a phone call script for the following scenario.
+
+Executive: ${name} — ${title}
+Call type: ${type}
+Likely objection: ${objection}
+Context: ${context || 'No additional context'}
+
+Write a complete, natural-sounding call script with:
+- OPENER: How to introduce yourself and get through the gate
+- VALUE HOOK: A single compelling reason tailored to their role
+- DISCOVERY QUESTION: One question to qualify and engage
+- ${objection !== 'none' ? 'OBJECTION HANDLER: How to address "' + objection + '"' : 'DIFFERENTIATOR: What separates Odyssey Black from rideshare'}
+- CLOSE: Ask for the next step (trial ride, account setup, or meeting)
+- LEAVE/VOICEMAIL: If they don't answer
+
+Use executive-level language. Sound like a peer, not a salesperson. Keep the whole script readable in under 3 minutes.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': 'YOUR_API_KEY', 'anthropic-version': '2023-06-01' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1200,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await res.json();
+    textEl.textContent = data.content?.[0]?.text || 'Error generating script.';
+    output.classList.add('visible');
+  } catch (e) {
+    textEl.textContent = 'Error generating script. Please try again.';
+    output.classList.add('visible');
+  }
+  spinner.classList.remove('visible');
+}
+
+// ─── Pipeline ─────────────────────────────────────────────
+function saveToPipeline() {
+  if (!currentProspect) return;
+  const exists = pipeline.find(p => p.name === currentProspect.name && p.company === currentProspect.company);
+  if (exists) { notify('Already in pipeline'); return; }
+  pipeline.push({ ...currentProspect, id: Date.now() });
+  localStorage.setItem('ob-pipeline', JSON.stringify(pipeline));
+  notify(currentProspect.name + ' added to pipeline');
+}
+
+function renderPipeline() {
+  const cols = { identified: [], outreach: [], booked: [] };
+  pipeline.forEach(p => { if (cols[p.stage]) cols[p.stage].push(p); });
+
+  ['identified','outreach','booked'].forEach(stage => {
+    const el = document.getElementById('col-' + stage);
+    el.innerHTML = cols[stage].map(p => `
+      <div class="pipeline-card" onclick="moveStage(${p.id})">
+        <div class="pipeline-card-name">${p.name}</div>
+        <div class="pipeline-card-co">${p.title} · ${p.company}</div>
+        <div style="margin-top:6px; display:flex; gap:6px; align-items:center;">
+          <span style="font-size:10px; color:${p.score>=28?'var(--gold)':p.score>=24?'#2ecc71':'#3498db'}; font-weight:700;">${p.score}</span>
+          <span style="font-size:9px; color:var(--muted);">${p.score>=28?'HOT':p.score>=24?'STRONG':'QUALIFIED'}</span>
+        </div>
+      </div>
+    `).join('');
+    document.getElementById('count-' + stage).textContent = cols[stage].length;
+  });
+
+  document.getElementById('stat-total').textContent = pipeline.length;
+  document.getElementById('stat-hot').textContent = pipeline.filter(p => p.score >= 28).length;
+  document.getElementById('stat-strong').textContent = pipeline.filter(p => p.score >= 24 && p.score < 28).length;
+  document.getElementById('stat-qualified').textContent = pipeline.filter(p => p.score >= 20 && p.score < 24).length;
+  document.getElementById('pipeline-empty').style.display = pipeline.length ? 'none' : 'block';
+}
+
+function moveStage(id) {
+  const stages = ['identified', 'outreach', 'booked'];
+  const p = pipeline.find(x => x.id === id);
+  if (!p) return;
+  const idx = stages.indexOf(p.stage);
+  p.stage = stages[(idx + 1) % stages.length];
+  localStorage.setItem('ob-pipeline', JSON.stringify(pipeline));
+  renderPipeline();
+  notify('Moved to ' + p.stage.charAt(0).toUpperCase() + p.stage.slice(1));
+}
+
+// ─── Helpers ──────────────────────────────────────────────
+function clearForm() {
+  ['exec-name','exec-title','exec-company','exec-notes'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('score-result').style.display = 'none';
+  document.getElementById('strategy-output').classList.remove('visible');
+  currentProspect = null;
+}
+
+function copyOutput(id) {
+  const el = document.getElementById(id);
+  const text = el.querySelector('div[id$="-text"]')?.textContent || '';
+  navigator.clipboard.writeText(text).then(() => notify('Copied to clipboard'));
+}
+
+function notify(msg) {
+  const el = document.getElementById('notif');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>
