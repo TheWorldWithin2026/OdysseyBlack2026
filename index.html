@@ -6,120 +6,201 @@
 <title>Odyssey Black | Executive Acquisition</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root {
-  --black: #080808;
-  --card: #111111;
-  --border: #1e1e1e;
-  --gold: #c9a84c;
-  --gold-light: #e2c47a;
-  --gold-dim: rgba(201,168,76,0.12);
-  --text: #e8e0d0;
-  --muted: #7a7060;
-}
-* { margin:0; padding:0; box-sizing:border-box; }
-body { background:var(--black); color:var(--text); font-family:'Montserrat',sans-serif; min-height:100vh; }
-header { display:flex; align-items:center; justify-content:space-between; padding:20px 36px; border-bottom:1px solid var(--border); }
-.logo-text { font-family:'Cormorant Garamond',serif; font-size:20px; letter-spacing:3px; color:var(--gold-light); text-transform:uppercase; }
-.logo-sub { font-size:9px; letter-spacing:4px; color:var(--muted); text-transform:uppercase; margin-top:2px; }
-.badge { font-size:10px; letter-spacing:2px; color:var(--gold); border:1px solid rgba(201,168,76,0.3); padding:5px 12px; text-transform:uppercase; }
-.wrap { max-width:1000px; margin:0 auto; padding:36px 24px 80px; }
-.tabs { display:flex; border-bottom:1px solid var(--border); margin-bottom:36px; overflow-x:auto; }
-.tab { background:none; border:none; border-bottom:2px solid transparent; padding:12px 20px; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--muted); cursor:pointer; font-family:'Montserrat',sans-serif; transition:all 0.2s; white-space:nowrap; }
-.tab:hover { color:var(--text); }
-.tab.active { color:var(--gold); border-bottom-color:var(--gold); }
-.panel { display:none; }
-.panel.active { display:block; }
-.sec-tag { font-size:9px; letter-spacing:4px; text-transform:uppercase; color:var(--gold); margin-bottom:6px; }
-.sec-h { font-family:'Cormorant Garamond',serif; font-size:28px; font-weight:300; margin-bottom:4px; }
-.sec-d { font-size:12px; color:var(--muted); margin-bottom:28px; }
-.card { background:var(--card); border:1px solid var(--border); padding:24px; margin-bottom:16px; border-radius:2px; }
-.g2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px; }
-.g3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin-bottom:14px; }
-.g1 { margin-bottom:14px; }
-label { display:block; font-size:9px; letter-spacing:3px; text-transform:uppercase; color:var(--muted); margin-bottom:7px; }
-input, select, textarea { width:100%; background:rgba(255,255,255,0.03); border:1px solid var(--border); color:var(--text); padding:11px 13px; font-family:'Montserrat',sans-serif; font-size:13px; outline:none; border-radius:1px; transition:border-color 0.2s; }
-input:focus, select:focus, textarea:focus { border-color:var(--gold); }
-select option { background:#111; }
-textarea { resize:vertical; min-height:75px; }
-.btn { display:inline-flex; align-items:center; gap:8px; padding:11px 24px; font-size:10px; letter-spacing:3px; text-transform:uppercase; font-family:'Montserrat',sans-serif; cursor:pointer; border:none; border-radius:1px; font-weight:600; transition:opacity 0.15s; }
-.btn:disabled { opacity:0.4; cursor:not-allowed; }
-.btn-gold { background:var(--gold); color:#080808; }
-.btn-gold:hover:not(:disabled) { opacity:0.85; }
-.btn-outline { background:transparent; border:1px solid rgba(201,168,76,0.4); color:var(--gold); }
-.btn-outline:hover:not(:disabled) { background:var(--gold-dim); }
-.btn-ghost { background:transparent; border:1px solid var(--border); color:var(--muted); }
-.btn-ghost:hover { color:var(--text); border-color:var(--text); }
-.btns { display:flex; gap:10px; flex-wrap:wrap; margin-top:16px; }
-.score-row { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:16px; }
-.score-box { width:56px; height:56px; display:flex; flex-direction:column; align-items:center; justify-content:center; border:1px solid; border-radius:2px; }
-.score-num { font-size:22px; font-weight:600; line-height:1; }
-.score-tier { font-size:8px; letter-spacing:2px; text-transform:uppercase; margin-top:2px; }
-.hot { background:rgba(201,168,76,0.15); border-color:rgba(201,168,76,0.5); color:var(--gold); }
-.strong { background:rgba(46,204,113,0.1); border-color:rgba(46,204,113,0.4); color:#2ecc71; }
-.qualified { background:rgba(52,152,219,0.1); border-color:rgba(52,152,219,0.4); color:#3498db; }
-.low { background:rgba(122,112,96,0.1); border-color:var(--border); color:var(--muted); }
-.breakdown { font-size:12px; color:var(--muted); line-height:2.2; }
-.divider { height:1px; background:var(--border); margin:18px 0; }
-.ai-box { position:relative; background:rgba(201,168,76,0.04); border:1px solid rgba(201,168,76,0.2); padding:20px; margin-top:16px; border-radius:2px; display:none; }
-.ai-box.show { display:block; }
-.ai-label { position:absolute; top:-9px; left:16px; background:var(--card); padding:0 8px; font-size:9px; letter-spacing:3px; text-transform:uppercase; color:var(--gold); }
-.ai-text { font-size:13px; line-height:1.85; color:var(--text); white-space:pre-wrap; }
-.copy-btn { position:absolute; top:10px; right:10px; background:none; border:1px solid var(--border); color:var(--muted); padding:4px 10px; font-size:9px; letter-spacing:2px; cursor:pointer; font-family:'Montserrat',sans-serif; border-radius:1px; text-transform:uppercase; }
-.copy-btn:hover { border-color:var(--gold); color:var(--gold); }
-.spin { display:none; width:14px; height:14px; border:2px solid rgba(201,168,76,0.2); border-top-color:var(--gold); border-radius:50%; animation:spin 0.7s linear infinite; }
-.spin.on { display:inline-block; }
-@keyframes spin { to { transform:rotate(360deg); } }
-.stats { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:28px; }
-.stat { background:var(--card); border:1px solid var(--border); padding:16px; text-align:center; border-radius:2px; }
-.stat-n { font-family:'Cormorant Garamond',serif; font-size:32px; font-weight:300; color:var(--gold); }
-.stat-l { font-size:9px; letter-spacing:3px; text-transform:uppercase; color:var(--muted); margin-top:3px; }
-.pipe { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
-.pipe-col { background:var(--card); border:1px solid var(--border); padding:14px; border-radius:2px; }
-.pipe-head { font-size:9px; letter-spacing:3px; text-transform:uppercase; color:var(--muted); padding-bottom:10px; border-bottom:1px solid var(--border); margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; }
-.pipe-cnt { background:var(--gold-dim); color:var(--gold); font-size:10px; padding:2px 8px; border-radius:99px; }
-.pipe-card { background:rgba(255,255,255,0.02); border:1px solid var(--border); padding:10px; margin-bottom:8px; cursor:pointer; border-radius:1px; }
-.pipe-card:hover { border-color:rgba(201,168,76,0.4); }
-.pipe-name { font-family:'Cormorant Garamond',serif; font-size:15px; margin-bottom:2px; }
-.pipe-co { font-size:11px; color:var(--muted); }
-.pipe-sc { font-size:11px; font-weight:600; margin-top:5px; }
-.empty-msg { text-align:center; color:var(--muted); font-size:13px; padding:3rem 0; }
-.notif { position:fixed; bottom:20px; right:20px; background:var(--card); border:1px solid rgba(201,168,76,0.4); color:var(--gold); padding:10px 18px; font-size:11px; letter-spacing:1px; z-index:999; opacity:0; transform:translateY(6px); transition:all 0.25s; pointer-events:none; border-radius:2px; }
-.notif.show { opacity:1; transform:translateY(0); }
-.import-drop { border:2px dashed var(--border); padding:40px; text-align:center; cursor:pointer; transition:border-color 0.2s; border-radius:2px; }
-.import-drop:hover, .import-drop.over { border-color:var(--gold); }
-.import-icon { font-size:32px; margin-bottom:12px; }
-.import-text { font-size:13px; color:var(--muted); }
-.import-sub { font-size:11px; color:var(--muted); margin-top:6px; opacity:0.6; }
-.bulk-table { width:100%; border-collapse:collapse; font-size:12px; }
-.bulk-table th { font-size:9px; letter-spacing:2px; text-transform:uppercase; color:var(--muted); padding:10px 12px; border-bottom:1px solid var(--border); text-align:left; }
-.bulk-table td { padding:10px 12px; border-bottom:1px solid rgba(30,30,30,0.5); vertical-align:middle; }
-.bulk-table tr:hover td { background:rgba(255,255,255,0.02); }
-.t-hot { color:var(--gold); font-weight:600; }
-.t-strong { color:#2ecc71; font-weight:600; }
-.t-qual { color:#3498db; font-weight:600; }
-.t-low { color:var(--muted); }
-.filter-row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:16px; }
-.fbtn { background:none; border:1px solid var(--border); color:var(--muted); padding:5px 14px; font-size:9px; letter-spacing:2px; text-transform:uppercase; cursor:pointer; font-family:'Montserrat',sans-serif; border-radius:1px; }
-.fbtn.on { border-color:var(--gold); color:var(--gold); background:var(--gold-dim); }
-.rnote { font-size:10px; color:var(--gold); margin-left:8px; opacity:0.8; font-weight:400; letter-spacing:1px; }
-@media(max-width:640px) {
-  .g2,.g3 { grid-template-columns:1fr; }
-  .stats { grid-template-columns:repeat(2,1fr); }
-  .pipe { grid-template-columns:1fr; }
-  header { padding:16px 20px; }
-}
+:root{--black:#080808;--card:#111;--border:#1e1e1e;--gold:#c9a84c;--gold-light:#e2c47a;--gold-dim:rgba(201,168,76,0.12);--text:#e8e0d0;--muted:#7a7060;--green:#2ecc71;--yellow:#f1c40f;--blue:#3498db;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--black);color:var(--text);font-family:'Montserrat',sans-serif;min-height:100vh;}
+header{display:flex;align-items:center;justify-content:space-between;padding:20px 36px;border-bottom:1px solid var(--border);}
+.logo-text{font-family:'Cormorant Garamond',serif;font-size:20px;letter-spacing:3px;color:var(--gold-light);text-transform:uppercase;}
+.logo-sub{font-size:9px;letter-spacing:4px;color:var(--muted);text-transform:uppercase;margin-top:2px;}
+.badge{font-size:10px;letter-spacing:2px;color:var(--gold);border:1px solid rgba(201,168,76,0.3);padding:5px 12px;text-transform:uppercase;}
+.wrap{max-width:1060px;margin:0 auto;padding:36px 24px 80px;}
+.tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:36px;overflow-x:auto;}
+.tab{background:none;border:none;border-bottom:2px solid transparent;padding:12px 18px;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);cursor:pointer;font-family:'Montserrat',sans-serif;transition:all 0.2s;white-space:nowrap;}
+.tab:hover{color:var(--text);}
+.tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+.panel{display:none;}.panel.active{display:block;}
+.sec-tag{font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:6px;}
+.sec-h{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;margin-bottom:4px;}
+.sec-d{font-size:12px;color:var(--muted);margin-bottom:28px;}
+.card{background:var(--card);border:1px solid var(--border);padding:24px;margin-bottom:16px;border-radius:2px;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px;}
+.g1{margin-bottom:14px;}
+label{display:block;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:7px;}
+input,select,textarea{width:100%;background:rgba(255,255,255,0.03);border:1px solid var(--border);color:var(--text);padding:11px 13px;font-family:'Montserrat',sans-serif;font-size:13px;outline:none;border-radius:1px;transition:border-color 0.2s;}
+input:focus,select:focus,textarea:focus{border-color:var(--gold);}
+select option{background:#111;}
+textarea{resize:vertical;min-height:75px;}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:11px 24px;font-size:10px;letter-spacing:3px;text-transform:uppercase;font-family:'Montserrat',sans-serif;cursor:pointer;border:none;border-radius:1px;font-weight:600;transition:opacity 0.15s;}
+.btn:disabled{opacity:0.4;cursor:not-allowed;}
+.btn-gold{background:var(--gold);color:#080808;}
+.btn-gold:hover:not(:disabled){opacity:0.85;}
+.btn-outline{background:transparent;border:1px solid rgba(201,168,76,0.4);color:var(--gold);}
+.btn-outline:hover:not(:disabled){background:var(--gold-dim);}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--muted);}
+.btn-ghost:hover{color:var(--text);border-color:var(--text);}
+.btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;}
+.divider{height:1px;background:var(--border);margin:20px 0;}
+.ai-box{position:relative;background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.2);padding:20px;margin-top:16px;border-radius:2px;display:none;}
+.ai-box.show{display:block;}
+.ai-label{position:absolute;top:-9px;left:16px;background:var(--card);padding:0 8px;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);}
+.ai-text{font-size:13px;line-height:1.85;color:var(--text);white-space:pre-wrap;}
+.copy-btn{position:absolute;top:10px;right:10px;background:none;border:1px solid var(--border);color:var(--muted);padding:4px 10px;font-size:9px;letter-spacing:2px;cursor:pointer;font-family:'Montserrat',sans-serif;border-radius:1px;text-transform:uppercase;}
+.copy-btn:hover{border-color:var(--gold);color:var(--gold);}
+.spin{display:none;width:14px;height:14px;border:2px solid rgba(201,168,76,0.2);border-top-color:var(--gold);border-radius:50%;animation:spin 0.7s linear infinite;}
+.spin.on{display:inline-block;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.score-panel{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;}
+.score-block{flex:1;min-width:120px;background:rgba(255,255,255,0.02);border:1px solid var(--border);padding:14px;border-radius:1px;}
+.score-block-label{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+.score-block-val{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;line-height:1;}
+.score-block-sub{font-size:9px;letter-spacing:2px;text-transform:uppercase;margin-top:5px;}
+.breakdown{font-size:12px;color:var(--muted);line-height:2.4;}
+.section-sep{margin-top:20px;padding-top:20px;border-top:1px solid var(--border);}
+.sep-title{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.mini-badge{font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:3px 10px;border-radius:1px;}
+.mb-green{background:rgba(46,204,113,0.1);border:1px solid rgba(46,204,113,0.3);color:var(--green);}
+.mb-gold{background:var(--gold-dim);border:1px solid rgba(201,168,76,0.3);color:var(--gold);}
+.signals-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.sig-chip{display:flex;align-items:flex-start;gap:10px;background:rgba(255,255,255,0.02);border:1px solid var(--border);padding:10px 12px;border-radius:1px;cursor:pointer;transition:all 0.2s;user-select:none;}
+.sig-chip:hover{border-color:rgba(46,204,113,0.4);}
+.sig-chip.on{border-color:rgba(46,204,113,0.5);background:rgba(46,204,113,0.06);}
+.sig-chip input{width:14px;height:14px;margin-top:1px;flex-shrink:0;accent-color:var(--green);cursor:pointer;}
+.sig-chip span{font-size:11px;color:var(--muted);line-height:1.4;}
+.sig-chip.on span{color:var(--text);}
+.bm-row{margin-top:14px;padding:14px;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:1px;display:flex;align-items:center;gap:16px;}
+.bm-num{font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:300;line-height:1;min-width:44px;text-align:center;}
+.bm-right{flex:1;}
+.bm-track{height:5px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden;margin-bottom:6px;}
+.bm-fill{height:5px;border-radius:3px;transition:width 0.35s ease;width:0%;}
+.bm-desc{font-size:10px;letter-spacing:2px;text-transform:uppercase;}
+.ea-tog-row{display:flex;align-items:center;gap:10px;cursor:pointer;}
+.ea-tog-row input[type=checkbox]{width:16px;height:16px;accent-color:var(--gold);cursor:pointer;}
+.ea-tog-row span{font-size:12px;color:var(--muted);}
+.ea-fields{display:none;margin-top:16px;}
+.ea-fields.open{display:block;}
+.chk-row{display:flex;align-items:center;gap:8px;padding:10px 12px;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:1px;cursor:pointer;transition:all 0.2s;}
+.chk-row input{width:14px;height:14px;accent-color:var(--gold);cursor:pointer;flex-shrink:0;}
+.chk-row label{font-size:11px;color:var(--muted);cursor:pointer;text-transform:none;letter-spacing:0;margin:0;line-height:1.3;}
+.chk-row.on{border-color:rgba(201,168,76,0.4);background:var(--gold-dim);}
+.chk-row.on label{color:var(--text);}
+.ea-inf-row{display:flex;align-items:center;gap:12px;margin-top:12px;padding:10px 14px;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:1px;}
+.ea-inf-lbl{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);}
+.ea-inf-badge{font-size:10px;letter-spacing:2px;text-transform:uppercase;font-weight:700;padding:3px 12px;border-radius:1px;}
+.inf-low{background:rgba(122,112,96,0.15);border:1px solid var(--border);color:var(--muted);}
+.inf-med{background:rgba(241,196,15,0.1);border:1px solid rgba(241,196,15,0.3);color:var(--yellow);}
+.inf-high{background:rgba(46,204,113,0.1);border:1px solid rgba(46,204,113,0.3);color:var(--green);}
+.ea-inf-note{font-size:11px;color:var(--muted);}
+.ea-intel-chip{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:1px;font-size:10px;letter-spacing:1px;margin:2px;border:1px solid;}
+.eic-comm{background:rgba(52,152,219,0.08);border-color:rgba(52,152,219,0.3);color:var(--blue);}
+.eic-resp{background:rgba(46,204,113,0.08);border-color:rgba(46,204,113,0.3);color:var(--green);}
+.eic-book{background:rgba(241,196,15,0.08);border-color:rgba(241,196,15,0.3);color:var(--yellow);}
+.eic-pers{background:rgba(201,168,76,0.08);border-color:rgba(201,168,76,0.3);color:var(--gold);}
+.eic-warn{background:rgba(231,76,60,0.08);border-color:rgba(231,76,60,0.3);color:#e74c3c;}
+.ea-bonus{display:inline-flex;align-items:center;gap:6px;background:rgba(46,204,113,0.08);border:1px solid rgba(46,204,113,0.25);color:var(--green);padding:5px 12px;font-size:10px;letter-spacing:2px;text-transform:uppercase;border-radius:1px;margin-top:12px;}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px;}
+.stat{background:var(--card);border:1px solid var(--border);padding:16px;text-align:center;border-radius:2px;}
+.stat-n{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;color:var(--gold);}
+.stat-l{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-top:3px;}
+.pipe{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+.pipe-scroll{overflow-x:auto;padding-bottom:8px;}
+.pipe-inner{display:grid;grid-template-columns:repeat(8,minmax(180px,1fr));gap:10px;min-width:1440px;}
+.pipe-col{background:var(--card);border:1px solid var(--border);padding:14px;border-radius:2px;}
+.pipe-head{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);padding-bottom:10px;border-bottom:1px solid var(--border);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;}
+.pipe-cnt{background:var(--gold-dim);color:var(--gold);font-size:10px;padding:2px 8px;border-radius:99px;}
+.pipe-card{background:rgba(255,255,255,0.02);border:1px solid var(--border);padding:10px;margin-bottom:8px;cursor:pointer;border-radius:1px;transition:border-color 0.2s;}
+.pipe-card:hover{border-color:rgba(201,168,76,0.4);}
+.pipe-card.bm-hi{border-left:3px solid var(--green);}
+.pipe-name{font-family:'Cormorant Garamond',serif;font-size:15px;margin-bottom:2px;}
+.pipe-co{font-size:11px;color:var(--muted);}
+.pipe-sc{font-size:11px;font-weight:600;margin-top:5px;display:flex;gap:8px;align-items:center;}
+.bm-dot{width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block;}
+.empty-msg{text-align:center;color:var(--muted);font-size:13px;padding:3rem 0;}
+.mode-tabs{display:flex;border:1px solid var(--border);border-radius:1px;overflow:hidden;margin-bottom:20px;}
+.mode-tab{flex:1;background:none;border:none;padding:10px;font-size:10px;letter-spacing:2px;text-transform:uppercase;font-family:'Montserrat',sans-serif;cursor:pointer;color:var(--muted);transition:all 0.2s;}
+.mode-tab.active{background:var(--gold);color:var(--black);font-weight:700;}
+.mode-note{font-size:10px;letter-spacing:2px;text-transform:uppercase;padding:6px 12px;border-radius:1px;margin-bottom:14px;display:inline-block;}
+.mn-gold{background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);color:var(--gold);}
+.mn-green{background:rgba(46,204,113,0.08);border:1px solid rgba(46,204,113,0.2);color:var(--green);}
+.rnote{font-size:10px;color:var(--gold);margin-left:8px;opacity:0.8;letter-spacing:1px;}
+.import-drop{border:2px dashed var(--border);padding:40px;text-align:center;cursor:pointer;transition:border-color 0.2s;border-radius:2px;}
+.import-drop:hover,.import-drop.over{border-color:var(--gold);}
+.import-icon{font-size:32px;margin-bottom:12px;}
+.import-text{font-size:13px;color:var(--muted);}
+.import-sub{font-size:11px;color:var(--muted);margin-top:6px;opacity:0.6;}
+.bulk-table{width:100%;border-collapse:collapse;font-size:12px;}
+.bulk-table th{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:10px 12px;border-bottom:1px solid var(--border);text-align:left;}
+.bulk-table td{padding:10px 12px;border-bottom:1px solid rgba(30,30,30,0.5);vertical-align:middle;}
+.bulk-table tr:hover td{background:rgba(255,255,255,0.02);}
+.t-hot{color:var(--gold);font-weight:600;}.t-strong{color:var(--green);font-weight:600;}.t-qual{color:var(--blue);font-weight:600;}.t-low{color:var(--muted);}
+.filter-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:16px;}
+.fbtn{background:none;border:1px solid var(--border);color:var(--muted);padding:5px 14px;font-size:9px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:'Montserrat',sans-serif;border-radius:1px;}
+.fbtn.on{border-color:var(--gold);color:var(--gold);background:var(--gold-dim);}
+.co-card{background:rgba(255,255,255,0.02);border:1px solid var(--border);padding:16px;border-radius:1px;margin-bottom:12px;}
+.co-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
+.co-name{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:500;}
+.co-meta{font-size:11px;color:var(--muted);margin-top:3px;}
+.co-opp-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;text-align:right;}
+.co-opp-val{font-size:22px;font-family:'Cormorant Garamond',serif;font-weight:300;text-align:right;}
+.co-execs-list{border-top:1px solid var(--border);padding-top:10px;}
+.co-exec-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(30,30,30,0.5);font-size:12px;}
+.co-exec-row:last-child{border-bottom:none;}
+.co-exec-name{color:var(--text);font-weight:500;}
+.co-exec-title{color:var(--muted);font-size:11px;}
+.notif{position:fixed;bottom:20px;right:20px;background:var(--card);border:1px solid rgba(201,168,76,0.4);color:var(--gold);padding:10px 18px;font-size:11px;letter-spacing:1px;z-index:999;opacity:0;transform:translateY(6px);transition:all 0.25s;pointer-events:none;border-radius:2px;}
+.notif.show{opacity:1;transform:translateY(0);}
+.client-type-badge{font-size:10px;letter-spacing:2px;text-transform:uppercase;font-weight:700;padding:4px 14px;border-radius:1px;white-space:nowrap;}
+.ct-hf{background:rgba(201,168,76,0.15);border:1px solid rgba(201,168,76,0.4);color:var(--gold);}
+.ct-corp{background:rgba(46,204,113,0.1);border:1px solid rgba(46,204,113,0.35);color:var(--green);}
+.ct-event{background:rgba(52,152,219,0.1);border:1px solid rgba(52,152,219,0.35);color:var(--blue);}
+.ct-occ{background:rgba(122,112,96,0.15);border:1px solid var(--border);color:var(--muted);}
+.conv-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:1px;font-size:10px;letter-spacing:2px;text-transform:uppercase;font-weight:600;}
+.conv-high{background:rgba(46,204,113,0.1);border:1px solid rgba(46,204,113,0.35);color:var(--green);}
+.conv-med{background:rgba(241,196,15,0.1);border:1px solid rgba(241,196,15,0.35);color:var(--yellow);}
+.conv-low{background:rgba(122,112,96,0.15);border:1px solid var(--border);color:var(--muted);}
+.pipe-card-actions{display:flex;gap:6px;margin-top:8px;}
+.pipe-action-btn{background:none;border:1px solid var(--border);color:var(--muted);padding:3px 10px;font-size:9px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;font-family:'Montserrat',sans-serif;border-radius:1px;transition:all 0.15s;}
+.pipe-action-btn:hover{border-color:var(--gold);color:var(--gold);}
+.overdue{border-left:3px solid #e74c3c !important;}
+.stage-label{font-size:8px;letter-spacing:2px;text-transform:uppercase;padding:3px 8px;border-radius:1px;display:inline-block;margin-bottom:4px;}
+.stage-identified{color:var(--muted);background:rgba(122,112,96,0.1);border:1px solid var(--border);}
+.stage-contacted{color:var(--blue);background:rgba(52,152,219,0.1);border:1px solid rgba(52,152,219,0.3);}
+.stage-assistant{color:var(--yellow);background:rgba(241,196,15,0.1);border:1px solid rgba(241,196,15,0.3);}
+.stage-trial-sched{color:#9b59b6;background:rgba(155,89,182,0.1);border:1px solid rgba(155,89,182,0.3);}
+.stage-trial-done{color:#e67e22;background:rgba(230,126,34,0.1);border:1px solid rgba(230,126,34,0.3);}
+.stage-active{color:var(--green);background:rgba(46,204,113,0.1);border:1px solid rgba(46,204,113,0.3);}
+.stage-recurring{color:var(--gold);background:rgba(201,168,76,0.15);border:1px solid rgba(201,168,76,0.4);}
+.stage-corporate{color:#fff;background:linear-gradient(135deg,rgba(201,168,76,0.3),rgba(46,204,113,0.3));border:1px solid var(--gold);}
+.revenue-tag{font-size:10px;color:var(--green);font-weight:600;margin-top:4px;}
+.followup-alert{font-size:10px;padding:3px 8px;border-radius:1px;margin-top:5px;display:inline-block;}
+.alert-soon{background:rgba(241,196,15,0.1);border:1px solid rgba(241,196,15,0.3);color:var(--yellow);}
+.alert-overdue{background:rgba(231,76,60,0.1);border:1px solid rgba(231,76,60,0.3);color:#e74c3c;}
+.alert-ok{background:rgba(46,204,113,0.08);border:1px solid rgba(46,204,113,0.25);color:var(--green);}
+.event-mode-bar{background:linear-gradient(135deg,rgba(155,89,182,0.15),rgba(201,168,76,0.1));border:1px solid rgba(155,89,182,0.4);padding:12px 18px;border-radius:2px;margin-bottom:20px;display:none;align-items:center;justify-content:space-between;gap:12px;}
+.event-mode-bar.active{display:flex;}
+.event-mode-title{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#9b59b6;font-weight:700;}
+.event-mode-desc{font-size:11px;color:var(--muted);margin-top:2px;}
+.event-urgency{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#9b59b6;background:rgba(155,89,182,0.12);border:1px solid rgba(155,89,182,0.3);padding:3px 10px;border-radius:1px;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.6;}}
+.event-toggle-row{display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px 14px;background:rgba(155,89,182,0.06);border:1px solid rgba(155,89,182,0.2);border-radius:1px;margin-bottom:14px;}
+.event-toggle-row input{width:16px;height:16px;accent-color:#9b59b6;cursor:pointer;}
+.event-toggle-row span{font-size:12px;color:var(--muted);}
+.event-toggle-row.on span{color:#9b59b6;}
+.resp-status{font-size:10px;letter-spacing:1px;padding:2px 8px;border-radius:1px;margin-top:4px;display:inline-block;}
+.resp-none{color:var(--muted);background:rgba(122,112,96,0.1);border:1px solid var(--border);}
+.resp-positive{color:var(--green);background:rgba(46,204,113,0.08);border:1px solid rgba(46,204,113,0.25);}
+.resp-negative{color:#e74c3c;background:rgba(231,76,60,0.08);border:1px solid rgba(231,76,60,0.25);}
+.resp-pending{color:var(--yellow);background:rgba(241,196,15,0.08);border:1px solid rgba(241,196,15,0.25);}
+.pipe-col-header{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding-bottom:10px;border-bottom:1px solid var(--border);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;}
+.overdue .pipe-co{color:#e74c3c;}
+@media(max-width:640px){.g2,.g3{grid-template-columns:1fr;}.stats{grid-template-columns:repeat(2,1fr);}.pipe{grid-template-columns:1fr;}.signals-grid{grid-template-columns:1fr;}.score-panel{flex-direction:column;}header{padding:16px 20px;}.wrap{padding:24px 16px 60px;}}
 </style>
 </head>
 <body>
-
 <header>
-  <div>
-    <div class="logo-text">Odyssey Black</div>
-    <div class="logo-sub">Executive Acquisition Suite</div>
-  </div>
-  <div class="badge">Atlanta · Premium Ground</div>
+  <div><div class="logo-text">Odyssey Black</div><div class="logo-sub">Executive Acquisition Suite</div></div>
+  <div class="badge">Atlanta &middot; Premium Ground</div>
 </header>
-
 <div class="wrap">
   <div class="tabs">
     <button class="tab active" onclick="switchTab('prospect',this)">Prospect Builder</button>
@@ -127,13 +208,14 @@ textarea { resize:vertical; min-height:75px; }
     <button class="tab" onclick="switchTab('pipeline',this)">Pipeline</button>
     <button class="tab" onclick="switchTab('script',this)">Call Script</button>
     <button class="tab" onclick="switchTab('import',this)">Apollo Import</button>
+    <button class="tab" onclick="switchTab('company',this)">Company Intel</button>
   </div>
 
-  <!-- PROSPECT BUILDER -->
+  <!-- TAB 1: PROSPECT BUILDER -->
   <div class="panel active" id="panel-prospect">
     <div class="sec-tag">Step 01</div>
     <div class="sec-h">Score and Qualify a Prospect</div>
-    <div class="sec-d">Enter executive details to calculate their OD Black acquisition score and generate your approach strategy.</div>
+    <div class="sec-d">Enter executive details, select timing signals, and add EA intelligence for a complete acquisition score.</div>
     <div class="card">
       <div class="g2">
         <div><label>Executive Name</label><input type="text" id="p-name" placeholder="e.g. Carol Tome"></div>
@@ -144,18 +226,12 @@ textarea { resize:vertical; min-height:75px; }
         <div><label>Industry</label>
           <select id="p-industry">
             <option value="">Select industry...</option>
-            <option>Airline / Aviation</option>
-            <option>Financial Services / Banking</option>
-            <option>Technology</option>
-            <option>Healthcare / Pharma</option>
-            <option>Real Estate / Development</option>
-            <option>Legal / Law Firm</option>
-            <option>Private Equity / VC</option>
-            <option>Consulting</option>
-            <option>Energy / Utilities</option>
-            <option>Manufacturing / Logistics</option>
-            <option>Entertainment / Media</option>
-            <option>Other Fortune 500</option>
+            <option>Airline / Aviation</option><option>Financial Services / Banking</option>
+            <option>Technology</option><option>Healthcare / Pharma</option>
+            <option>Real Estate / Development</option><option>Legal / Law Firm</option>
+            <option>Private Equity / VC</option><option>Consulting</option>
+            <option>Energy / Utilities</option><option>Manufacturing / Logistics</option>
+            <option>Entertainment / Media</option><option>Other Fortune 500</option>
           </select>
         </div>
       </div>
@@ -168,7 +244,7 @@ textarea { resize:vertical; min-height:75px; }
           </select>
         </div>
         <div><label>Travel Frequency</label>
-          <select id="p-travel">
+          <select id="p-travel" onchange="updateClientTypeDisplay()">
             <option value="heavy">Heavy (weekly flights)</option>
             <option value="moderate">Moderate (2-3x per month)</option>
             <option value="light">Light (occasional)</option>
@@ -176,124 +252,373 @@ textarea { resize:vertical; min-height:75px; }
         </div>
         <div><label>Lead Source</label>
           <select id="p-source">
-            <option value="linkedin">LinkedIn</option>
-            <option value="referral">Referral</option>
-            <option value="event">Event / Conference</option>
-            <option value="cold">Cold outreach</option>
+            <option value="linkedin">LinkedIn</option><option value="referral">Referral</option>
+            <option value="event">Event / Conference</option><option value="cold">Cold outreach</option>
           </select>
         </div>
       </div>
       <div class="g1"><label>Notes</label><textarea id="p-notes" placeholder="Intel, context, mutual connections..."></textarea></div>
-      <div class="btns">
+
+      <!-- TRAVEL INTELLIGENCE -->
+      <div class="section-sep">
+        <div class="sep-title">
+          <span class="mini-badge" style="background:rgba(52,152,219,0.1);border:1px solid rgba(52,152,219,0.3);color:var(--blue);">Travel Intelligence</span>
+          <span style="font-size:11px;color:var(--muted);">Drives recurring service positioning and client type classification</span>
+        </div>
+        <div class="g2">
+          <div>
+            <label>Common Routes</label>
+            <select id="tr-route1" onchange="updateClientTypeDisplay()">
+              <option value="">Primary route...</option>
+              <option value="ATL-NYC">ATL &rarr; NYC (LaGuardia / JFK)</option>
+              <option value="ATL-DC">ATL &rarr; DC (Reagan / Dulles)</option>
+              <option value="ATL-CHI">ATL &rarr; Chicago (O'Hare)</option>
+              <option value="ATL-LAX">ATL &rarr; Los Angeles</option>
+              <option value="ATL-MIA">ATL &rarr; Miami</option>
+              <option value="ATL-DFW">ATL &rarr; Dallas</option>
+              <option value="ATL-BOS">ATL &rarr; Boston</option>
+              <option value="ATL-SEA">ATL &rarr; Seattle</option>
+              <option value="ATL-SFO">ATL &rarr; San Francisco</option>
+              <option value="ATL-HOU">ATL &rarr; Houston</option>
+              <option value="INTL">International routes</option>
+              <option value="OTHER">Other domestic routes</option>
+            </select>
+          </div>
+          <div>
+            <label>Secondary Route (optional)</label>
+            <select id="tr-route2">
+              <option value="">Secondary route...</option>
+              <option value="ATL-NYC">ATL &rarr; NYC</option>
+              <option value="ATL-DC">ATL &rarr; DC</option>
+              <option value="ATL-CHI">ATL &rarr; Chicago</option>
+              <option value="ATL-LAX">ATL &rarr; Los Angeles</option>
+              <option value="ATL-MIA">ATL &rarr; Miami</option>
+              <option value="ATL-DFW">ATL &rarr; Dallas</option>
+              <option value="ATL-BOS">ATL &rarr; Boston</option>
+              <option value="ATL-SEA">ATL &rarr; Seattle</option>
+              <option value="ATL-SFO">ATL &rarr; San Francisco</option>
+              <option value="ATL-INTL">International</option>
+            </select>
+          </div>
+        </div>
+        <div class="g3">
+          <div>
+            <label>Weekly Travel Pattern</label>
+            <select id="tr-pattern" onchange="updateClientTypeDisplay()">
+              <option value="mon-thu">Mon depart / Thu return</option>
+              <option value="mon-fri">Mon depart / Fri return</option>
+              <option value="tue-thu">Tue depart / Thu return</option>
+              <option value="variable">Variable / unpredictable</option>
+              <option value="monthly">Monthly trips</option>
+              <option value="events">Event-driven only</option>
+            </select>
+          </div>
+          <div>
+            <label>Primary Airport</label>
+            <select id="tr-airport">
+              <option value="ATL-main">Hartsfield-Jackson (ATL) - Main</option>
+              <option value="ATL-intl">ATL - International Terminal</option>
+              <option value="PDK">Peachtree DeKalb (PDK) - Private</option>
+              <option value="FTY">Fulton County (FTY) - Private</option>
+              <option value="mixed">Mixed ATL + Private</option>
+            </select>
+          </div>
+          <div>
+            <label>Travel Companions</label>
+            <select id="tr-companions">
+              <option value="solo">Solo traveler</option>
+              <option value="team">Travels with team</option>
+              <option value="exec-team">C-suite / exec team</option>
+              <option value="client">Client-facing travel</option>
+            </select>
+          </div>
+        </div>
+        <div id="tr-classification" style="margin-top:12px;padding:12px 16px;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:1px;display:none;">
+          <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Client Type Classification</div>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div class="client-type-badge" id="ct-badge"></div>
+            <div style="font-size:11px;color:var(--muted);" id="ct-desc"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Timing Signals -->
+      <div class="section-sep">
+        <div class="sep-title">
+          <span class="mini-badge mb-green">Timing Signals</span>
+          <span style="font-size:11px;color:var(--muted);">Select all active signals to calculate Buying Moment Score</span>
+        </div>
+        <div class="signals-grid">
+          <div class="sig-chip" id="chip-hired" onclick="toggleSig('sig-hired','chip-hired')"><input type="checkbox" id="sig-hired" onclick="event.stopPropagation()"><span>Recently hired or promoted</span></div>
+          <div class="sig-chip" id="chip-office" onclick="toggleSig('sig-office','chip-office')"><input type="checkbox" id="sig-office" onclick="event.stopPropagation()"><span>Company opening new Atlanta office</span></div>
+          <div class="sig-chip" id="chip-earnings" onclick="toggleSig('sig-earnings','chip-earnings')"><input type="checkbox" id="sig-earnings" onclick="event.stopPropagation()"><span>Upcoming earnings call or board meeting</span></div>
+          <div class="sig-chip" id="chip-speaking" onclick="toggleSig('sig-speaking','chip-speaking')"><input type="checkbox" id="sig-speaking" onclick="event.stopPropagation()"><span>Speaking at an Atlanta event</span></div>
+          <div class="sig-chip" id="chip-reloc" onclick="toggleSig('sig-reloc','chip-reloc')"><input type="checkbox" id="sig-reloc" onclick="event.stopPropagation()"><span>Relocating to Atlanta</span></div>
+          <div class="sig-chip" id="chip-travel" onclick="toggleSig('sig-travel','chip-travel')"><input type="checkbox" id="sig-travel" onclick="event.stopPropagation()"><span>Increased travel activity detected</span></div>
+        </div>
+        <div class="bm-row" id="bm-row">
+          <div><div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">Buying Moment</div><div class="bm-num" id="bm-num" style="color:var(--muted);">0</div></div>
+          <div class="bm-right"><div class="bm-track"><div class="bm-fill" id="bm-fill" style="background:var(--muted);"></div></div><div class="bm-desc" id="bm-desc" style="color:var(--muted);">No signals active</div></div>
+        </div>
+      </div>
+
+      <!-- EA Intelligence -->
+      <div class="section-sep">
+        <div class="sep-title"><span class="mini-badge mb-gold">EA Intelligence</span></div>
+        <label class="ea-tog-row"><input type="checkbox" id="ea-toggle" onchange="toggleEAFields(this)"><span>I have Executive Assistant access</span></label>
+        <div class="ea-fields" id="ea-fields">
+          <div class="g2" style="margin-top:14px;">
+            <div><label>Assistant Name</label><input type="text" id="ea-name" placeholder="e.g. Jennifer Harris"></div>
+            <div><label>Assistant Role</label>
+              <select id="ea-role" onchange="calcEAInf()">
+                <option value="ea">Executive Assistant</option><option value="cos">Chief of Staff</option>
+                <option value="om">Office Manager</option><option value="tc">Travel Coordinator</option>
+              </select>
+            </div>
+          </div>
+          <div class="g2">
+            <div><label>Assistant Email</label><input type="email" id="ea-email" placeholder="e.g. j.harris@ups.com"></div>
+            <div><label>Assistant Phone (optional)</label><input type="tel" id="ea-phone" placeholder="e.g. 404-555-0100"></div>
+          </div>
+          <div class="section-sep" style="margin-top:14px;padding-top:14px;">
+            <div class="sep-title" style="margin-bottom:10px;">
+              <span class="mini-badge" style="background:rgba(52,152,219,0.1);border:1px solid rgba(52,152,219,0.3);color:var(--blue);">Assistant Intelligence Profile</span>
+              <span style="font-size:11px;color:var(--muted);">Treat this person like a VIP, not a gatekeeper</span>
+            </div>
+            <div class="g2">
+              <div>
+                <label>Preferred Communication</label>
+                <select id="ea-comm-pref" onchange="updateEAProfile()">
+                  <option value="email">Email — formal, written</option>
+                  <option value="email-casual">Email — casual, brief</option>
+                  <option value="phone">Phone call preferred</option>
+                  <option value="text">Text / SMS</option>
+                  <option value="linkedin">LinkedIn message</option>
+                  <option value="in-person">In-person / office visit</option>
+                  <option value="unknown">Unknown yet</option>
+                </select>
+              </div>
+              <div>
+                <label>Responsiveness</label>
+                <select id="ea-responsiveness" onchange="updateEAProfile()">
+                  <option value="fast">Fast — responds same day</option>
+                  <option value="moderate">Moderate — 2-3 days</option>
+                  <option value="slow">Slow — needs follow-up</option>
+                  <option value="gatekeeper">Protective gatekeeper</option>
+                  <option value="champion">Champion — actively helps</option>
+                  <option value="unknown">Unknown yet</option>
+                </select>
+              </div>
+            </div>
+            <div class="g2">
+              <div>
+                <label>Booking Habits</label>
+                <select id="ea-booking" onchange="updateEAProfile()">
+                  <option value="plans-ahead">Plans ahead — books 1-2 weeks out</option>
+                  <option value="last-minute">Last-minute — same day or next day</option>
+                  <option value="recurring">Sets recurring / standing bookings</option>
+                  <option value="reactive">Reactive — only books when told</option>
+                  <option value="unknown">Unknown yet</option>
+                </select>
+              </div>
+              <div>
+                <label>Personality Cues</label>
+                <select id="ea-personality" onchange="updateEAProfile()">
+                  <option value="professional">Professional — formal, task-focused</option>
+                  <option value="warm">Warm — friendly, relationship-oriented</option>
+                  <option value="efficient">Efficient — brief, no small talk</option>
+                  <option value="cautious">Cautious — needs approval for everything</option>
+                  <option value="empowered">Empowered — makes decisions independently</option>
+                  <option value="unknown">Unknown yet</option>
+                </select>
+              </div>
+            </div>
+            <div class="g1"><label>Additional Intelligence Notes</label><textarea id="ea-notes" placeholder="e.g. Prefers morning contact, mentioned executive travels every Monday, very organized, uses shared calendar..."></textarea></div>
+            <div id="ea-intel-profile" style="display:none;margin-top:12px;padding:12px 14px;background:rgba(52,152,219,0.05);border:1px solid rgba(52,152,219,0.2);border-radius:1px;">
+              <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--blue);margin-bottom:8px;">EA Profile Summary</div>
+              <div id="ea-intel-summary" style="font-size:12px;color:var(--text);line-height:1.8;"></div>
+              <div id="ea-contact-rec" style="margin-top:8px;font-size:11px;color:var(--gold);font-weight:600;"></div>
+            </div>
+          </div>
+          <div class="g3" style="margin-top:14px;">
+            <div class="chk-row" id="cr-tc" onclick="toggleChkRow(this,'ea-tc')"><input type="checkbox" id="ea-tc" onclick="event.stopPropagation()"><label for="ea-tc">Controls Travel Bookings (+5)</label></div>
+            <div class="chk-row" id="cr-ten" onclick="toggleChkRow(this,'ea-ten')"><input type="checkbox" id="ea-ten" onclick="event.stopPropagation()"><label for="ea-ten">Long Tenure 3+ Years (+3)</label></div>
+            <div class="chk-row" id="cr-multi" onclick="toggleChkRow(this,'ea-multi')"><input type="checkbox" id="ea-multi" onclick="event.stopPropagation()"><label for="ea-multi">Supports Multiple Execs (+4)</label></div>
+          </div>
+          <div class="ea-inf-row"><span class="ea-inf-lbl">EA Influence Level:</span><span class="ea-inf-badge inf-low" id="ea-inf-badge">Low</span><span class="ea-inf-note" id="ea-inf-note">Pursue exec directly</span></div>
+          <div class="ea-bonus">&#9650; EA access adds +6 to +10 points to acquisition score</div>
+        </div>
+      </div>
+
+      <!-- Event Mode Toggle -->
+      <div class="section-sep" style="margin-top:16px;padding-top:16px;">
+        <label class="event-toggle-row" id="event-toggle-row">
+          <input type="checkbox" id="event-mode" onchange="toggleEventMode(this)">
+          <span>&#9889; Event Mode — prospect is attending or speaking at an upcoming Atlanta event</span>
+        </label>
+        <div id="event-mode-fields" style="display:none;">
+          <div class="g2" style="margin-top:12px;">
+            <div><label>Event Name</label><input type="text" id="ev-name" placeholder="e.g. ATL CEO Summit 2026"></div>
+            <div><label>Event Date</label><input type="date" id="ev-date"></div>
+          </div>
+          <div class="g1"><label>Event Notes</label><textarea id="ev-notes" placeholder="e.g. Keynote speaker, panel moderator, VIP attendee..." style="min-height:55px;"></textarea></div>
+        </div>
+      </div>
+      <div class="btns" style="margin-top:20px;">
         <button class="btn btn-gold" onclick="scoreProspect()">Calculate Score <div class="spin" id="sp1"></div></button>
-        <button class="btn btn-ghost" onclick="clearProspect()">Clear</button>
+        <button class="btn btn-ghost" onclick="clearProspect()">Clear All</button>
       </div>
     </div>
+
+    <!-- Score Result -->
     <div class="card" id="score-card" style="display:none;">
-      <div class="score-row">
-        <div>
-          <div class="sec-tag">Acquisition Score</div>
-          <div id="r-name" style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:500;"></div>
-          <div id="r-sub" style="font-size:12px;color:var(--muted);margin-top:3px;"></div>
-        </div>
-        <div class="score-box" id="score-badge">
-          <div class="score-num" id="score-num">--</div>
-          <div class="score-tier" id="score-tier"></div>
-        </div>
+      <div id="r-name" style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:500;margin-bottom:3px;"></div>
+      <div id="r-sub" style="font-size:12px;color:var(--muted);margin-bottom:16px;"></div>
+      <div class="score-panel">
+        <div class="score-block"><div class="score-block-label">Acquisition Score</div><div class="score-block-val" id="acq-val" style="color:var(--gold);">--</div><div class="score-block-sub" id="acq-tier"></div></div>
+        <div class="score-block"><div class="score-block-label">Buying Moment</div><div class="score-block-val" id="bm-val" style="color:var(--muted);">0/10</div><div class="score-block-sub" id="bm-tier-lbl" style="color:var(--muted);">No signals</div></div>
+        <div class="score-block" id="ea-sb" style="display:none;"><div class="score-block-label">EA Influence</div><div class="score-block-val" id="ea-sb-val" style="font-size:18px;margin-top:6px;"></div><div class="score-block-sub" id="ea-sb-note"></div></div>
+        <div class="score-block" id="ct-sb" style="display:none;"><div class="score-block-label">Client Type</div><div style="margin-top:6px;" id="ct-sb-badge"></div><div class="score-block-sub" id="ct-sb-note" style="margin-top:6px;"></div></div>
+        <div class="score-block"><div class="score-block-label">Conversion Probability</div><div style="margin-top:6px;" id="conv-badge-el"><span style="font-size:11px;color:var(--muted);">Score first</span></div><div class="score-block-sub" id="conv-sub" style="margin-top:6px;"></div></div>
       </div>
       <div class="breakdown" id="breakdown"></div>
       <div class="divider"></div>
       <div class="btns">
         <button class="btn btn-gold" onclick="generateStrategy()">Generate Approach Strategy <div class="spin" id="sp2"></div></button>
         <button class="btn btn-outline" onclick="addToPipeline()">Add to Pipeline</button>
+        <button class="btn btn-outline" onclick="generateEventCapture()" id="event-capture-btn" style="display:none;border-color:rgba(155,89,182,0.5);color:#9b59b6;">&#9889; Event Capture Strategy <div class="spin" id="sp-ev"></div></button>
       </div>
-      <div class="ai-box" id="strat-box">
-        <span class="ai-label">AI Strategy</span>
-        <button class="copy-btn" onclick="copyText('strat-ai')">Copy</button>
-        <div class="ai-text" id="strat-ai"></div>
-      </div>
+      <div class="ai-box" id="strat-box"><span class="ai-label">AI Strategy</span><button class="copy-btn" onclick="copyText('strat-ai')">Copy</button><div class="ai-text" id="strat-ai"></div></div>
     </div>
   </div>
 
-  <!-- OUTREACH -->
+  <!-- TAB 2: OUTREACH -->
   <div class="panel" id="panel-outreach">
     <div class="sec-tag">Step 02</div>
     <div class="sec-h">AI-Powered Outreach</div>
-    <div class="sec-d">Click Research Executive first to gather verified facts, then generate a personalized message.</div>
-    <div class="card">
-      <div class="g2">
-        <div><label>Executive Name</label><input type="text" id="o-name" placeholder="e.g. Carol Tome"></div>
-        <div><label>Title and Company</label><input type="text" id="o-title" placeholder="e.g. CEO, UPS"></div>
-      </div>
-      <div class="g2">
-        <div><label>Channel</label>
-          <select id="o-channel">
-            <option value="email">Cold email</option>
-            <option value="linkedin">LinkedIn DM</option>
-            <option value="referral">Referral introduction email</option>
-            <option value="event">Post-event follow-up</option>
-            <option value="voicemail">Voicemail script</option>
-          </select>
+    <div class="sec-d">Research the executive first, then generate a personalized message grounded in verified facts.</div>
+    <div class="mode-tabs">
+      <button class="mode-tab active" id="mode-exec-btn" onclick="setMode('exec',this)">Executive Mode</button>
+      <button class="mode-tab" id="mode-ea-btn" onclick="setMode('ea',this)">Assistant Mode</button>
+    </div>
+    <div id="exec-fields">
+      <span class="mode-note mn-gold">Direct executive outreach</span>
+      <div class="card">
+        <div class="g2">
+          <div><label>Executive Name</label><input type="text" id="o-name" placeholder="e.g. Carol Tome"></div>
+          <div><label>Title and Company</label><input type="text" id="o-title" placeholder="e.g. CEO, UPS"></div>
         </div>
-        <div><label>Tone</label>
-          <select id="o-tone">
-            <option value="luxury">Luxury and exclusive</option>
-            <option value="peer">Executive peer-to-peer</option>
-            <option value="concise">Concise and respectful</option>
-            <option value="warm">Warm and referral-based</option>
-          </select>
+        <div class="g2">
+          <div><label>Channel</label>
+            <select id="o-channel">
+              <option value="email">Cold email</option><option value="linkedin">LinkedIn DM</option>
+              <option value="referral">Referral introduction email</option><option value="event">Post-event follow-up</option>
+              <option value="voicemail">Voicemail script</option>
+            </select>
+          </div>
+          <div><label>Tone</label>
+            <select id="o-tone">
+              <option value="luxury">Luxury and exclusive</option><option value="peer">Executive peer-to-peer</option>
+              <option value="concise">Concise and respectful</option><option value="warm">Warm and referral-based</option>
+            </select>
+          </div>
+        </div>
+        <div class="g1"><label>Additional Context <span class="rnote">auto-filled after research</span></label><textarea id="o-ctx" placeholder="Click Research Executive first, or add your own context..."></textarea></div>
+        <div class="btns">
+          <button class="btn btn-outline" onclick="researchExec()">Research Executive <div class="spin" id="sp-res"></div></button>
+          <button class="btn btn-gold" onclick="generateOutreach()">Generate Message <div class="spin" id="sp3"></div></button>
         </div>
       </div>
-      <div class="g1">
-        <label>Additional Context <span class="rnote">auto-filled after research</span></label>
-        <textarea id="o-ctx" placeholder="Click Research Executive first, or add your own context here..."></textarea>
+    </div>
+    <div id="ea-fields-out" style="display:none;">
+      <span class="mode-note mn-green">Route through Executive Assistant</span>
+      <div class="card">
+        <div class="g2">
+          <div><label>Assistant Name</label><input type="text" id="oa-name" placeholder="e.g. Jennifer Harris"></div>
+          <div><label>Assistant Role</label>
+            <select id="oa-role">
+              <option value="ea">Executive Assistant</option><option value="cos">Chief of Staff</option>
+              <option value="om">Office Manager</option><option value="tc">Travel Coordinator</option>
+            </select>
+          </div>
+        </div>
+        <div class="g2">
+          <div><label>Assistant Email</label><input type="email" id="oa-email" placeholder="e.g. j.harris@ups.com"></div>
+          <div><label>Assistant Phone (optional)</label><input type="tel" id="oa-phone" placeholder="e.g. 404-555-0100"></div>
+        </div>
+        <div class="g1"><label>Executive They Support</label><input type="text" id="oa-exec" placeholder="e.g. Carol Tome, CEO of UPS"></div>
+        <div class="g2">
+          <div>
+            <label>Communication Preference</label>
+            <select id="oa-comm">
+              <option value="email">Email</option>
+              <option value="email-casual">Email (casual)</option>
+              <option value="phone">Phone</option>
+              <option value="text">Text</option>
+              <option value="linkedin">LinkedIn</option>
+              <option value="unknown">Unknown</option>
+            </select>
+          </div>
+          <div>
+            <label>Personality / Approach</label>
+            <select id="oa-personality">
+              <option value="professional">Professional &amp; formal</option>
+              <option value="warm">Warm &amp; relational</option>
+              <option value="efficient">Efficient — keep it brief</option>
+              <option value="cautious">Cautious — needs approval</option>
+              <option value="empowered">Empowered decision-maker</option>
+              <option value="unknown">Unknown</option>
+            </select>
+          </div>
+        </div>
+        <div class="g1"><label>Intelligence Notes</label><textarea id="oa-notes" placeholder="e.g. Books last-minute, responds fast to texts, very protective of exec schedule, prefers morning contact..."></textarea></div>
+        <div class="btns"><button class="btn btn-gold" onclick="generateOutreach()">Generate Assistant Outreach <div class="spin" id="sp3b"></div></button></div>
       </div>
-      <div class="btns">
-        <button class="btn btn-outline" onclick="researchExecutive()">Research Executive <div class="spin" id="sp-res"></div></button>
-        <button class="btn btn-gold" onclick="generateOutreach()">Generate Message <div class="spin" id="sp3"></div></button>
-      </div>
     </div>
-    <div class="ai-box" id="research-box">
-      <span class="ai-label">Executive Research</span>
-      <button class="copy-btn" onclick="copyText('research-ai')">Copy</button>
-      <div class="ai-text" id="research-ai"></div>
-    </div>
-    <div class="ai-box" id="out-box">
-      <span class="ai-label">Generated Outreach</span>
-      <button class="copy-btn" onclick="copyText('out-ai')">Copy</button>
-      <div class="ai-text" id="out-ai"></div>
-    </div>
+    <div class="ai-box" id="research-box"><span class="ai-label">Executive Research</span><button class="copy-btn" onclick="copyText('research-ai')">Copy</button><div class="ai-text" id="research-ai"></div></div>
+    <div class="ai-box" id="out-box"><span class="ai-label">Generated Outreach</span><button class="copy-btn" onclick="copyText('out-ai')">Copy</button><div class="ai-text" id="out-ai"></div></div>
   </div>
 
-  <!-- PIPELINE -->
+  <!-- TAB 3: PIPELINE -->
   <div class="panel" id="panel-pipeline">
     <div class="sec-tag">Your Prospects</div>
     <div class="sec-h">Acquisition Pipeline</div>
-    <div class="sec-d">Click a prospect card to advance their stage.</div>
+    <div class="sec-d">8-stage pipeline tracking real business progression. Click a card to advance. Green border = active buying moment.</div>
+
+    <!-- Event Mode Bar -->
+    <div class="event-mode-bar" id="event-mode-bar">
+      <div>
+        <div class="event-mode-title">&#9889; Event Mode Active</div>
+        <div class="event-mode-desc" id="event-mode-desc">Scoring boosted for event attendees. Act today.</div>
+      </div>
+      <div class="event-urgency">Time-Sensitive Window</div>
+    </div>
+
+    <!-- Revenue Stats -->
     <div class="stats">
       <div class="stat"><div class="stat-n" id="st-total">0</div><div class="stat-l">Total</div></div>
-      <div class="stat"><div class="stat-n" id="st-hot">0</div><div class="stat-l">HOT 28+</div></div>
-      <div class="stat"><div class="stat-n" id="st-strong">0</div><div class="stat-l">Strong 24-27</div></div>
-      <div class="stat"><div class="stat-n" id="st-qual">0</div><div class="stat-l">Qualified 20-23</div></div>
+      <div class="stat"><div class="stat-n" id="st-hot">0</div><div class="stat-l">High Conv</div></div>
+      <div class="stat"><div class="stat-n" id="st-revenue" style="font-size:20px;padding-top:6px;">$0</div><div class="stat-l">Est Monthly</div></div>
+      <div class="stat"><div class="stat-n" id="st-bm">0</div><div class="stat-l">Overdue / BM</div></div>
     </div>
-    <div class="pipe">
-      <div class="pipe-col">
-        <div class="pipe-head">Identified <span class="pipe-cnt" id="cnt-identified">0</span></div>
-        <div id="col-identified"></div>
-      </div>
-      <div class="pipe-col">
-        <div class="pipe-head">Outreach Sent <span class="pipe-cnt" id="cnt-outreach">0</span></div>
-        <div id="col-outreach"></div>
-      </div>
-      <div class="pipe-col">
-        <div class="pipe-head">Engaged / Booked <span class="pipe-cnt" id="cnt-booked">0</span></div>
-        <div id="col-booked"></div>
+
+    <!-- 8-Stage Board -->
+    <div class="pipe-scroll">
+      <div class="pipe-inner">
+        <div class="pipe-col"><div class="pipe-col-header">Identified <span class="pipe-cnt" id="cnt-identified">0</span></div><div id="col-identified"></div></div>
+        <div class="pipe-col"><div class="pipe-col-header">Contacted <span class="pipe-cnt" id="cnt-contacted">0</span></div><div id="col-contacted"></div></div>
+        <div class="pipe-col"><div class="pipe-col-header">Asst Engaged <span class="pipe-cnt" id="cnt-assistant">0</span></div><div id="col-assistant"></div></div>
+        <div class="pipe-col"><div class="pipe-col-header">Trial Scheduled <span class="pipe-cnt" id="cnt-trial-sched">0</span></div><div id="col-trial-sched"></div></div>
+        <div class="pipe-col"><div class="pipe-col-header">Trial Done <span class="pipe-cnt" id="cnt-trial-done">0</span></div><div id="col-trial-done"></div></div>
+        <div class="pipe-col"><div class="pipe-col-header">Active Client <span class="pipe-cnt" id="cnt-active">0</span></div><div id="col-active"></div></div>
+        <div class="pipe-col"><div class="pipe-col-header">Recurring <span class="pipe-cnt" id="cnt-recurring">0</span></div><div id="col-recurring"></div></div>
+        <div class="pipe-col"><div class="pipe-col-header">Corporate Acct <span class="pipe-cnt" id="cnt-corporate">0</span></div><div id="col-corporate"></div></div>
       </div>
     </div>
     <div class="empty-msg" id="pipe-empty">No prospects yet. Score a prospect and add them to the pipeline.</div>
   </div>
 
-  <!-- CALL SCRIPT -->
+  <!-- TAB 4: CALL SCRIPT -->
   <div class="panel" id="panel-script">
     <div class="sec-tag">Live Conversations</div>
     <div class="sec-h">Call Script Builder</div>
@@ -306,56 +631,36 @@ textarea { resize:vertical; min-height:75px; }
       <div class="g2">
         <div><label>Call Type</label>
           <select id="c-type">
-            <option value="cold">Cold call - first touch</option>
-            <option value="followup">Follow-up - already emailed</option>
-            <option value="referral">Referral introduction</option>
-            <option value="close">Trial close - ready to book</option>
+            <option value="cold">Cold call - first touch</option><option value="followup">Follow-up - already emailed</option>
+            <option value="referral">Referral introduction</option><option value="close">Trial close - ready to book</option>
           </select>
         </div>
         <div><label>Anticipated Objection</label>
           <select id="c-obj">
-            <option value="none">None / unknown</option>
-            <option value="price">Too expensive</option>
-            <option value="uber">Already use Uber Black</option>
-            <option value="have">Already have a car service</option>
-            <option value="need">Do not travel enough</option>
-            <option value="contract">Do not want a contract</option>
+            <option value="none">None / unknown</option><option value="price">Too expensive</option>
+            <option value="uber">Already use Uber Black</option><option value="have">Already have a car service</option>
+            <option value="need">Do not travel enough</option><option value="contract">Do not want a contract</option>
           </select>
         </div>
       </div>
       <div class="g1"><label>Context</label><textarea id="c-ctx" placeholder="e.g. Referred by John Doe, travels ATL-NYC weekly..."></textarea></div>
-      <div class="btns">
-        <button class="btn btn-gold" onclick="generateScript()">Build Call Script <div class="spin" id="sp4"></div></button>
-      </div>
+      <div class="btns"><button class="btn btn-gold" onclick="generateScript()">Build Call Script <div class="spin" id="sp4"></div></button></div>
     </div>
-    <div class="ai-box" id="script-box">
-      <span class="ai-label">Call Script</span>
-      <button class="copy-btn" onclick="copyText('script-ai')">Copy</button>
-      <div class="ai-text" id="script-ai"></div>
-    </div>
+    <div class="ai-box" id="script-box"><span class="ai-label">Call Script</span><button class="copy-btn" onclick="copyText('script-ai')">Copy</button><div class="ai-text" id="script-ai"></div></div>
   </div>
 
-  <!-- APOLLO IMPORT -->
+  <!-- TAB 5: APOLLO IMPORT -->
   <div class="panel" id="panel-import">
     <div class="sec-tag">Apollo Integration</div>
     <div class="sec-h">Bulk Import and Score</div>
-    <div class="sec-d">Export your Apollo search as CSV and drop it here. All prospects are scored instantly with HOT leads at the top.</div>
+    <div class="sec-d">Export your Apollo search as CSV and drop it here. All prospects scored instantly.</div>
     <div class="card">
       <div class="sec-tag" style="margin-bottom:12px;">How to export from Apollo</div>
-      <div style="font-size:12px;color:var(--muted);line-height:2.2;">
-        1. Apollo people search, set filters: CEO / CFO / COO plus Atlanta plus 1000+ employees<br>
-        2. Check the top checkbox to select all visible records<br>
-        3. Click Export in the toolbar, then Export to CSV<br>
-        4. Drop the downloaded CSV file in the box below
-      </div>
+      <div style="font-size:12px;color:var(--muted);line-height:2.2;">1. Apollo people search, set filters: CEO / CFO / COO plus Atlanta plus 1000+ employees<br>2. Check the top checkbox to select all visible records<br>3. Click Export in the toolbar, then Export to CSV<br>4. Drop the downloaded CSV file below</div>
     </div>
     <div class="card">
-      <div class="import-drop" id="drop-zone"
-        onclick="document.getElementById('csv-file').click()"
-        ondragover="event.preventDefault();this.classList.add('over')"
-        ondragleave="this.classList.remove('over')"
-        ondrop="handleDrop(event)">
-        <div class="import-icon">📋</div>
+      <div class="import-drop" id="drop-zone" onclick="document.getElementById('csv-file').click()" ondragover="event.preventDefault();this.classList.add('over')" ondragleave="this.classList.remove('over')" ondrop="handleDrop(event)">
+        <div class="import-icon">&#128203;</div>
         <div class="import-text">Drop Apollo CSV here or click to browse</div>
         <div class="import-sub">Accepts Apollo people export CSV</div>
       </div>
@@ -364,470 +669,937 @@ textarea { resize:vertical; min-height:75px; }
     <div id="import-results" style="display:none;">
       <div class="filter-row">
         <div id="import-summary" style="font-size:12px;color:var(--muted);flex:1;"></div>
-        <button class="fbtn on" onclick="filterTable('all',this)">All</button>
-        <button class="fbtn" onclick="filterTable('hot',this)">HOT Only</button>
-        <button class="fbtn" onclick="filterTable('strong',this)">Strong Plus</button>
+        <button class="fbtn on" onclick="filterBulk('all',this)">All</button>
+        <button class="fbtn" onclick="filterBulk('hot',this)">HOT Only</button>
+        <button class="fbtn" onclick="filterBulk('strong',this)">Strong Plus</button>
         <button class="btn btn-outline" style="padding:6px 16px;font-size:9px;" onclick="addAllHot()">Add HOT to Pipeline</button>
       </div>
       <div class="card" style="padding:0;overflow:auto;">
-        <table class="bulk-table">
-          <thead><tr><th>Name</th><th>Title</th><th>Company</th><th>Score</th><th>Tier</th><th>Action</th></tr></thead>
-          <tbody id="bulk-tbody"></tbody>
-        </table>
+        <table class="bulk-table"><thead><tr><th>Name</th><th>Title</th><th>Company</th><th>Score</th><th>Tier</th><th>Action</th></tr></thead><tbody id="bulk-tbody"></tbody></table>
       </div>
     </div>
   </div>
 
+  <!-- TAB 6: COMPANY INTEL -->
+  <div class="panel" id="panel-company">
+    <div class="sec-tag">Phase 3</div>
+    <div class="sec-h">Company Intelligence</div>
+    <div class="sec-d">Link multiple executives to the same company and identify multi-executive account opportunities.</div>
+    <div class="btns" style="margin-bottom:24px;">
+      <button class="btn btn-gold" onclick="buildCoMap()">Build from Pipeline <div class="spin" id="sp-co"></div></button>
+      <button class="btn btn-outline" onclick="genAccountStrategy()">Generate Account Strategy <div class="spin" id="sp-co2"></div></button>
+    </div>
+    <div id="co-map" style="display:none;"><div id="co-list"></div></div>
+    <div class="empty-msg" id="co-empty">Add prospects to your pipeline first, then build the company map.</div>
+    <div class="ai-box" id="co-strat-box"><span class="ai-label">Account Expansion Strategy</span><button class="copy-btn" onclick="copyText('co-strat-ai')">Copy</button><div class="ai-text" id="co-strat-ai"></div></div>
+  </div>
 </div>
-
 <div class="notif" id="notif"></div>
 
 <script>
-var pipeline = JSON.parse(localStorage.getItem('ob-pipeline') || '[]');
-var currentP = null;
-var bulkData = [];
-var bulkFilter = 'all';
+var pipeline=JSON.parse(localStorage.getItem('ob-pipeline')||'[]');
+var currentP=null,bulkData=[],bulkFilter='all',outMode='exec';
+var SIG_SCORES={'sig-hired':3,'sig-office':2,'sig-earnings':1,'sig-speaking':2,'sig-reloc':3,'sig-travel':2};
+var SIG_LABELS={'sig-hired':'Recently hired/promoted','sig-office':'Company opening ATL office','sig-earnings':'Upcoming earnings/board meeting','sig-speaking':'Speaking at ATL event','sig-reloc':'Relocating to Atlanta','sig-travel':'Increased travel activity'};
+var CHIP_IDS={'sig-hired':'chip-hired','sig-office':'chip-office','sig-earnings':'chip-earnings','sig-speaking':'chip-speaking','sig-reloc':'chip-reloc','sig-travel':'chip-travel'};
 
-function switchTab(name, el) {
-  document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
-  document.querySelectorAll('.panel').forEach(function(p) { p.classList.remove('active'); });
-  el.classList.add('active');
-  document.getElementById('panel-' + name).classList.add('active');
-  if (name === 'pipeline') { renderPipeline(); }
-}
+function switchTab(n,el){document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});el.classList.add('active');document.getElementById('panel-'+n).classList.add('active');if(n==='pipeline'){renderPipeline();}if(n==='company'){buildCoMap();}}
 
-function getTier(score) {
-  if (score >= 28) { return 'HOT'; }
-  if (score >= 24) { return 'STRONG'; }
-  if (score >= 20) { return 'QUALIFIED'; }
-  return 'LOW';
-}
+function toggleSig(sid,cid){var cb=document.getElementById(sid);var chip=document.getElementById(cid);cb.checked=!cb.checked;if(cb.checked){chip.classList.add('on');}else{chip.classList.remove('on');}refreshBM();}
+function refreshBM(){var total=0;Object.keys(SIG_SCORES).forEach(function(id){var el=document.getElementById(id);if(el&&el.checked){total+=SIG_SCORES[id];}});total=Math.min(total,10);var num=document.getElementById('bm-num'),fill=document.getElementById('bm-fill'),desc=document.getElementById('bm-desc');num.textContent=total;fill.style.width=(total*10)+'%';var c,d;if(total===0){c='var(--muted)';d='No signals active';}else if(total<=3){c='#e67e22';d='Mild timing - monitor';}else if(total<=6){c='var(--yellow)';d='Good timing - reach out soon';}else if(total<=8){c='var(--green)';d='Strong timing - act this week';}else{c='var(--gold)';d='PEAK MOMENT - reach out today';}num.style.color=c;fill.style.background=c;desc.style.color=c;desc.textContent=d;return total;}
+function getActiveSigs(){var a=[];Object.keys(SIG_SCORES).forEach(function(id){var el=document.getElementById(id);if(el&&el.checked){a.push(SIG_LABELS[id]);}});return a;}
 
-function getTierClass(score) {
-  if (score >= 28) { return 't-hot'; }
-  if (score >= 24) { return 't-strong'; }
-  if (score >= 20) { return 't-qual'; }
-  return 't-low';
-}
+function toggleEAFields(cb){var f=document.getElementById('ea-fields');if(cb.checked){f.classList.add('open');calcEAInf();}else{f.classList.remove('open');}}
+function toggleChkRow(div,id){var cb=document.getElementById(id);cb.checked=!cb.checked;if(cb.checked){div.classList.add('on');}else{div.classList.remove('on');}calcEAInf();}
+function calcEAInf(){var role=document.getElementById('ea-role').value;var tc=document.getElementById('ea-tc').checked;var ten=document.getElementById('ea-ten').checked;var multi=document.getElementById('ea-multi').checked;var s=0;if(tc){s+=5;}if(role==='cos'){s+=6;}if(ten){s+=3;}if(multi){s+=4;}var lv,cls,note;if(s>=9){lv='High';cls='ea-inf-badge inf-high';note='EA-first strategy recommended';}else if(s>=5){lv='Medium';cls='ea-inf-badge inf-med';note='Parallel EA and exec outreach';}else{lv='Low';cls='ea-inf-badge inf-low';note='Pursue exec directly';}var b=document.getElementById('ea-inf-badge');var n=document.getElementById('ea-inf-note');b.textContent=lv;b.className=cls;n.textContent=note;return{score:s,level:lv,note:note};}
 
-function titleScore(title) {
-  var tl = (title || '').toLowerCase();
-  if (/\b(ceo|chief executive|president|chairman)\b/.test(tl)) { return 10; }
-  if (/\b(cfo|coo|cto|ciso|cmo|chief)\b/.test(tl)) { return 8; }
-  if (/\b(evp|svp|executive vice|senior vice)\b/.test(tl)) { return 7; }
-  if (/\b(vp|vice president|managing director|managing partner)\b/.test(tl)) { return 6; }
-  if (/\b(director|partner|principal)\b/.test(tl)) { return 4; }
-  return 2;
-}
+function getTitleScore(t){var tl=(t||'').toLowerCase();if(/\b(ceo|chief executive|president|chairman)\b/.test(tl)){return 10;}if(/\b(cfo|coo|cto|ciso|cmo|chief)\b/.test(tl)){return 8;}if(/\b(evp|svp|executive vice|senior vice)\b/.test(tl)){return 7;}if(/\b(vp|vice president|managing director|managing partner)\b/.test(tl)){return 6;}if(/\b(director|partner|principal)\b/.test(tl)){return 4;}return 2;}
+function getTier(s){if(s>=28){return'HOT';}if(s>=24){return'STRONG';}if(s>=20){return'QUALIFIED';}return'LOW';}
+function getTierClass(s){if(s>=28){return't-hot';}if(s>=24){return't-strong';}if(s>=20){return't-qual';}return't-low';}
 
-function scoreProspect() {
-  var name = document.getElementById('p-name').value.trim();
-  var title = document.getElementById('p-title').value.trim();
-  var company = document.getElementById('p-company').value.trim();
-  if (!name || !title || !company) { notify('Please fill in Name, Title, and Company'); return; }
-
-  var hq = document.getElementById('p-hq').value;
-  var travel = document.getElementById('p-travel').value;
-  var industry = document.getElementById('p-industry').value;
-  var source = document.getElementById('p-source').value;
-  var score = 0;
-  var bd = [];
-
-  var ts = titleScore(title);
-  score += ts;
-  var tl = title.toLowerCase();
-  if (/\b(ceo|chief executive|president|chairman)\b/.test(tl)) { bd.push('C-Suite CEO: +' + ts); }
-  else if (/\b(cfo|coo|cto|ciso|cmo|chief)\b/.test(tl)) { bd.push('C-Suite Other: +' + ts); }
-  else if (/\b(evp|svp|executive vice|senior vice)\b/.test(tl)) { bd.push('EVP/SVP: +' + ts); }
-  else if (/\b(vp|vice president|managing director|managing partner)\b/.test(tl)) { bd.push('VP/MD: +' + ts); }
-  else if (/\b(director|partner|principal)\b/.test(tl)) { bd.push('Director: +' + ts); }
-  else { bd.push('Manager: +' + ts); }
-
-  if (hq === 'yes') { score += 8; bd.push('Atlanta HQ: +8'); }
-  else if (hq === 'regional') { score += 5; bd.push('ATL Regional: +5'); }
-  else { score += 3; bd.push('Visiting: +3'); }
-
-  if (travel === 'heavy') { score += 7; bd.push('Heavy Travel: +7'); }
-  else if (travel === 'moderate') { score += 4; bd.push('Moderate Travel: +4'); }
-  else { score += 1; bd.push('Light Travel: +1'); }
-
-  var premIndustry = ['Airline / Aviation', 'Financial Services / Banking', 'Private Equity / VC', 'Legal / Law Firm', 'Consulting'];
-  if (premIndustry.indexOf(industry) >= 0) { score += 5; bd.push('Premium Industry: +5'); }
-  else if (industry) { score += 3; bd.push('Fortune 500: +3'); }
-
-  if (source === 'referral') { score += 5; bd.push('Referral: +5'); }
-  else if (source === 'event') { score += 3; bd.push('Event: +3'); }
-  else { score += 1; bd.push('Cold: +1'); }
-
-  currentP = { name: name, title: title, company: company, industry: industry, hq: hq, travel: travel, source: source, score: score, notes: document.getElementById('p-notes').value, stage: 'identified', id: Date.now() };
-
-  document.getElementById('r-name').textContent = name;
-  document.getElementById('r-sub').textContent = title + ' · ' + company;
-  document.getElementById('score-num').textContent = score;
-
-  var badge = document.getElementById('score-badge');
-  var tierEl = document.getElementById('score-tier');
-  badge.className = 'score-box';
-  if (score >= 28) { badge.classList.add('hot'); }
-  else if (score >= 24) { badge.classList.add('strong'); }
-  else if (score >= 20) { badge.classList.add('qualified'); }
-  else { badge.classList.add('low'); }
-  tierEl.textContent = getTier(score);
-
-  document.getElementById('breakdown').innerHTML = bd.map(function(b) {
-    return '<span style="display:inline-block;margin-right:14px;">&#9670; ' + b + '</span>';
-  }).join('');
-  document.getElementById('score-card').style.display = 'block';
+function scoreProspect(){
+  var name=document.getElementById('p-name').value.trim();
+  var title=document.getElementById('p-title').value.trim();
+  var company=document.getElementById('p-company').value.trim();
+  if(!name||!title||!company){notify('Please fill in Name, Title, and Company');return;}
+  var hq=document.getElementById('p-hq').value;
+  var travel=document.getElementById('p-travel').value;
+  var industry=document.getElementById('p-industry').value;
+  var source=document.getElementById('p-source').value;
+  var score=0,bd=[];
+  var ts=getTitleScore(title);score+=ts;
+  var tl=title.toLowerCase();
+  if(/\b(ceo|chief executive|president|chairman)\b/.test(tl)){bd.push('C-Suite CEO: +'+ts);}
+  else if(/\b(cfo|coo|cto|ciso|cmo|chief)\b/.test(tl)){bd.push('C-Suite Other: +'+ts);}
+  else if(/\b(evp|svp)\b/.test(tl)){bd.push('EVP/SVP: +'+ts);}
+  else if(/\b(vp|vice president)\b/.test(tl)){bd.push('VP/MD: +'+ts);}
+  else if(/\b(director|partner)\b/.test(tl)){bd.push('Director: +'+ts);}
+  else{bd.push('Manager: +'+ts);}
+  if(hq==='yes'){score+=8;bd.push('Atlanta HQ: +8');}else if(hq==='regional'){score+=5;bd.push('ATL Regional: +5');}else{score+=3;bd.push('Visiting: +3');}
+  if(travel==='heavy'){score+=7;bd.push('Heavy Travel: +7');}else if(travel==='moderate'){score+=4;bd.push('Moderate Travel: +4');}else{score+=1;bd.push('Light Travel: +1');}
+  var premInd=['Airline / Aviation','Financial Services / Banking','Private Equity / VC','Legal / Law Firm','Consulting'];
+  if(premInd.indexOf(industry)>=0){score+=5;bd.push('Premium Industry: +5');}else if(industry){score+=3;bd.push('Fortune 500: +3');}
+  if(source==='referral'){score+=5;bd.push('Referral: +5');}else if(source==='event'){score+=3;bd.push('Event: +3');}else{score+=1;bd.push('Cold: +1');}
+  var travelData=getTravelData();
+  var eaOn=document.getElementById('ea-toggle').checked;
+  var eaName=document.getElementById('ea-name').value.trim();
+  var eaEmail=document.getElementById('ea-email').value.trim();
+  var eaPhone=document.getElementById('ea-phone').value.trim();
+  var eaRole=document.getElementById('ea-role').value;
+  var eaNotes=document.getElementById('ea-notes').value.trim();
+  var eaBonus=0,eaInf={score:0,level:'None',note:''};
+  if(eaOn&&eaName){
+    if(eaEmail&&eaPhone){eaBonus=10;bd.push('EA Full Access: +10');}
+    else if(eaEmail){eaBonus=8;bd.push('EA Email Access: +8');}
+    else{eaBonus=6;bd.push('EA Identified: +6');}
+    score+=eaBonus;eaInf=calcEAInf();
+  }
+  var bmScore=refreshBM();
+  var sigs=getActiveSigs();
+  var ct=classifyClientType(travelData,score,travel);
+  var tempP={name:name,title:title,company:company,industry:industry,hq:hq,travel:travel,source:source,score:score,notes:document.getElementById('p-notes').value,stage:'identified',id:Date.now(),bmScore:bmScore,signals:sigs,travelData:travelData,clientType:ct.short,clientTypeInfo:ct,ea:{active:eaOn&&!!eaName,name:eaName,role:eaRole,email:eaEmail,phone:eaPhone,notes:eaNotes,infLevel:eaInf.level,infScore:eaInf.score,infNote:eaInf.note,intel:getEAIntelProfile()}};
+  tempP.convProb=calcConvProb(tempP);
+  currentP=tempP;
+  document.getElementById('r-name').textContent=name;
+  document.getElementById('r-sub').textContent=title+' · '+company;
+  var tier=getTier(score);
+  document.getElementById('acq-val').textContent=score;
+  document.getElementById('acq-tier').textContent=tier;
+  document.getElementById('acq-tier').style.color=score>=28?'var(--gold)':score>=24?'var(--green)':score>=20?'var(--blue)':'var(--muted)';
+  var bmc=bmScore===0?'var(--muted)':bmScore<=3?'#e67e22':bmScore<=6?'var(--yellow)':bmScore<=8?'var(--green)':'var(--gold)';
+  var bmd=bmScore===0?'No signals':bmScore<=3?'Monitor':bmScore<=6?'Reach out soon':bmScore<=8?'Act this week':'PEAK MOMENT';
+  document.getElementById('bm-val').textContent=bmScore+'/10';document.getElementById('bm-val').style.color=bmc;
+  document.getElementById('bm-tier-lbl').textContent=bmd;document.getElementById('bm-tier-lbl').style.color=bmc;
+  if(eaOn&&eaName){
+    document.getElementById('ea-sb').style.display='block';
+    var ev=document.getElementById('ea-sb-val');ev.textContent=eaInf.level;
+    ev.style.color=eaInf.level==='High'?'var(--green)':eaInf.level==='Medium'?'var(--yellow)':'var(--muted)';
+    var eaI=getEAIntelProfile();
+    var eaRecStr=getBestContactMethod(eaI);
+    document.getElementById('ea-sb-note').innerHTML=eaInf.note+'<br><span style="font-size:10px;color:var(--gold);margin-top:4px;display:block;">&#x27A4; '+eaRecStr+'</span>';
+    document.getElementById('ea-sb-note').style.color='var(--muted)';
+    updateEAProfile();
+  }else{document.getElementById('ea-sb').style.display='none';}
+  var ct=currentP.clientTypeInfo;
+  document.getElementById('ct-sb').style.display='block';
+  document.getElementById('ct-sb-badge').innerHTML='<span class="client-type-badge '+ct.cls+'">'+ct.type+'</span>';
+  document.getElementById('ct-sb-note').textContent=ct.desc;
+  document.getElementById('ct-sb-note').style.color='var(--muted)';
+  var convCls=currentP.convProb==='High'?'conv-high':currentP.convProb==='Medium'?'conv-med':'conv-low';
+  document.getElementById('conv-badge-el').innerHTML='<span class="conv-badge '+convCls+'">'+currentP.convProb+'</span>';
+  document.getElementById('conv-sub').textContent='Likelihood to convert';
+  document.getElementById('conv-sub').style.color='var(--muted)';
+  updateClientTypeDisplay();
+  document.getElementById('breakdown').innerHTML=bd.map(function(b){return'<span style="display:inline-block;margin-right:14px;">&#9670; '+b+'</span>';}).join('');
+  document.getElementById('score-card').style.display='block';
   document.getElementById('strat-box').classList.remove('show');
-}
-
-async function callAI(lines, maxTokens) {
-  var prompt = lines.join('\n');
-  var res = await fetch('/.netlify/functions/claude', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: 'claude-haiku-4-5-20251001',
-      max_tokens: maxTokens || 1000,
-      messages: [{ role: 'user', content: prompt }]
-    })
-  });
-  var data = await res.json();
-  if (data.error) { throw new Error(JSON.stringify(data.error)); }
-  if (!data.content || !data.content[0]) { throw new Error('Bad response: ' + JSON.stringify(data).substring(0, 200)); }
-  return data.content[0].text;
-}
-
-async function generateStrategy() {
-  if (!currentP) { return; }
-  var sp = document.getElementById('sp2');
-  var box = document.getElementById('strat-box');
-  var out = document.getElementById('strat-ai');
-  sp.classList.add('on');
-  box.classList.remove('show');
-  try {
-    out.textContent = await callAI([
-      'You are a business development advisor for Odyssey Black VIP Transportation in Atlanta, a luxury black car service for Fortune 500 executives.',
-      'Prospect: ' + currentP.name + ', ' + currentP.title + ' at ' + currentP.company,
-      'Industry: ' + currentP.industry + ' | Atlanta: ' + currentP.hq + ' | Travel: ' + currentP.travel + ' | Source: ' + currentP.source,
-      'Score: ' + currentP.score + '/40 (' + getTier(currentP.score) + ')',
-      'Notes: ' + (currentP.notes || 'None'),
-      'Write a sharp acquisition strategy with these 5 sections:',
-      '1. WHY THEY ARE A FIT',
-      '2. APPROACH ANGLE',
-      '3. BEST CHANNEL AND TIMING',
-      '4. VALUE PROPOSITION',
-      '5. FIRST MOVE TODAY',
-      'Be specific and concise. Executive-level language.'
-    ], 1000);
-    box.classList.add('show');
-  } catch(e) {
-    out.textContent = 'Error: ' + e.message;
-    box.classList.add('show');
+  var evBtn=document.getElementById('event-capture-btn');
+  if(evBtn){evBtn.style.display=eventModeActive?'inline-flex':'none';}
+  if(eventModeActive){
+    var evData=getEventData();
+    var daysAway=getDaysToEvent(evData.date);
+    var urgency=getEventUrgency(daysAway);
+    showEventModeBar(true,evData);
+    var evBonus=0;
+    if(daysAway!==null){
+      if(daysAway===0||daysAway===1){evBonus=5;}
+      else if(daysAway<=3){evBonus=4;}
+      else if(daysAway<=7){evBonus=3;}
+      else{evBonus=2;}
+    }else{evBonus=2;}
+    currentP.score+=evBonus;
+    currentP.bmScore=Math.min(10,currentP.bmScore+evBonus);
+    currentP.convProb=calcConvProb(currentP);
+    document.getElementById('acq-val').textContent=currentP.score;
+    document.getElementById('bm-val').textContent=currentP.bmScore+'/10';
+    document.getElementById('bm-val').style.color='#9b59b6';
+    document.getElementById('bm-tier-lbl').textContent=urgency.label+' (+'+evBonus+' event pts)';
+    document.getElementById('bm-tier-lbl').style.color='#9b59b6';
+    var convCls2=currentP.convProb==='High'?'conv-high':currentP.convProb==='Medium'?'conv-med':'conv-low';
+    document.getElementById('conv-badge-el').innerHTML='<span class="conv-badge '+convCls2+'">'+currentP.convProb+'</span>';
+    currentP.eventData=evData;
+    currentP.eventUrgency=urgency;
+    currentP.eventBonus=evBonus;
+    saveEventMode();
+  }else{
+    showEventModeBar(false,null);
   }
+}
+
+async function callAI(lines,maxT){
+  var prompt=Array.isArray(lines)?lines.filter(Boolean).join('\n'):lines;
+  var res=await fetch('/.netlify/functions/claude',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:maxT||1000,messages:[{role:'user',content:prompt}]})});
+  var d=await res.json();
+  if(d.error){throw new Error(JSON.stringify(d.error));}
+  if(!d.content||!d.content[0]){throw new Error('Bad response: '+JSON.stringify(d).substring(0,200));}
+  return d.content[0].text;
+}
+
+async function generateStrategy(){
+  if(!currentP){return;}
+  var sp=document.getElementById('sp2');var box=document.getElementById('strat-box');var out=document.getElementById('strat-ai');
+  sp.classList.add('on');box.classList.remove('show');
+  var sigs=currentP.signals&&currentP.signals.length>0?currentP.signals.join(', '):'None identified';
+  var eaLine='';
+  if(currentP.ea&&currentP.ea.active){
+    var eaI2=currentP.ea.intel||{};
+    var eaIS=getEAIntelString(eaI2);
+    var eaCR=getBestContactMethod(eaI2);
+    var eaTG=getEAToneGuidance(eaI2);
+    eaLine='EA: '+currentP.ea.name+' ('+currentP.ea.role+') | Influence: '+currentP.ea.infLevel+' | '+currentP.ea.infNote+(eaIS?' | Profile: '+eaIS:'')+(eaCR?' | Best contact: '+eaCR:'')+(eaTG?' | Tone guidance: '+eaTG:'');
+  }
+  try{
+    var td=currentP.travelData||{};
+    var routeStr=td.route1?td.route1+(td.route2?' and '+td.route2:''):'Not specified';
+    var patternStr=td.pattern||'variable';
+    var airportStr=td.airport||'ATL main';
+    var ctInfo=currentP.clientTypeInfo||{type:'Unknown',desc:''};
+    var convStr=currentP.convProb||'Unknown';
+    out.textContent=await callAI([
+      'You are a business development advisor for Odyssey Black VIP Transportation in Atlanta, a premium black car service for Fortune 500 executives.',
+      'Prospect: '+currentP.name+', '+currentP.title+' at '+currentP.company,
+      'Industry: '+currentP.industry+' | Atlanta presence: '+currentP.hq+' | Travel frequency: '+currentP.travel,
+      'Acquisition Score: '+currentP.score+'/40 ('+getTier(currentP.score)+')',
+      'Buying Moment Score: '+currentP.bmScore+'/10',
+      'Active Timing Signals: '+sigs,
+      'Client Type Classification: '+ctInfo.type+' - '+ctInfo.desc,
+      'Conversion Probability: '+convStr,
+      'Travel Routes: '+routeStr,
+      'Weekly Pattern: '+patternStr,
+      'Primary Airport: '+airportStr,
+      eaLine,
+      'Notes: '+(currentP.notes||'None'),
+      '',
+      'Write a sharp acquisition strategy with exactly these 7 sections:',
+      '1. WHY THEY ARE A FIT - specific to their client type classification',
+      '2. WHY NOW IS THE RIGHT TIME - reference active timing signals specifically',
+      '3. APPROACH ANGLE - Executive-first or EA-first and exactly why. If EA data is available, specify the exact channel and tone to use based on their intelligence profile.',
+      '4. RECURRING SERVICE OPPORTUNITY - based on their routes and weekly pattern, propose a specific recurring service arrangement (e.g. Mon/Thu ATL-NYC standing reservation). Be specific about the route and schedule.',
+      '5. VALUE PROPOSITION - tailored to their client type and travel behavior',
+      '6. MESSAGING TONE - one paragraph on how to frame the pitch based on their classification',
+      '7. FIRST MOVE TODAY - one specific action in the next 24 hours',
+      '',
+      'If Buying Moment Score is 7 or higher, open with urgency.',
+      'If Client Type is High-Frequency Traveler, emphasize standing reservations and route ownership.',
+      'If Client Type is Corporate Account Decision-Maker, emphasize fleet accounts and company-wide contracts.',
+      'Be specific, concise, executive-level throughout.'
+    ],1400);
+    box.classList.add('show');
+  }catch(e){out.textContent='Error: '+e.message;box.classList.add('show');}
   sp.classList.remove('on');
 }
 
-async function researchExecutive() {
-  var name = document.getElementById('o-name').value.trim();
-  var title = document.getElementById('o-title').value.trim();
-  if (!name || !title) { notify('Fill in name and title first'); return; }
-  var sp = document.getElementById('sp-res');
-  var box = document.getElementById('research-box');
-  var out = document.getElementById('research-ai');
-  sp.classList.add('on');
-  box.classList.remove('show');
-  try {
-    var research = await callAI([
-      'You are a research assistant providing verified facts about an executive for a sales team.',
-      'Executive: ' + name + ', ' + title,
-      'Provide ONLY facts you are highly confident about.',
-      'Flag anything uncertain with the word VERIFY in brackets.',
-      'Never invent company names, events, quotes, or initiatives you are not sure about.',
-      'Cover these 5 sections:',
-      '1. CURRENT ROLE AND COMPANY: confirmed current position and company HQ location',
-      '2. CAREER BACKGROUND: previous verified roles and companies',
-      '3. BUSINESS FOCUS: known priorities or public statements',
-      '4. TRAVEL INDICATORS: known travel patterns or multiple office locations',
-      '5. OUTREACH HOOK: one specific verified fact connecting to executive ground transportation needs',
-      'If you lack verified current data on any section say so clearly rather than guessing.'
-    ], 800);
-    out.textContent = research;
+function setMode(m,el){outMode=m;document.querySelectorAll('.mode-tab').forEach(function(t){t.classList.remove('active');});el.classList.add('active');document.getElementById('exec-fields').style.display=m==='exec'?'block':'none';document.getElementById('ea-fields-out').style.display=m==='ea'?'block':'none';document.getElementById('research-box').classList.remove('show');document.getElementById('out-box').classList.remove('show');}
+
+async function researchExec(){
+  var name=document.getElementById('o-name').value.trim();var title=document.getElementById('o-title').value.trim();
+  if(!name||!title){notify('Fill in name and title first');return;}
+  var sp=document.getElementById('sp-res');var box=document.getElementById('research-box');var out=document.getElementById('research-ai');
+  sp.classList.add('on');box.classList.remove('show');
+  try{
+    var research=await callAI(['You are a research assistant providing verified facts about an executive for a sales team.','Executive: '+name+', '+title,'Provide ONLY facts you are highly confident about. Flag uncertain facts with [VERIFY].','Never invent company names, events, quotes, or initiatives you are not sure about.','Cover these 5 sections:','1. CURRENT ROLE AND COMPANY: confirmed current position and company HQ location','2. CAREER BACKGROUND: previous verified roles and companies','3. BUSINESS FOCUS: known priorities or public statements','4. TRAVEL INDICATORS: known travel patterns or multiple office locations','5. OUTREACH HOOK: one specific verified fact connecting to executive ground transportation needs','If you lack verified data on any section, say so clearly rather than guessing.'],800);
+    out.textContent=research;box.classList.add('show');
+    var hi=research.indexOf('OUTREACH HOOK');
+    if(hi>=0){var hl=research.substring(hi+13).replace(/^[:\s\-]+/,'').split('\n')[0].trim();if(hl.length>10){document.getElementById('o-ctx').value=hl;notify('Research complete - context auto-filled');}else{notify('Research complete');}}else{notify('Research complete');}
+  }catch(e){out.textContent='Error: '+e.message;box.classList.add('show');}
+  sp.classList.remove('on');
+}
+
+async function generateOutreach(){
+  if(outMode==='ea'){await genEAOutreach();return;}
+  var name=document.getElementById('o-name').value.trim();var title=document.getElementById('o-title').value.trim();
+  if(!name||!title){notify('Fill in name and title');return;}
+  var ch=document.getElementById('o-channel').value;var tone=document.getElementById('o-tone').value;
+  var ctx=document.getElementById('o-ctx').value.trim();var research=document.getElementById('research-ai').textContent.trim();
+  var sp=document.getElementById('sp3');var box=document.getElementById('out-box');var out=document.getElementById('out-ai');
+  sp.classList.add('on');box.classList.remove('show');
+  var chL={email:'a cold email',linkedin:'a LinkedIn DM under 150 words',referral:'a warm referral introduction email',event:'a post-event follow-up email',voicemail:'a 30-second voicemail script'};
+  var tL={luxury:'luxury and exclusivity positioning',peer:'executive peer-to-peer tone not salesy',concise:'ultra-concise respectful of their time',warm:'warm personal referral-based tone'};
+  var pipePros=pipeline.find(function(p){return p.name===name||(p.name&&name&&p.name.toLowerCase()===name.toLowerCase());});
+  var travelHint='';var clientHint='';var convHint='';
+  if(pipePros){
+    if(pipePros.travelData&&pipePros.travelData.route1){travelHint='Known travel routes: '+pipePros.travelData.route1+(pipePros.travelData.route2?' and '+pipePros.travelData.route2:'')+'. Weekly pattern: '+pipePros.travelData.pattern+'.';}
+    if(pipePros.clientType){clientHint='Client classification: '+pipePros.clientType+(pipePros.clientTypeInfo?' - '+pipePros.clientTypeInfo.desc:'')+'.';}
+    if(pipePros.convProb){convHint='Conversion probability: '+pipePros.convProb+'.';}
+  }
+  try{
+    out.textContent=await callAI(['You write outreach for Odyssey Black VIP Transportation in Atlanta, premium black car service for Fortune 500 executives.','Differentiators: reliability, discretion, professional chauffeurs, flight tracking, last-minute availability, recurring route ownership.','Write '+chL[ch]+' for:','Name: '+name,'Role: '+title,'Tone: '+tL[tone],travelHint||'',clientHint||'',convHint||'','Verified Research: '+(research||'None available'),'Additional Context: '+(ctx||'None'),'RULES: Only reference facts from Verified Research. Do NOT invent details not in research.','If travel route data is available, reference it specifically as a hook (e.g. Mon/Thu ATL-NYC stands out as a predictable route worth owning).','If client type is High-Frequency Traveler, lead with standing reservation concept. If Corporate Account, lead with company-wide reliability.','Do not sound like a mass email. Include a soft call to action.',ch==='email'?'Include a compelling subject line.':''],1000);
     box.classList.add('show');
-    var hookIdx = research.indexOf('OUTREACH HOOK');
-    if (hookIdx >= 0) {
-      var hookLine = research.substring(hookIdx + 13).replace(/^[:\s\-]+/, '').split('\n')[0].trim();
-      if (hookLine.length > 10) {
-        document.getElementById('o-ctx').value = hookLine;
-        notify('Research complete - context auto-filled');
-      }
-    } else {
-      notify('Research complete');
+  }catch(e){out.textContent='Error: '+e.message;box.classList.add('show');}
+  sp.classList.remove('on');
+}
+
+async function genEAOutreach(){
+  var aName=document.getElementById('oa-name').value.trim();var execInfo=document.getElementById('oa-exec').value.trim();
+  if(!aName||!execInfo){notify('Fill in Assistant Name and Executive info');return;}
+  var aRole=document.getElementById('oa-role').value;var aNotes=document.getElementById('oa-notes').value.trim();
+  var sp=document.getElementById('sp3b');var box=document.getElementById('out-box');var out=document.getElementById('out-ai');
+  sp.classList.add('on');box.classList.remove('show');
+  var rL={ea:'Executive Assistant',cos:'Chief of Staff',om:'Office Manager',tc:'Travel Coordinator'};
+  var execNameOnly=execInfo.split(',')[0].trim();
+  var pipePros3=pipeline.find(function(p){return p.name===execNameOnly||(p.name&&execNameOnly&&p.name.toLowerCase()===execNameOnly.toLowerCase());});
+  var eaRouteHint='';var eaPatternHint='';var eaPipeIntel=null;
+  if(pipePros3&&pipePros3.travelData&&pipePros3.travelData.route1){
+    eaRouteHint='The executive regularly travels '+pipePros3.travelData.route1+(pipePros3.travelData.route2?' and '+pipePros3.travelData.route2:'')+'.';}
+  if(pipePros3&&pipePros3.travelData&&pipePros3.travelData.pattern&&pipePros3.travelData.pattern!=='variable'){
+    eaPatternHint='Their typical travel pattern is '+pipePros3.travelData.pattern+' — a predictable schedule ideal for standing reservations.';}
+  if(pipePros3&&pipePros3.ea&&pipePros3.ea.intel){eaPipeIntel=pipePros3.ea.intel;}
+  var oaComm=document.getElementById('oa-comm')?document.getElementById('oa-comm').value:'unknown';
+  var oaPers=document.getElementById('oa-personality')?document.getElementById('oa-personality').value:'unknown';
+  var liveIntel={commPref:oaComm,responsiveness:'unknown',bookingHabit:'unknown',personality:oaPers,notes:aNotes||''};
+  var intelToUse=eaPipeIntel||liveIntel;
+  var toneGuide=getEAToneGuidance(intelToUse);
+  var contactRec=getBestContactMethod(intelToUse);
+  var intelStr=getEAIntelString(intelToUse);
+  var commLabel={'email':'email','email-casual':'casual email','phone':'phone call','text':'text message','linkedin':'LinkedIn message','in-person':'in-person visit','unknown':'email'}[intelToUse.commPref||'unknown']||'email';
+  try{
+    out.textContent=await callAI(['You write outreach for Odyssey Black VIP Transportation in Atlanta, a professional black car service for Fortune 500 executives.','You are writing to an executive assistant or office coordinator. Treat them as a VIP, not a gatekeeper.','Assistant Name: '+aName,'Assistant Role: '+rL[aRole],'Executive they support: '+execInfo,eaRouteHint||'',eaPatternHint||'','Assistant Intelligence Profile: '+intelStr,'Channel: Write as a '+commLabel,'TONE GUIDANCE based on their profile: '+toneGuide,'CONTACT RECOMMENDATION: '+contactRec,'CORE POSITIONING: Odyssey Black eliminates transportation stress — one contact, proactive flight tracking, seamless last-minute changes, one monthly invoice.','RULES: Do not use luxury or prestige language. Focus on making their job easier.','If route data available, reference a specific standing booking proposal.','Keep under 180 words. Include a subject line.','End with a specific low-friction ask appropriate for their personality type.'],1000);
+    box.classList.add('show');
+  }catch(e){out.textContent='Error: '+e.message;box.classList.add('show');}
+  sp.classList.remove('on');
+}
+
+async function generateScript(){
+  var name=document.getElementById('c-name').value.trim();var title=document.getElementById('c-title').value.trim();
+  if(!name||!title){notify('Fill in name and role');return;}
+  var type=document.getElementById('c-type').value;var obj=document.getElementById('c-obj').value;var ctx=document.getElementById('c-ctx').value.trim();
+  var sp=document.getElementById('sp4');var box=document.getElementById('script-box');var out=document.getElementById('script-ai');
+  sp.classList.add('on');box.classList.remove('show');
+  var objSec=obj!=='none'?'OBJECTION HANDLER: address the objection: '+obj:'DIFFERENTIATOR: what separates Odyssey Black from rideshare';
+  try{
+    var pipePros2=pipeline.find(function(p){return p.name===name||(p.name&&name&&p.name.toLowerCase()===name.toLowerCase());});
+    var ctHint2='';var trHint2='';
+    if(pipePros2){
+      if(pipePros2.clientType){ctHint2='Client type: '+pipePros2.clientType+(pipePros2.clientTypeInfo?' - '+pipePros2.clientTypeInfo.desc:'')+'.';}
+      if(pipePros2.travelData&&pipePros2.travelData.route1){trHint2='Travel routes: '+pipePros2.travelData.route1+(pipePros2.travelData.route2?' and '+pipePros2.travelData.route2:'')+'. Pattern: '+pipePros2.travelData.pattern+'.';}
     }
-  } catch(e) {
-    out.textContent = 'Error: ' + e.message;
+    out.textContent=await callAI(['You are a sales coach for Odyssey Black VIP Transportation, Atlanta premium executive black car service.','Executive: '+name+', '+title,'Call type: '+type,'Objection: '+obj,ctHint2||'',trHint2||'','Context: '+(ctx||'None'),'Write a complete call script with these labeled sections:','OPENER - reference their specific travel pattern or route if known','VALUE HOOK - tailor to their client type classification if available','DISCOVERY QUESTION',''+objSec,'CLOSE - propose a trial ride on their most common route if known','VOICEMAIL VERSION if they do not answer','If High-Frequency Traveler, emphasize standing reservations. If Corporate Account, emphasize fleet reliability. Sound like a peer. Readable in under 3 minutes.'],1200);
     box.classList.add('show');
-  }
+  }catch(e){out.textContent='Error: '+e.message;box.classList.add('show');}
   sp.classList.remove('on');
 }
 
-async function generateOutreach() {
-  var name = document.getElementById('o-name').value.trim();
-  var title = document.getElementById('o-title').value.trim();
-  if (!name || !title) { notify('Fill in name and title'); return; }
-  var channel = document.getElementById('o-channel').value;
-  var tone = document.getElementById('o-tone').value;
-  var ctx = document.getElementById('o-ctx').value.trim();
-  var research = document.getElementById('research-ai').textContent.trim();
-  var sp = document.getElementById('sp3');
-  var box = document.getElementById('out-box');
-  var out = document.getElementById('out-ai');
-  sp.classList.add('on');
-  box.classList.remove('show');
-
-  var chLabels = { email: 'a cold email', linkedin: 'a LinkedIn DM under 150 words', referral: 'a warm referral introduction email', event: 'a post-event follow-up email', voicemail: 'a 30-second voicemail script' };
-  var tLabels = { luxury: 'luxury and exclusivity positioning', peer: 'executive peer-to-peer tone not salesy', concise: 'ultra-concise respectful of their time', warm: 'warm personal referral-based tone' };
-
-  var lines = [
-    'You write outreach for Odyssey Black VIP Transportation in Atlanta, premium black car service for Fortune 500 executives.',
-    'Differentiators: reliability, discretion, professional chauffeurs, flight tracking, last-minute availability.',
-    'Write ' + chLabels[channel] + ' for:',
-    'Name: ' + name,
-    'Role: ' + title,
-    'Tone: ' + tLabels[tone],
-    'Verified Research: ' + (research || 'None available'),
-    'Additional Context: ' + (ctx || 'None'),
-    'IMPORTANT: Only reference facts from the Verified Research above.',
-    'Do NOT invent specific details like company names, earnings calls, events, or initiatives not in the research.',
-    'If research is limited write a strong general executive travel email without fake specifics.',
-    'Do not sound like a mass email. Reference real pain points. Include a soft call to action.'
-  ];
-  if (channel === 'email') { lines.push('Include a compelling subject line.'); }
-
-  try {
-    out.textContent = await callAI(lines, 1000);
-    box.classList.add('show');
-  } catch(e) {
-    out.textContent = 'Error: ' + e.message;
-    box.classList.add('show');
+function addToPipeline(){
+  if(!currentP){return;}
+  if(pipeline.find(function(p){return p.name===currentP.name&&p.company===currentP.company;})){notify('Already in pipeline');return;}
+  var saved=JSON.parse(JSON.stringify(currentP));
+  if(!saved.bmScore){saved.bmScore=0;}
+  if(!saved.signals){saved.signals=[];}
+  if(!saved.travelData){saved.travelData={};}
+  if(!saved.clientType){saved.clientType='';}
+  if(!saved.convProb){saved.convProb=calcConvProb(saved);}
+  if(!saved.monthlyValue){saved.monthlyValue=estimateMonthlyValue(saved);}
+  if(!saved.responseStatus){saved.responseStatus='none';}
+  if(!saved.lastContact){saved.lastContact='';}
+  if(eventModeActive&&!saved.eventData){
+    saved.eventData=getEventData();
+    saved.eventUrgency=getEventUrgency(getDaysToEvent(saved.eventData.date));
   }
-  sp.classList.remove('on');
+  pipeline.push(saved);
+  localStorage.setItem('ob-pipeline',JSON.stringify(pipeline));
+  notify(currentP.name+' added — est. $'+saved.monthlyValue.toLocaleString()+'/mo');
 }
 
-async function generateScript() {
-  var name = document.getElementById('c-name').value.trim();
-  var title = document.getElementById('c-title').value.trim();
-  if (!name || !title) { notify('Fill in name and role'); return; }
-  var type = document.getElementById('c-type').value;
-  var obj = document.getElementById('c-obj').value;
-  var ctx = document.getElementById('c-ctx').value.trim();
-  var sp = document.getElementById('sp4');
-  var box = document.getElementById('script-box');
-  var out = document.getElementById('script-ai');
-  sp.classList.add('on');
-  box.classList.remove('show');
-  var objSection = obj !== 'none' ? 'OBJECTION HANDLER: address the objection: ' + obj : 'DIFFERENTIATOR: what separates Odyssey Black from rideshare';
-  try {
-    out.textContent = await callAI([
-      'You are a sales coach for Odyssey Black VIP Transportation, Atlanta premium executive black car service.',
-      'Executive: ' + name + ', ' + title,
-      'Call type: ' + type,
-      'Objection to handle: ' + obj,
-      'Context: ' + (ctx || 'None'),
-      'Write a complete call script with these labeled sections:',
-      'OPENER',
-      'VALUE HOOK tailored to their role',
-      'DISCOVERY QUESTION',
-      objSection,
-      'CLOSE',
-      'VOICEMAIL VERSION if they do not answer',
-      'Sound like a peer not a salesperson. Readable in under 3 minutes.'
-    ], 1200);
-    box.classList.add('show');
-  } catch(e) {
-    out.textContent = 'Error: ' + e.message;
-    box.classList.add('show');
-  }
-  sp.classList.remove('on');
-}
-
-function addToPipeline() {
-  if (!currentP) { return; }
-  if (pipeline.find(function(p) { return p.name === currentP.name && p.company === currentP.company; })) { notify('Already in pipeline'); return; }
-  pipeline.push(Object.assign({}, currentP));
-  localStorage.setItem('ob-pipeline', JSON.stringify(pipeline));
-  notify(currentP.name + ' added to pipeline');
-}
-
-function renderPipeline() {
-  var cols = { identified: [], outreach: [], booked: [] };
-  pipeline.forEach(function(p) { if (cols[p.stage]) { cols[p.stage].push(p); } });
-  ['identified', 'outreach', 'booked'].forEach(function(stage) {
-    var el = document.getElementById('col-' + stage);
-    el.innerHTML = cols[stage].map(function(p) {
-      return '<div class="pipe-card" onclick="moveStage(' + p.id + ')">' +
-        '<div class="pipe-name">' + p.name + '</div>' +
-        '<div class="pipe-co">' + p.title + ' · ' + p.company + '</div>' +
-        '<div class="pipe-sc ' + getTierClass(p.score) + '">' + p.score + ' - ' + getTier(p.score) + '</div>' +
+function renderPipeline(){
+  var cols={'identified':[],'contacted':[],'assistant':[],'trial-sched':[],'trial-done':[],'active':[],'recurring':[],'corporate':[]};
+  pipeline.forEach(function(p){if(cols[p.stage]){cols[p.stage].push(p);}});
+  var convOrder={'High':0,'Medium':1,'Low':2,undefined:3};
+  Object.keys(cols).forEach(function(stage){cols[stage].sort(function(a,b){var co=convOrder[a.convProb]-convOrder[b.convProb];if(co!==0){return co;}return(b.bmScore||0)-(a.bmScore||0);});});
+  ['identified','contacted','assistant','trial-sched','trial-done','active','recurring','corporate'].forEach(function(stage){
+    var el=document.getElementById('col-'+stage);
+    el.innerHTML=cols[stage].map(function(p){
+      var urgent=p.bmScore&&p.bmScore>=7;
+      var tc=getTierClass(p.score);var tier=getTier(p.score);
+      var dot=urgent?'<span class="bm-dot" title="Active buying moment"></span>':'';
+      var convCls=p.convProb==='High'?'conv-high':p.convProb==='Medium'?'conv-med':'conv-low';
+      var convDot=p.convProb?'<span class="conv-badge '+convCls+'" style="padding:2px 8px;font-size:9px;">'+p.convProb+'</span>':'';
+      var stageCls=getStagePipeStageCss(p.stage);
+      var stageLabel=getStageLabel(p.stage);
+      var fuAlert=getFollowUpAlert(p);
+      var fuStr=fuAlert?'<div class="followup-alert '+fuAlert.cls+'">'+fuAlert.text+'</div>':'';
+      var respCls=p.responseStatus==='positive'?'resp-positive':p.responseStatus==='negative'?'resp-negative':p.responseStatus==='pending'?'resp-pending':'resp-none';
+      var respStr=p.responseStatus&&p.responseStatus!=='none'?'<span class="resp-status '+respCls+'">'+RESPONSE_LABELS[p.responseStatus]+'</span>':'';
+      var revStr=p.monthlyValue?'<div class="revenue-tag">$'+p.monthlyValue.toLocaleString()+'/mo</div>':'';
+      var overdue=fuAlert&&fuAlert.cls==='alert-overdue'?'overdue':'';
+      var sugAction=getSuggestedAction(p);
+      return'<div class="pipe-card '+(urgent?'bm-hi ':'')+overdue+'">'+
+        '<span class="stage-label '+stageCls+'">'+stageLabel+'</span>'+
+        '<div class="pipe-name">'+p.name+'</div>'+
+        '<div class="pipe-co">'+p.title+' &middot; '+p.company+'</div>'+
+        '<div class="pipe-sc"><span class="'+tc+'">'+p.score+'</span>'+dot+convDot+'</div>'+
+        revStr+respStr+fuStr+
+        '<div style="font-size:10px;color:var(--muted);margin-top:5px;font-style:italic;">'+sugAction+'</div>'+
+        '<div id="fu-out-'+p.id+'" style="display:none;font-size:11px;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.2);padding:8px;margin-top:6px;border-radius:1px;white-space:pre-wrap;"></div>'+
+        '<div class="pipe-card-actions">'+
+        '<button class="pipe-action-btn" onclick="event.stopPropagation();quickOutreach('+p.id+')">Outreach</button>'+
+        '<button class="pipe-action-btn" onclick="event.stopPropagation();generateFollowUp('+p.id+')" style="display:inline-flex;align-items:center;gap:4px;">Follow-up <div class="spin" id="fu-spin-'+p.id+'" style="width:10px;height:10px;border-width:1.5px;"></div></button>'+
+        '<select class="pipe-action-btn" style="padding:3px 6px;font-size:9px;cursor:pointer;" onchange="event.stopPropagation();setResponseStatus('+p.id+',this.value)"><option value="none"'+(p.responseStatus==='none'?' selected':'')+'>No response</option><option value="positive"'+(p.responseStatus==='positive'?' selected':'')+'>Responded +</option><option value="pending"'+(p.responseStatus==='pending'?' selected':'')+'>Waiting</option><option value="negative"'+(p.responseStatus==='negative'?' selected':'')+'>Declined</option></select>'+
+        '<button class="pipe-action-btn" onclick="event.stopPropagation();setMonthlyValue('+p.id+')">$Value</button>'+
+        '<button class="pipe-action-btn" onclick="event.stopPropagation();moveStage('+p.id+')">Advance &rarr;</button>'+
+        '</div>'+
         '</div>';
     }).join('');
-    document.getElementById('cnt-' + stage).textContent = cols[stage].length;
+    document.getElementById('cnt-'+stage).textContent=cols[stage].length;
   });
-  document.getElementById('st-total').textContent = pipeline.length;
-  document.getElementById('st-hot').textContent = pipeline.filter(function(p) { return p.score >= 28; }).length;
-  document.getElementById('st-strong').textContent = pipeline.filter(function(p) { return p.score >= 24 && p.score < 28; }).length;
-  document.getElementById('st-qual').textContent = pipeline.filter(function(p) { return p.score >= 20 && p.score < 24; }).length;
-  document.getElementById('pipe-empty').style.display = pipeline.length ? 'none' : 'block';
+  document.getElementById('st-total').textContent=pipeline.length;
+  document.getElementById('st-hot').textContent=pipeline.filter(function(p){return p.convProb==='High';}).length;
+  var monthlyRev=pipeline.filter(function(p){return p.stage==='active'||p.stage==='recurring'||p.stage==='corporate';}).reduce(function(s,p){return s+(p.monthlyValue||0);},0);
+  var projRev=pipeline.filter(function(p){return p.convProb==='High'&&(p.stage==='trial-sched'||p.stage==='trial-done');}).reduce(function(s,p){return s+(p.monthlyValue||0);},0);
+  document.getElementById('st-revenue').textContent='$'+(monthlyRev+projRev).toLocaleString();
+  var today=new Date().toISOString().slice(0,10);
+  var overdueCount=pipeline.filter(function(p){return p.followUp&&p.followUp<today;}).length;
+  document.getElementById('st-bm').textContent=overdueCount>0?overdueCount+' overdue':pipeline.filter(function(p){return p.bmScore&&p.bmScore>=7;}).length+' active';
+  document.getElementById('pipe-empty').style.display=pipeline.length?'none':'block';
 }
 
-function moveStage(id) {
-  var stages = ['identified', 'outreach', 'booked'];
-  var p = pipeline.find(function(x) { return x.id === id; });
-  if (!p) { return; }
-  p.stage = stages[(stages.indexOf(p.stage) + 1) % stages.length];
-  localStorage.setItem('ob-pipeline', JSON.stringify(pipeline));
-  renderPipeline();
-  notify('Moved to ' + p.stage);
+function moveStage(id){
+  var stages=['identified','contacted','assistant','trial-sched','trial-done','active','recurring','corporate'];
+  var p=pipeline.find(function(x){return x.id===id;});
+  if(!p){return;}
+  p.stage=stages[(stages.indexOf(p.stage)+1)%stages.length];
+  localStorage.setItem('ob-pipeline',JSON.stringify(pipeline));
+  renderPipeline();notify('Moved to '+p.stage);
 }
 
-function clearProspect() {
-  ['p-name', 'p-title', 'p-company', 'p-notes'].forEach(function(id) { document.getElementById(id).value = ''; });
-  document.getElementById('score-card').style.display = 'none';
+function clearProspect(){
+  ['p-name','p-title','p-company','p-notes','ea-name','ea-email','ea-phone','ea-notes'].forEach(function(id){var el=document.getElementById(id);if(el){el.value='';};});
+  ['ea-comm-pref','ea-responsiveness','ea-booking','ea-personality'].forEach(function(id){var el=document.getElementById(id);if(el){el.selectedIndex=0;}});
+  var eaIPel=document.getElementById('ea-intel-profile');if(eaIPel){eaIPel.style.display='none';}
+  ['tr-route1','tr-route2'].forEach(function(id){var el=document.getElementById(id);if(el){el.selectedIndex=0;}});
+  var trClass=document.getElementById('tr-classification');if(trClass){trClass.style.display='none';}
+  document.getElementById('conv-badge-el').innerHTML='<span style="font-size:11px;color:var(--muted);">Score first</span>';
+  document.getElementById('ct-sb').style.display='none';
+  ['p-industry','p-hq','p-travel','p-source','ea-role'].forEach(function(id){var el=document.getElementById(id);if(el){el.selectedIndex=0;}});
+  Object.keys(SIG_SCORES).forEach(function(id){var cb=document.getElementById(id);if(cb){cb.checked=false;}});
+  Object.values(CHIP_IDS).forEach(function(id){var el=document.getElementById(id);if(el){el.classList.remove('on');}});
+  refreshBM();
+  var et=document.getElementById('ea-toggle');if(et){et.checked=false;}
+  var ef=document.getElementById('ea-fields');if(ef){ef.classList.remove('open');}
+  ['cr-tc','cr-ten','cr-multi'].forEach(function(id){var el=document.getElementById(id);if(el){el.classList.remove('on');}});
+  ['ea-tc','ea-ten','ea-multi'].forEach(function(id){var el=document.getElementById(id);if(el){el.checked=false;}});
+  document.getElementById('score-card').style.display='none';
   document.getElementById('strat-box').classList.remove('show');
-  currentP = null;
+  var evToggle=document.getElementById('event-mode');if(evToggle){evToggle.checked=false;}
+  var evFields=document.getElementById('event-mode-fields');if(evFields){evFields.style.display='none';}
+  var evRow=document.getElementById('event-toggle-row');if(evRow){evRow.classList.remove('on');}
+  var evName=document.getElementById('ev-name');if(evName){evName.value='';}
+  var evDate=document.getElementById('ev-date');if(evDate){evDate.value='';}
+  var evNotes=document.getElementById('ev-notes');if(evNotes){evNotes.value='';}
+  var evBtn=document.getElementById('event-capture-btn');if(evBtn){evBtn.style.display='none';}
+  eventModeActive=false;
+  showEventModeBar(false,null);
+  currentP=null;
 }
 
-function handleDrop(e) {
-  e.preventDefault();
-  document.getElementById('drop-zone').classList.remove('over');
-  var file = e.dataTransfer.files[0];
-  if (file) { handleFile(file); }
-}
-
-function handleFile(file) {
-  if (!file || !file.name.endsWith('.csv')) { notify('Please upload a CSV file'); return; }
-  var reader = new FileReader();
-  reader.onload = function(e) { parseCSV(e.target.result); };
-  reader.readAsText(file);
-}
-
-function parseCSVLine(line) {
-  var result = [];
-  var cur = '';
-  var inQ = false;
-  for (var i = 0; i < line.length; i++) {
-    var ch = line[i];
-    if (ch === '"') { inQ = !inQ; }
-    else if (ch === ',' && !inQ) { result.push(cur.trim()); cur = ''; }
-    else { cur += ch; }
-  }
-  result.push(cur.trim());
-  return result;
-}
-
-function parseCSV(text) {
-  var lines = text.split('\n').filter(function(l) { return l.trim(); });
-  if (lines.length < 2) { notify('CSV appears empty'); return; }
-  var headers = lines[0].split(',').map(function(h) { return h.replace(/"/g, '').trim().toLowerCase(); });
-  var firstIdx = -1, lastIdx = -1, nameIdx = -1, titleIdx = -1, companyIdx = -1;
-  headers.forEach(function(h, i) {
-    if (h === 'first name' || h === 'firstname') { firstIdx = i; }
-    else if (h === 'last name' || h === 'lastname') { lastIdx = i; }
-    else if (h === 'name' || h === 'full name') { nameIdx = i; }
-    if (h.includes('title') || h === 'job title') { titleIdx = i; }
-    if (h === 'company' || h === 'company name' || h === 'account name') { companyIdx = i; }
-  });
-  if (firstIdx === -1 && nameIdx === -1) {
-    headers.forEach(function(h, i) {
-      if (h.includes('first') && firstIdx === -1) { firstIdx = i; }
-      if (h.includes('last') && !h.includes('latest') && lastIdx === -1) { lastIdx = i; }
-      if (h.includes('name') && nameIdx === -1) { nameIdx = i; }
-      if (h.includes('title') && titleIdx === -1) { titleIdx = i; }
-      if ((h.includes('company') || h.includes('account') || h.includes('organization')) && companyIdx === -1) { companyIdx = i; }
-    });
-  }
-  bulkData = [];
-  for (var i = 1; i < lines.length; i++) {
-    var cols = parseCSVLine(lines[i]);
-    var fullName = '';
-    if (firstIdx >= 0 && lastIdx >= 0) {
-      fullName = ((cols[firstIdx] || '') + ' ' + (cols[lastIdx] || '')).trim();
-    } else if (nameIdx >= 0) {
-      fullName = (cols[nameIdx] || '').replace(/"/g, '').trim();
-    }
-    if (!fullName || fullName.length < 2) { continue; }
-    var title = titleIdx >= 0 ? (cols[titleIdx] || '').replace(/"/g, '').trim() : '';
-    var company = companyIdx >= 0 ? (cols[companyIdx] || '').replace(/"/g, '').trim() : '';
-    var ts = titleScore(title);
-    var total = ts + 8 + 7 + 1;
-    bulkData.push({ name: fullName, title: title, company: company, score: total, id: Date.now() + Math.random(), stage: 'identified', hq: 'yes', travel: 'heavy', source: 'linkedin', industry: '', notes: '' });
-  }
-  bulkData.sort(function(a, b) { return b.score - a.score; });
-  renderBulkTable();
-  notify('Scored ' + bulkData.length + ' prospects');
-}
-
-function renderBulkTable() {
-  document.getElementById('import-results').style.display = 'block';
-  var hot = bulkData.filter(function(p) { return p.score >= 28; }).length;
-  var strong = bulkData.filter(function(p) { return p.score >= 24 && p.score < 28; }).length;
-  document.getElementById('import-summary').textContent = bulkData.length + ' prospects scored - ' + hot + ' HOT, ' + strong + ' Strong';
-  var filtered = bulkData;
-  if (bulkFilter === 'hot') { filtered = bulkData.filter(function(p) { return p.score >= 28; }); }
-  if (bulkFilter === 'strong') { filtered = bulkData.filter(function(p) { return p.score >= 24; }); }
-  document.getElementById('bulk-tbody').innerHTML = filtered.map(function(p) {
-    var safeId = String(p.id).replace('.', '_');
-    return '<tr>' +
-      '<td style="font-weight:500;">' + p.name + '</td>' +
-      '<td style="color:var(--muted);font-size:11px;">' + (p.title || '') + '</td>' +
-      '<td style="font-size:12px;">' + (p.company || '') + '</td>' +
-      '<td style="font-weight:600;color:var(--gold);">' + p.score + '</td>' +
-      '<td class="' + getTierClass(p.score) + '">' + getTier(p.score) + '</td>' +
-      '<td><button class="btn btn-ghost" style="padding:5px 12px;font-size:9px;" onclick="addBulkOne(\'' + safeId + '\')">Add</button></td>' +
-      '</tr>';
+function buildCoMap(){
+  var cos={};
+  pipeline.forEach(function(p){var co=(p.company||'Unknown').trim();if(!cos[co]){cos[co]=[];}cos[co].push(p);});
+  var list=document.getElementById('co-list');var map=document.getElementById('co-map');var empty=document.getElementById('co-empty');
+  if(Object.keys(cos).length===0){empty.style.display='block';map.style.display='none';return;}
+  empty.style.display='none';map.style.display='block';
+  var sorted=Object.keys(cos).sort(function(a,b){return cos[b].length-cos[a].length;});
+  list.innerHTML=sorted.map(function(co){
+    var execs=cos[co];
+    var avg=Math.round(execs.reduce(function(s,p){return s+p.score;},0)/execs.length);
+    var hot=execs.filter(function(p){return p.score>=28;}).length;
+    var bm=execs.filter(function(p){return p.bmScore&&p.bmScore>=5;}).length;
+    var totalRev=execs.reduce(function(s,p){return s+(p.monthlyValue||estimateMonthlyValue(p));},0);
+    var activeRev=execs.filter(function(p){return p.stage==='active'||p.stage==='recurring'||p.stage==='corporate';}).reduce(function(s,p){return s+(p.monthlyValue||0);},0);
+    var opp=Math.min(10,Math.round(execs.length*1.5+hot*1.5+bm));
+    var oppC=opp>=8?'var(--gold)':opp>=5?'var(--green)':'var(--muted)';
+    var rows=execs.map(function(p){return'<div class="co-exec-row"><div><div class="co-exec-name">'+p.name+'</div><div class="co-exec-title">'+p.title+'</div></div><div class="'+getTierClass(p.score)+'" style="font-weight:600;">'+p.score+(p.bmScore>=5?' &#9650;':'')+'</div></div>';}).join('');
+    var revStr=totalRev>0?'<span style="color:var(--green);font-weight:600;margin-left:8px;">$'+totalRev.toLocaleString()+'/mo est</span>'+(activeRev>0?' <span style="color:var(--gold);font-size:10px;">('+('$'+activeRev.toLocaleString())+' active)</span>':''):'';
+    return'<div class="co-card"><div class="co-head"><div><div class="co-name">'+co+'</div><div class="co-meta">'+execs.length+' executive'+(execs.length!==1?'s':'')+' in pipeline &nbsp;&middot;&nbsp; Avg score: '+avg+(bm>0?' &nbsp;&middot;&nbsp; '+bm+' active BM':'')+revStr+'</div></div><div><div class="co-opp-label">Opp Score</div><div class="co-opp-val" style="color:'+oppC+';">'+opp+'/10</div></div></div><div class="co-execs-list">'+rows+'</div></div>';
   }).join('');
 }
 
-function filterTable(f, el) {
-  bulkFilter = f;
-  document.querySelectorAll('.fbtn').forEach(function(b) { b.classList.remove('on'); });
-  el.classList.add('on');
-  renderBulkTable();
+async function genAccountStrategy(){
+  var cos={};pipeline.forEach(function(p){var co=(p.company||'Unknown').trim();if(!cos[co]){cos[co]=[];}cos[co].push(p);});
+  var top=Object.keys(cos).sort(function(a,b){return cos[b].length-cos[a].length;}).slice(0,3);
+  if(top.length===0){notify('Add prospects to pipeline first');return;}
+  var sp=document.getElementById('sp-co2');var box=document.getElementById('co-strat-box');var out=document.getElementById('co-strat-ai');
+  sp.classList.add('on');box.classList.remove('show');
+  var summary=top.map(function(co){var execs=cos[co];return co+': '+execs.length+' executive(s) - '+execs.map(function(p){return p.name+' ('+p.title+', score '+p.score+(p.bmScore>=5?', active buying moment':')');}).join('; ');}).join('\n');
+  try{
+    out.textContent=await callAI(['You are a senior business development strategist for Odyssey Black VIP Transportation in Atlanta.','These are companies with multiple executive prospects in our pipeline:',summary,'','For each company write a multi-executive account expansion plan with these sections:','1. ACCOUNT ENTRY POINT: which executive to approach first and exactly why','2. EXPANSION STRATEGY: how to turn 1 booking into 3-5 executive accounts','3. INTERNAL CHAMPION: who is most likely to refer colleagues internally','4. CORPORATE ACCOUNT PITCH: one paragraph positioning Odyssey Black as the company-wide solution','5. 30/60/90 DAY MILESTONES: realistic expansion timeline','','Be specific and strategic. Flag any prospect with active buying moment as priority.'],1500);
+    box.classList.add('show');buildCoMap();
+  }catch(e){out.textContent='Error: '+e.message;box.classList.add('show');}
+  sp.classList.remove('on');
 }
 
-function addBulkOne(safeId) {
-  var p = bulkData.find(function(x) { return String(x.id).replace('.', '_') === safeId; });
-  if (!p) { return; }
-  if (pipeline.find(function(x) { return x.name === p.name && x.company === p.company; })) { notify('Already in pipeline'); return; }
-  pipeline.push(Object.assign({}, p));
-  localStorage.setItem('ob-pipeline', JSON.stringify(pipeline));
-  notify(p.name + ' added to pipeline');
-}
-
-function addAllHot() {
-  var hot = bulkData.filter(function(p) { return p.score >= 28; });
-  var added = 0;
-  hot.forEach(function(p) {
-    if (!pipeline.find(function(x) { return x.name === p.name && x.company === p.company; })) {
-      pipeline.push(Object.assign({}, p));
-      added++;
-    }
+function handleDrop(e){e.preventDefault();document.getElementById('drop-zone').classList.remove('over');var f=e.dataTransfer.files[0];if(f){handleFile(f);}}
+function handleFile(f){if(!f||!f.name.endsWith('.csv')){notify('Please upload a CSV file');return;}var r=new FileReader();r.onload=function(e){parseCSV(e.target.result);};r.readAsText(f);}
+function parseCSVLine(line){var result=[],cur='',inQ=false;for(var i=0;i<line.length;i++){var ch=line[i];if(ch==='"'){inQ=!inQ;}else if(ch===','&&!inQ){result.push(cur.trim());cur='';}else{cur+=ch;}}result.push(cur.trim());return result;}
+function parseCSV(text){
+  var lines=text.split('\n').filter(function(l){return l.trim();});
+  if(lines.length<2){notify('CSV appears empty');return;}
+  var headers=lines[0].split(',').map(function(h){return h.replace(/"/g,'').trim().toLowerCase();});
+  var fi=-1,li=-1,ni=-1,ti=-1,ci=-1;
+  headers.forEach(function(h,i){
+    if(h==='first name'||h==='firstname'){fi=i;}
+    else if(h==='last name'||h==='lastname'){li=i;}
+    else if(h==='name'||h==='full name'){ni=i;}
+    if((h.includes('title')||h==='job title')&&ti===-1){ti=i;}
+    if((h==='company'||h==='company name'||h==='account name')&&ci===-1){ci=i;}
   });
-  localStorage.setItem('ob-pipeline', JSON.stringify(pipeline));
-  notify('Added ' + added + ' HOT prospects to pipeline');
+  if(fi===-1&&ni===-1){headers.forEach(function(h,i){if(h.includes('first')&&fi===-1){fi=i;}if(h.includes('last')&&!h.includes('latest')&&li===-1){li=i;}if(h.includes('name')&&ni===-1){ni=i;}if(h.includes('title')&&ti===-1){ti=i;}if((h.includes('company')||h.includes('account')||h.includes('organization'))&&ci===-1){ci=i;}});}
+  bulkData=[];
+  for(var i=1;i<lines.length;i++){
+    var cols=parseCSVLine(lines[i]);var fullName='';
+    if(fi>=0&&li>=0){fullName=((cols[fi]||'')+' '+(cols[li]||'')).trim();}
+    else if(ni>=0){fullName=(cols[ni]||'').replace(/"/g,'').trim();}
+    if(!fullName||fullName.length<2){continue;}
+    var title=ti>=0?(cols[ti]||'').replace(/"/g,'').trim():'';
+    var company=ci>=0?(cols[ci]||'').replace(/"/g,'').trim():'';
+    var ts=getTitleScore(title);
+    var hqPts=8;var travelPts=7;var sourcePts=1;
+    var total=ts+hqPts+travelPts+sourcePts;
+    var bulkDefaultTravel={route1:'',route2:'',pattern:'variable',airport:'ATL-main',companions:'solo'};
+    var bulkCT=classifyClientType(bulkDefaultTravel,total,'heavy');
+    var bulkProspect={name:fullName,title:title,company:company,score:total,id:Date.now()+Math.random(),stage:'identified',hq:'yes',travel:'heavy',source:'linkedin',industry:'',notes:'',bmScore:0,signals:[],travelData:bulkDefaultTravel,clientType:bulkCT.short,clientTypeInfo:bulkCT,ea:{active:false}};
+    bulkProspect.convProb=calcConvProb(bulkProspect);
+    bulkProspect.monthlyValue=estimateMonthlyValue(bulkProspect);
+    bulkProspect.responseStatus='none';
+    bulkProspect.lastContact='';
+    bulkData.push(bulkProspect);
+  }
+  bulkData.sort(function(a,b){return b.score-a.score;});
+  renderBulkTable();notify('Scored '+bulkData.length+' prospects');
+}
+function renderBulkTable(){
+  document.getElementById('import-results').style.display='block';
+  var hot=bulkData.filter(function(p){return p.score>=28;}).length;var strong=bulkData.filter(function(p){return p.score>=24&&p.score<28;}).length;
+  document.getElementById('import-summary').textContent=bulkData.length+' prospects scored - '+hot+' HOT, '+strong+' Strong';
+  var filtered=bulkData;
+  if(bulkFilter==='hot'){filtered=bulkData.filter(function(p){return p.score>=28;});}
+  if(bulkFilter==='strong'){filtered=bulkData.filter(function(p){return p.score>=24;});}
+  document.getElementById('bulk-tbody').innerHTML=filtered.map(function(p){var sid=String(p.id).replace('.','_');return'<tr><td style="font-weight:500;">'+p.name+'</td><td style="color:var(--muted);font-size:11px;">'+(p.title||'')+'</td><td style="font-size:12px;">'+(p.company||'')+'</td><td style="font-weight:600;color:var(--gold);">'+p.score+'</td><td class="'+getTierClass(p.score)+'">'+getTier(p.score)+'</td><td><button class="btn btn-ghost" style="padding:5px 12px;font-size:9px;" onclick="addBulkOne(\''+sid+'\')">Add</button></td></tr>';}).join('');
+}
+function filterBulk(f,el){bulkFilter=f;document.querySelectorAll('.fbtn').forEach(function(b){b.classList.remove('on');});el.classList.add('on');renderBulkTable();}
+function addBulkOne(sid){var p=bulkData.find(function(x){return String(x.id).replace('.','_')===sid;});if(!p){return;}if(pipeline.find(function(x){return x.name===p.name&&x.company===p.company;})){notify('Already in pipeline');return;}var bp=JSON.parse(JSON.stringify(p));
+  if(!bp.convProb){bp.convProb=calcConvProb(bp);}
+  if(!bp.clientType){var bct=classifyClientType(bp.travelData||{},bp.score,bp.travel||'heavy');bp.clientType=bct.short;bp.clientTypeInfo=bct;}
+  if(!bp.monthlyValue){bp.monthlyValue=estimateMonthlyValue(bp);}
+  if(!bp.responseStatus){bp.responseStatus='none';}
+  if(!bp.lastContact){bp.lastContact='';}
+  pipeline.push(bp);localStorage.setItem('ob-pipeline',JSON.stringify(pipeline));notify(p.name+' added — est. $'+bp.monthlyValue.toLocaleString()+'/mo');}
+function addAllHot(){var hot=bulkData.filter(function(p){return p.score>=28;});var added=0;hot.forEach(function(p){if(!pipeline.find(function(x){return x.name===p.name&&x.company===p.company;})){pipeline.push(JSON.parse(JSON.stringify(p)));added++;}});localStorage.setItem('ob-pipeline',JSON.stringify(pipeline));notify('Added '+added+' HOT prospects to pipeline');}
+
+
+// ── TRAVEL INTELLIGENCE & CLIENT TYPE ─────────────────────────────────────
+function getTravelData(){
+  return{route1:document.getElementById('tr-route1').value,route2:document.getElementById('tr-route2').value,pattern:document.getElementById('tr-pattern').value,airport:document.getElementById('tr-airport').value,companions:document.getElementById('tr-companions').value};
 }
 
-function copyText(id) {
-  var text = document.getElementById(id).textContent;
-  navigator.clipboard.writeText(text).then(function() { notify('Copied to clipboard'); });
+function classifyClientType(travel,score,freq){
+  var f=freq||'light';var route=travel.route1||'';var pattern=travel.pattern||'variable';
+  if(f==='heavy'&&(pattern==='mon-thu'||pattern==='mon-fri'||pattern==='tue-thu')){return{type:'High-Frequency Traveler',cls:'ct-hf',desc:'Weekly recurring rider — target for monthly contract',short:'High-Freq'};}
+  if(score>=24&&(f==='heavy'||f==='moderate')){return{type:'Corporate Account Decision-Maker',cls:'ct-corp',desc:'Controls budget — position as company-wide solution',short:'Corp Account'};}
+  if(pattern==='events'||f==='light'){return{type:'Event-Based Traveler',cls:'ct-event',desc:'High-value occasional — target around known events',short:'Event-Based'};}
+  return{type:'Occasional Luxury User',cls:'ct-occ',desc:'Lower frequency — nurture with brand awareness',short:'Occasional'};}
+
+function updateClientTypeDisplay(){
+  var td=getTravelData();var freq=document.getElementById('p-travel')?document.getElementById('p-travel').value:'light';
+  var score=currentP?currentP.score:0;var ct=classifyClientType(td,score,freq);
+  var wrap=document.getElementById('tr-classification');var badge=document.getElementById('ct-badge');var desc=document.getElementById('ct-desc');
+  if(wrap&&badge&&desc){wrap.style.display='block';badge.className='client-type-badge '+ct.cls;badge.textContent=ct.type;desc.textContent=ct.desc;}
+  return ct;
 }
 
-function notify(msg) {
-  var el = document.getElementById('notif');
-  el.textContent = msg;
-  el.classList.add('show');
-  setTimeout(function() { el.classList.remove('show'); }, 2500);
+// ── CONVERSION PROBABILITY ─────────────────────────────────────────────────
+function calcConvProb(prospect){
+  var s=0;
+  var freq=prospect.travel||'light';
+  if(freq==='heavy'){s+=3;}else if(freq==='moderate'){s+=2;}else{s+=1;}
+  if(prospect.ea&&prospect.ea.active){s+=3;if(prospect.ea.infLevel==='High'){s+=2;}else if(prospect.ea.infLevel==='Medium'){s+=1;}}
+  if(prospect.bmScore>=7){s+=3;}else if(prospect.bmScore>=4){s+=2;}else if(prospect.bmScore>=1){s+=1;}
+  if(prospect.source==='referral'){s+=3;}else if(prospect.source==='event'){s+=2;}else if(prospect.source==='linkedin'){s+=1;}
+  var travelData=prospect.travelData||{};
+  if(travelData.pattern&&travelData.pattern!=='variable'&&travelData.pattern!=='events'){s+=1;}
+  if(s>=9){return'High';}if(s>=5){return'Medium';}return'Low';
 }
+
+// ── QUICK OUTREACH FROM PIPELINE ──────────────────────────────────────────
+function quickOutreach(id){
+  var p=pipeline.find(function(x){return x.id===id;});
+  if(!p){return;}
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
+  document.querySelectorAll('.panel').forEach(function(pl){pl.classList.remove('active');});
+  document.querySelector('[onclick*="outreach"]').classList.add('active');
+  document.getElementById('panel-outreach').classList.add('active');
+  document.getElementById('o-name').value=p.name;
+  document.getElementById('o-title').value=p.title+(p.company?', '+p.company:'');
+  if(p.ea&&p.ea.active&&p.ea.name){
+    document.getElementById('oa-name').value=p.ea.name;
+    document.getElementById('oa-exec').value=p.name+', '+p.title+' at '+p.company;
+    if(p.ea.email){document.getElementById('oa-email').value=p.ea.email;}
+    if(p.ea.phone){document.getElementById('oa-phone').value=p.ea.phone;}
+  }
+  document.getElementById('research-box').classList.remove('show');
+  document.getElementById('out-box').classList.remove('show');
+  if(p.ea&&p.ea.active&&p.ea.name){
+    var eaBtn=document.getElementById('mode-ea-btn')||document.querySelectorAll('.mode-tab')[1];
+    if(eaBtn){setMode('ea',eaBtn);}
+    notify('Pre-filled EA outreach for '+p.name+' via '+p.ea.name);
+  }else{
+    var execBtn=document.getElementById('mode-exec-btn')||document.querySelectorAll('.mode-tab')[0];
+    if(execBtn){setMode('exec',execBtn);}
+    notify('Pre-filled outreach for '+p.name);
+  }
+}
+
+// ── FOLLOW-UP DATE ────────────────────────────────────────────────────────
+function setFollowUp(id){
+  var p=pipeline.find(function(x){return x.id===id;});
+  if(!p){return;}
+  var d=prompt('Set follow-up date for '+p.name+' (YYYY-MM-DD):',p.followUp||new Date(Date.now()+3*86400000).toISOString().slice(0,10));
+  if(!d){return;}
+  p.followUp=d;
+  localStorage.setItem('ob-pipeline',JSON.stringify(pipeline));
+  renderPipeline();notify('Follow-up set: '+d);
+}
+
+
+// ══════════════════════════════════════════════════════════
+// PHASE 1: REVENUE & RIDE FREQUENCY HELPERS
+// ══════════════════════════════════════════════════════════
+var STAGE_LABELS={
+  'identified':{'label':'Identified','cls':'stage-identified'},
+  'contacted':{'label':'Contacted','cls':'stage-contacted'},
+  'assistant':{'label':'Asst Engaged','cls':'stage-assistant'},
+  'trial-sched':{'label':'Trial Scheduled','cls':'stage-trial-sched'},
+  'trial-done':{'label':'Trial Done','cls':'stage-trial-done'},
+  'active':{'label':'Active Client','cls':'stage-active'},
+  'recurring':{'label':'Recurring','cls':'stage-recurring'},
+  'corporate':{'label':'Corporate Acct','cls':'stage-corporate'}
+};
+
+function estimateMonthlyValue(p){
+  var freq=p.travel||'light';
+  var stage=p.stage||'identified';
+  var base=0;
+  if(freq==='heavy'){base=3200;}
+  else if(freq==='moderate'){base=1400;}
+  else{base=600;}
+  if(p.travelData&&p.travelData.companions==='exec-team'){base*=2.5;}
+  else if(p.travelData&&p.travelData.companions==='team'){base*=1.5;}
+  if(p.travelData&&p.travelData.airport==='PDK'||p.travelData&&p.travelData.airport==='FTY'){base*=1.4;}
+  return Math.round(base);
+}
+
+function getStagePipeStageCss(stage){
+  return STAGE_LABELS[stage]?STAGE_LABELS[stage].cls:'stage-identified';
+}
+
+function getStageLabel(stage){
+  return STAGE_LABELS[stage]?STAGE_LABELS[stage].label:stage;
+}
+
+// ══════════════════════════════════════════════════════════
+// PHASE 2: FOLLOW-UP SYSTEM
+// ══════════════════════════════════════════════════════════
+var RESPONSE_LABELS={'none':'No response yet','positive':'Responded positively','negative':'Declined / not interested','pending':'Waiting for reply'};
+
+function getFollowUpAlert(p){
+  var today=new Date();
+  var todayStr=today.toISOString().slice(0,10);
+  if(!p.followUp){return null;}
+  var diff=Math.ceil((new Date(p.followUp)-today)/(1000*60*60*24));
+  if(diff<0){return{cls:'alert-overdue',text:'Overdue by '+Math.abs(diff)+' day'+(Math.abs(diff)!==1?'s':'')};}
+  if(diff===0){return{cls:'alert-overdue',text:'Follow up TODAY'};}
+  if(diff<=3){return{cls:'alert-soon',text:'Follow up in '+diff+' day'+(diff!==1?'s':'')};}
+  return{cls:'alert-ok',text:'Next: '+p.followUp};
+}
+
+function getSuggestedAction(p){
+  var stage=p.stage||'identified';
+  var resp=p.responseStatus||'none';
+  var actions={
+    'identified':'Research on LinkedIn and identify EA contact',
+    'contacted':resp==='none'?'No response — try EA route or different channel':resp==='positive'?'Schedule trial ride — strike while warm':'Try new approach — change channel or messaging',
+    'assistant':resp==='none'?'Follow up with EA — check if email received':'Confirm exec is aware — propose trial this week',
+    'trial-sched':'\u26a0\ufe0f Send confirmation email + driver info 24hrs before. Call morning of.',
+    'trial-done':'\u2b50 Follow up within 48hrs — this is your highest-leverage moment',
+    'active':'Check satisfaction + propose recurring package or monthly retainer',
+    'recurring':'Introduce corporate account benefits — ask for internal referral',
+    'corporate':'Identify next exec to onboard — request warm intro'
+  };
+  return actions[stage]||'Advance to next stage';
+}
+
+function setResponseStatus(id,status){
+  var p=pipeline.find(function(x){return x.id===id;});
+  if(!p){return;}
+  p.responseStatus=status;
+  p.lastContact=new Date().toISOString().slice(0,10);
+  var stageSuggestedDays={'identified':3,'contacted':4,'assistant':3,'trial-sched':1,'trial-done':2,'active':14,'recurring':30,'corporate':30};
+  var days=stageSuggestedDays[p.stage]||3;
+  var fu=new Date();fu.setDate(fu.getDate()+days);
+  p.followUp=fu.toISOString().slice(0,10);
+  localStorage.setItem('ob-pipeline',JSON.stringify(pipeline));
+  renderPipeline();
+  notify('Status updated for '+p.name);
+}
+
+function setMonthlyValue(id){
+  var p=pipeline.find(function(x){return x.id===id;});
+  if(!p){return;}
+  var suggested=estimateMonthlyValue(p);
+  var val=prompt('Monthly value for '+p.name+' (suggested: $'+suggested+'):',p.monthlyValue||suggested);
+  if(val===null){return;}
+  p.monthlyValue=parseInt(val)||0;
+  localStorage.setItem('ob-pipeline',JSON.stringify(pipeline));
+  renderPipeline();
+  notify('Monthly value set: $'+p.monthlyValue);
+}
+
+async function generateFollowUp(id){
+  var p=pipeline.find(function(x){return x.id===id;});
+  if(!p){return;}
+  var sp=document.getElementById('fu-spin-'+id);
+  if(sp){sp.classList.add('on');}
+  var stage=getStageLabel(p.stage);
+  var resp=RESPONSE_LABELS[p.responseStatus||'none'];
+  var action=getSuggestedAction(p);
+  var travelHint=p.travelData&&p.travelData.route1?'Primary route: '+p.travelData.route1+'. Pattern: '+p.travelData.pattern+'.':'';
+  try{
+    var msg=await callAI([
+      'You write follow-up outreach for Odyssey Black VIP Transportation in Atlanta.',
+      'Prospect: '+p.name+', '+p.title+' at '+p.company,
+      'Current pipeline stage: '+stage,
+      'Response status: '+resp,
+      'Last contact: '+(p.lastContact||'Unknown'),
+      travelHint,
+      'Client type: '+(p.clientType||'Unknown'),
+      'Conversion probability: '+(p.convProb||'Unknown'),
+      'Suggested next action: '+action,
+      '',
+      'Write a short follow-up message (email or text) appropriate for this stage.',
+      'If no response, change the angle — try a different hook, shorter message, or reference their travel route.',
+      'If positive response, move toward scheduling or confirming.',
+      'Keep it under 100 words. No subject line needed unless email stage.',
+      'Sound human, not templated. Reference specific details where possible.',
+      'End with one line: BEST TIME TO SEND: [specific recommendation based on stage and travel pattern]'
+    ],700);
+    var outEl=document.getElementById('fu-out-'+id);
+    if(outEl){outEl.textContent=msg;outEl.style.display='block';}
+  }catch(e){
+    var outEl=document.getElementById('fu-out-'+id);
+    if(outEl){outEl.textContent='Error: '+e.message;outEl.style.display='block';}
+  }
+  if(sp){sp.classList.remove('on');}
+}
+
+// ══════════════════════════════════════════════════════════
+// PHASE 3: EVENT MODE
+// ══════════════════════════════════════════════════════════
+var eventModeActive=false;
+var eventModeData={name:'',date:'',notes:''};
+var savedEventMode=localStorage.getItem('ob-event-mode');
+if(savedEventMode){try{var sem=JSON.parse(savedEventMode);if(sem.active&&sem.date&&new Date(sem.date)>=new Date()){eventModeData=sem;}}catch(e){}}
+
+function toggleEventMode(cb){
+  var fields=document.getElementById('event-mode-fields');
+  var row=document.getElementById('event-toggle-row');
+  eventModeActive=cb.checked;
+  if(cb.checked){
+    fields.style.display='block';
+    row.classList.add('on');
+  }else{
+    fields.style.display='none';
+    row.classList.remove('on');
+    localStorage.removeItem('ob-event-mode');
+  }
+}
+
+
+// ══════════════════════════════════════════════════════════
+// EA INTELLIGENCE SYSTEM
+// ══════════════════════════════════════════════════════════
+var EA_COMM_LABELS = {
+  'email':'Email (formal)','email-casual':'Email (casual)','phone':'Phone call',
+  'text':'Text/SMS','linkedin':'LinkedIn','in-person':'In-person','unknown':'Unknown'
+};
+var EA_RESP_LABELS = {
+  'fast':'Same-day responder','moderate':'2-3 day responder','slow':'Needs follow-up',
+  'gatekeeper':'Protective gatekeeper','champion':'Active champion','unknown':'Unknown'
+};
+var EA_BOOKING_LABELS = {
+  'plans-ahead':'Plans 1-2 weeks ahead','last-minute':'Last-minute booker',
+  'recurring':'Sets standing bookings','reactive':'Books when directed','unknown':'Unknown'
+};
+var EA_PERS_LABELS = {
+  'professional':'Formal & professional','warm':'Warm & relational',
+  'efficient':'Brief & efficient','cautious':'Needs approval','empowered':'Independent decision-maker','unknown':'Unknown'
+};
+
+function getEAIntelProfile(){
+  return {
+    commPref: document.getElementById('ea-comm-pref') ? document.getElementById('ea-comm-pref').value : 'unknown',
+    responsiveness: document.getElementById('ea-responsiveness') ? document.getElementById('ea-responsiveness').value : 'unknown',
+    bookingHabit: document.getElementById('ea-booking') ? document.getElementById('ea-booking').value : 'unknown',
+    personality: document.getElementById('ea-personality') ? document.getElementById('ea-personality').value : 'unknown',
+    notes: document.getElementById('ea-notes') ? document.getElementById('ea-notes').value.trim() : ''
+  };
+}
+
+function getBestContactMethod(intel){
+  var comm = intel.commPref || 'unknown';
+  var resp = intel.responsiveness || 'unknown';
+  var pers = intel.personality || 'unknown';
+  var method = '';
+  var timing = '';
+  if(comm === 'email' || comm === 'email-casual'){
+    method = comm === 'email' ? 'Send a concise, professional email' : 'Send a brief, friendly email';
+  } else if(comm === 'phone'){
+    method = 'Call directly — they prefer voice';
+  } else if(comm === 'text'){
+    method = 'Text first — low friction, fast response';
+  } else if(comm === 'linkedin'){
+    method = 'LinkedIn message — professional context';
+  } else {
+    method = 'Start with email, follow up by phone';
+  }
+  if(resp === 'fast'){timing = 'Expect same-day reply. Follow up after 24hrs if no response.';}
+  else if(resp === 'slow'){timing = 'Allow 3-4 days. Use a 2-touch approach.';}
+  else if(resp === 'gatekeeper'){timing = 'Be patient. Lead with exec benefit, not your pitch.';}
+  else if(resp === 'champion'){timing = 'Engage them as a partner. Ask for their input.';}
+  else {timing = 'Follow up after 2-3 days.';}
+  return method + ' — ' + timing;
+}
+
+function getEAToneGuidance(intel){
+  var pers = intel.personality || 'unknown';
+  var booking = intel.bookingHabit || 'unknown';
+  var guidance = [];
+  if(pers === 'professional'){guidance.push('Keep language formal and structured. Use bullet points.');}
+  else if(pers === 'warm'){guidance.push('Be personable. Use their first name. Show genuine interest in their role.');}
+  else if(pers === 'efficient'){guidance.push('Be extremely concise. Lead with the single most important point. No pleasantries.');}
+  else if(pers === 'cautious'){guidance.push('Be transparent and low-pressure. Offer information they can present to their exec without risk.');}
+  else if(pers === 'empowered'){guidance.push('Treat them as a peer decision-maker. Ask for their recommendation, not permission.');}
+  if(booking === 'plans-ahead'){guidance.push('Offer advance scheduling options and calendar integration.');}
+  else if(booking === 'last-minute'){guidance.push('Emphasize same-day availability and rapid response.');}
+  else if(booking === 'recurring'){guidance.push('Propose a standing arrangement they can set once and forget.');}
+  return guidance.join(' ');
+}
+
+function updateEAProfile(){
+  var intel = getEAIntelProfile();
+  var display = document.getElementById('ea-intel-profile');
+  var summary = document.getElementById('ea-intel-summary');
+  var rec = document.getElementById('ea-contact-rec');
+  if(!display || !summary || !rec){return;}
+  var anySet = intel.commPref !== 'unknown' || intel.responsiveness !== 'unknown' ||
+    intel.bookingHabit !== 'unknown' || intel.personality !== 'unknown';
+  if(!anySet){display.style.display = 'none'; return;}
+  display.style.display = 'block';
+  var chips = [
+    intel.commPref !== 'unknown' ? '<span class="ea-intel-chip eic-comm">&#128172; ' + EA_COMM_LABELS[intel.commPref] + '</span>' : '',
+    intel.responsiveness !== 'unknown' ? '<span class="ea-intel-chip ' + (intel.responsiveness === 'gatekeeper' ? 'eic-warn' : intel.responsiveness === 'champion' ? 'eic-resp' : 'eic-resp') + '">&#8987; ' + EA_RESP_LABELS[intel.responsiveness] + '</span>' : '',
+    intel.bookingHabit !== 'unknown' ? '<span class="ea-intel-chip eic-book">&#128197; ' + EA_BOOKING_LABELS[intel.bookingHabit] + '</span>' : '',
+    intel.personality !== 'unknown' ? '<span class="ea-intel-chip eic-pers">&#129309; ' + EA_PERS_LABELS[intel.personality] + '</span>' : ''
+  ].filter(Boolean).join('');
+  summary.innerHTML = chips;
+  rec.textContent = '&#x27A4; ' + getBestContactMethod(intel);
+}
+
+function getEAIntelString(intel){
+  if(!intel || (!intel.commPref && !intel.responsiveness)){return '';}
+  var parts = [];
+  if(intel.commPref && intel.commPref !== 'unknown'){parts.push('Preferred contact: ' + EA_COMM_LABELS[intel.commPref]);}
+  if(intel.responsiveness && intel.responsiveness !== 'unknown'){parts.push('Responsiveness: ' + EA_RESP_LABELS[intel.responsiveness]);}
+  if(intel.bookingHabit && intel.bookingHabit !== 'unknown'){parts.push('Booking style: ' + EA_BOOKING_LABELS[intel.bookingHabit]);}
+  if(intel.personality && intel.personality !== 'unknown'){parts.push('Personality: ' + EA_PERS_LABELS[intel.personality]);}
+  if(intel.notes){parts.push('Notes: ' + intel.notes);}
+  return parts.join('. ');
+}
+
+function saveEventMode(){
+  if(eventModeActive){
+    var ed=getEventData();
+    ed.active=true;
+    localStorage.setItem('ob-event-mode',JSON.stringify(ed));
+  }
+}
+
+function getEventData(){
+  return{
+    name:document.getElementById('ev-name')?document.getElementById('ev-name').value.trim():'',
+    date:document.getElementById('ev-date')?document.getElementById('ev-date').value:'',
+    notes:document.getElementById('ev-notes')?document.getElementById('ev-notes').value.trim():''
+  };
+}
+
+function getDaysToEvent(dateStr){
+  if(!dateStr){return null;}
+  var diff=Math.ceil((new Date(dateStr)-new Date())/(1000*60*60*24));
+  return diff;
+}
+
+function getEventUrgency(daysAway){
+  if(daysAway===null){return{level:'unknown',label:'Event date not set'};}
+  if(daysAway<0){return{level:'past',label:'Event passed '+Math.abs(daysAway)+' days ago'};}
+  if(daysAway===0){return{level:'today',label:'Event is TODAY'};}
+  if(daysAway===1){return{level:'tomorrow',label:'Event is TOMORROW'};}
+  if(daysAway<=3){return{level:'imminent',label:'Event in '+daysAway+' days — act now'};}
+  if(daysAway<=7){return{level:'soon',label:'Event in '+daysAway+' days'};}
+  return{level:'upcoming',label:'Event in '+daysAway+' days'};}
+
+async function generateEventCapture(){
+  if(!currentP){return;}
+  var sp=document.getElementById('sp-ev');
+  var box=document.getElementById('strat-box');
+  var out=document.getElementById('strat-ai');
+  sp.classList.add('on');
+  box.classList.remove('show');
+  var evData=getEventData();
+  var daysAway=getDaysToEvent(evData.date);
+  var urgency=getEventUrgency(daysAway);
+  try{
+    out.textContent=await callAI([
+      'You are a business development advisor for Odyssey Black VIP Transportation in Atlanta.',
+      'Prospect: '+currentP.name+', '+currentP.title+' at '+currentP.company,
+      'Acquisition Score: '+currentP.score+'/40 ('+getTier(currentP.score)+')',
+      'Buying Moment Score: '+currentP.bmScore+'/10',
+      'Client Type: '+(currentP.clientType||'Unknown'),
+      'Event: '+(evData.name||'Atlanta event'),
+      'Event Date: '+(evData.date||'Unknown'),
+      'Days Until Event: '+(daysAway!==null?daysAway+' days':' unknown'),
+      'Event Urgency: '+urgency.label,
+      'Event Notes: '+(evData.notes||'None'),
+      'Travel pattern: '+(currentP.travelData&&currentP.travelData.route1?currentP.travelData.route1:'Not specified'),
+      '',
+      'Write an EVENT CAPTURE STRATEGY with these sections:',
+      '1. WINDOW OF OPPORTUNITY - why this event creates the perfect moment to reach out',
+      '2. SAME-DAY HOOK - a specific message to send today referencing the event',
+      '3. EVENT-DAY LOGISTICS PITCH - how to position Odyssey Black for their event transportation',
+      '4. POST-EVENT FOLLOW-UP - what to say the day after the event',
+      '5. CONVERSION PATH - how to turn event contact into a recurring client',
+      '',
+      urgency.level==='today'||urgency.level==='tomorrow'?'CRITICAL: Event is imminent. Every message must create same-day or next-day urgency.':'',
+      'Be specific, tactical, and time-sensitive. Reference the actual event name.'
+    ],1200);
+    box.classList.add('show');
+  }catch(e){
+    out.textContent='Error: '+e.message;
+    box.classList.add('show');
+  }
+  sp.classList.remove('on');
+}
+
+function showEventModeBar(active,evData){
+  var bar=document.getElementById('event-mode-bar');
+  var desc=document.getElementById('event-mode-desc');
+  if(active&&bar){
+    bar.classList.add('active');
+    if(desc&&evData&&evData.name){desc.textContent=evData.name+' — scoring boosted. Act today.';}
+  }else if(bar){
+    bar.classList.remove('active');
+  }
+}
+
+function copyText(id){var t=document.getElementById(id).textContent;navigator.clipboard.writeText(t).then(function(){notify('Copied to clipboard');});}
+function notify(msg){var el=document.getElementById('notif');el.textContent=msg;el.classList.add('show');setTimeout(function(){el.classList.remove('show');},2500);}
 </script>
 </body>
 </html>
