@@ -147,6 +147,97 @@ textarea{resize:vertical;min-height:75px;}
 .co-exec-row:last-child{border-bottom:none;}
 .co-exec-name{color:var(--text);font-weight:500;}
 .co-exec-title{color:var(--muted);font-size:11px;}
+.cal-week{margin-bottom:24px;}
+.cal-week-header{display:flex;align-items:center;gap:12px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+.cal-week-num{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;color:var(--gold);line-height:1;min-width:40px;}
+.cal-week-title{font-size:13px;font-weight:600;color:var(--text);}
+.cal-week-focus{font-size:11px;color:var(--muted);margin-top:2px;}
+.cal-tasks{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.cal-task{background:rgba(255,255,255,0.02);border:1px solid var(--border);padding:12px 14px;border-radius:1px;display:flex;gap:12px;align-items:flex-start;}
+.cal-task.done{opacity:0.5;background:rgba(46,204,113,0.04);border-color:rgba(46,204,113,0.2);}
+.cal-task-check{width:16px;height:16px;border:1px solid var(--border);border-radius:2px;flex-shrink:0;cursor:pointer;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:10px;}
+.cal-task-check.checked{background:var(--green);border-color:var(--green);color:#000;}
+.cal-task-body{flex:1;}
+.cal-task-title{font-size:12px;color:var(--text);font-weight:500;margin-bottom:2px;}
+.cal-task-detail{font-size:11px;color:var(--muted);line-height:1.5;}
+.cal-task-tag{font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:2px 7px;border-radius:1px;display:inline-block;margin-top:4px;}
+.ct-prospect{background:rgba(52,152,219,0.1);border:1px solid rgba(52,152,219,0.3);color:var(--blue);}
+.ct-outreach{background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.3);color:var(--gold);}
+.ct-followup{background:rgba(241,196,15,0.1);border:1px solid rgba(241,196,15,0.3);color:var(--yellow);}
+.ct-close{background:rgba(46,204,113,0.1);border:1px solid rgba(46,204,113,0.3);color:var(--green);}
+.ct-account{background:rgba(155,89,182,0.1);border:1px solid rgba(155,89,182,0.3);color:#9b59b6;}
+.progress-bar{height:6px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden;margin-top:8px;}
+.progress-fill{height:6px;background:var(--gold);border-radius:3px;transition:width 0.4s ease;}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px;}
+.kpi-card{background:var(--card);border:1px solid var(--border);padding:16px;border-radius:2px;text-align:center;}
+.kpi-target{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;color:var(--gold);}
+.kpi-actual{font-size:18px;font-weight:600;color:var(--green);margin-top:2px;}
+.kpi-label{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-top:4px;}
+.kpi-gap{font-size:10px;color:var(--muted);margin-top:2px;}
+.phase-header{padding:14px 18px;border-radius:1px;margin-bottom:16px;border:1px solid;}
+.phase-1{background:rgba(52,152,219,0.06);border-color:rgba(52,152,219,0.25);}
+.phase-2{background:rgba(201,168,76,0.06);border-color:rgba(201,168,76,0.25);}
+.phase-3{background:rgba(46,204,113,0.06);border-color:rgba(46,204,113,0.25);}
+.phase-title{font-size:11px;letter-spacing:3px;text-transform:uppercase;font-weight:700;}
+.phase-desc{font-size:12px;color:var(--muted);margin-top:3px;}
+.strat-pillar{background:var(--card);border:1px solid var(--border);padding:20px;border-radius:2px;margin-bottom:16px;}
+.strat-pillar-num{font-family:'Cormorant Garamond',serif;font-size:48px;font-weight:300;color:var(--gold);line-height:1;float:right;margin-left:16px;}
+.strat-pillar-title{font-size:14px;font-weight:700;color:var(--text);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;}
+.strat-pillar-body{font-size:12px;color:var(--muted);line-height:1.9;}
+.strat-pillar-body strong{color:var(--text);}
+.war-room-ai{margin-top:16px;}
+.channel-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px;}
+.channel-card{background:rgba(255,255,255,0.02);border:1px solid var(--border);padding:14px;border-radius:1px;}
+.channel-name{font-size:11px;font-weight:700;color:var(--text);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;}
+.channel-body{font-size:11px;color:var(--muted);line-height:1.7;}
+.tier-badge{display:inline-flex;align-items:center;padding:4px 12px;border-radius:1px;font-size:10px;letter-spacing:2px;text-transform:uppercase;font-weight:700;}
+.tier-1{background:rgba(201,168,76,0.15);border:1px solid rgba(201,168,76,0.4);color:var(--gold);}
+.tier-2{background:rgba(46,204,113,0.1);border:1px solid rgba(46,204,113,0.35);color:var(--green);}
+.tier-3{background:rgba(52,152,219,0.1);border:1px solid rgba(52,152,219,0.35);color:var(--blue);}
+.market-card{background:var(--card);border:1px solid var(--border);padding:0;border-radius:2px;margin-bottom:14px;overflow:hidden;}
+.market-card-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;cursor:pointer;transition:background 0.2s;}
+.market-card-header:hover{background:rgba(255,255,255,0.02);}
+.market-card-body{display:none;padding:0 20px 20px;border-top:1px solid var(--border);}
+.market-card-body.open{display:block;}
+.market-icon{font-size:24px;margin-right:12px;}
+.market-name{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:500;}
+.market-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+.market-score{text-align:right;}
+.market-score-num{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;color:var(--gold);}
+.market-score-lbl{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);}
+.biz-score-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0;}
+.biz-score-item{background:rgba(255,255,255,0.02);border:1px solid var(--border);padding:10px 12px;border-radius:1px;}
+.biz-score-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+.biz-score-val{font-size:13px;color:var(--text);font-weight:500;}
+.decision-maker-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(30,30,30,0.5);}
+.decision-maker-row:last-child{border-bottom:none;}
+.dm-role{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);width:160px;flex-shrink:0;}
+.dm-approach{font-size:12px;color:var(--muted);}
+.tier-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px;}
+.tier-card{background:var(--card);border:1px solid var(--border);padding:20px;border-radius:2px;text-align:center;}
+.tier-card-num{font-family:'Cormorant Garamond',serif;font-size:48px;font-weight:300;line-height:1;}
+.tier-card-name{font-size:11px;letter-spacing:2px;text-transform:uppercase;margin-top:4px;font-weight:600;}
+.tier-card-rev{font-size:18px;font-weight:600;color:var(--green);margin-top:8px;}
+.tier-card-desc{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.6;}
+.market-prospect-form{background:rgba(255,255,255,0.02);border:1px solid var(--border);padding:20px;border-radius:1px;margin-top:16px;}
+.search-bar{display:flex;gap:10px;margin-bottom:16px;align-items:flex-end;}
+.search-bar input,.search-bar select{flex:1;}
+.search-bar .btn{flex-shrink:0;white-space:nowrap;}
+.places-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;}
+.place-card{background:rgba(255,255,255,0.02);border:1px solid var(--border);padding:14px;border-radius:1px;cursor:pointer;transition:all 0.2s;position:relative;}
+.place-card:hover{border-color:var(--gold);background:rgba(201,168,76,0.04);}
+.place-card.selected{border-color:var(--gold);background:rgba(201,168,76,0.08);}
+.place-name{font-weight:600;font-size:13px;color:var(--text);margin-bottom:4px;}
+.place-address{font-size:11px;color:var(--muted);margin-bottom:6px;line-height:1.4;}
+.place-rating{font-size:11px;color:var(--yellow);}
+.place-type-tag{font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:2px 8px;border-radius:1px;background:var(--gold-dim);border:1px solid rgba(201,168,76,0.3);color:var(--gold);display:inline-block;margin-top:4px;}
+.place-score-badge{position:absolute;top:10px;right:10px;font-size:11px;font-weight:700;color:var(--gold);}
+.places-empty{text-align:center;color:var(--muted);font-size:13px;padding:2rem;border:1px dashed var(--border);border-radius:1px;}
+.search-status{font-size:11px;color:var(--muted);margin-bottom:12px;}
+.api-key-row{display:flex;gap:10px;align-items:center;margin-bottom:14px;padding:12px 14px;background:rgba(52,152,219,0.05);border:1px solid rgba(52,152,219,0.2);border-radius:1px;}
+.api-key-row label{margin:0;font-size:10px;letter-spacing:2px;color:var(--blue);white-space:nowrap;}
+.api-key-row input{flex:1;}
+.api-key-row .btn{flex-shrink:0;padding:8px 16px;}
 .notif{position:fixed;bottom:20px;right:20px;background:var(--card);border:1px solid rgba(201,168,76,0.4);color:var(--gold);padding:10px 18px;font-size:11px;letter-spacing:1px;z-index:999;opacity:0;transform:translateY(6px);transition:all 0.25s;pointer-events:none;border-radius:2px;}
 .notif.show{opacity:1;transform:translateY(0);}
 .client-type-badge{font-size:10px;letter-spacing:2px;text-transform:uppercase;font-weight:700;padding:4px 14px;border-radius:1px;white-space:nowrap;}
@@ -209,6 +300,9 @@ textarea{resize:vertical;min-height:75px;}
     <button class="tab" onclick="switchTab('script',this)">Call Script</button>
     <button class="tab" onclick="switchTab('import',this)">Apollo Import</button>
     <button class="tab" onclick="switchTab('company',this)">Company Intel</button>
+    <button class="tab" onclick="switchTab('calendar',this)">90-Day Plan</button>
+    <button class="tab" onclick="switchTab('strategy',this)">&#9733; War Room</button>
+    <button class="tab" onclick="switchTab('markets',this)">&#9775; Market Expansion</button>
   </div>
 
   <!-- TAB 1: PROSPECT BUILDER -->
@@ -693,6 +787,487 @@ textarea{resize:vertical;min-height:75px;}
     <div class="empty-msg" id="co-empty">Add prospects to your pipeline first, then build the company map.</div>
     <div class="ai-box" id="co-strat-box"><span class="ai-label">Account Expansion Strategy</span><button class="copy-btn" onclick="copyText('co-strat-ai')">Copy</button><div class="ai-text" id="co-strat-ai"></div></div>
   </div>
+
+  <!-- TAB 7: 90-DAY CALENDAR -->
+  <div class="panel" id="panel-calendar">
+    <div class="sec-tag">Mission Control</div>
+    <div class="sec-h">90-Day Executive Acquisition Plan</div>
+    <div class="sec-d">Your daily and weekly action system. Check off tasks as you complete them. Progress saves automatically.</div>
+
+    <!-- KPI Dashboard -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-target">25</div>
+        <div class="kpi-actual" id="kpi-pipeline">0</div>
+        <div class="kpi-label">Pipeline Target</div>
+        <div class="kpi-gap" id="kpi-pipeline-gap">0 of 25 added</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-target">15</div>
+        <div class="kpi-actual" id="kpi-contacted">0</div>
+        <div class="kpi-label">Contacted</div>
+        <div class="kpi-gap" id="kpi-contacted-gap">0 of 15 reached</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-target">5</div>
+        <div class="kpi-actual" id="kpi-trials">0</div>
+        <div class="kpi-label">Trial Rides</div>
+        <div class="kpi-gap" id="kpi-trials-gap">0 of 5 scheduled</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-target">3</div>
+        <div class="kpi-actual" id="kpi-clients">0</div>
+        <div class="kpi-label">New Clients</div>
+        <div class="kpi-gap" id="kpi-clients-gap">0 of 3 closed</div>
+      </div>
+    </div>
+
+    <!-- Overall Progress -->
+    <div class="card" style="margin-bottom:24px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);">Overall 90-Day Progress</div>
+        <div style="font-size:13px;font-weight:600;color:var(--gold);" id="cal-pct">0%</div>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="cal-progress" style="width:0%"></div></div>
+      <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:11px;color:var(--muted);">
+        <span id="cal-tasks-done">0 tasks completed</span>
+        <button class="btn btn-ghost" style="padding:4px 12px;font-size:9px;" onclick="resetCalendar()">Reset</button>
+      </div>
+    </div>
+
+    <!-- Phase 1 -->
+    <div class="phase-header phase-1"><div class="phase-title" style="color:var(--blue);">Phase 1 — Foundation (Days 1-30)</div><div class="phase-desc">Build your target list, establish your outreach infrastructure, and land your first 5 conversations</div></div>
+    <div id="cal-phase1"></div>
+
+    <!-- Phase 2 -->
+    <div class="phase-header phase-2" style="margin-top:8px;"><div class="phase-title" style="color:var(--gold);">Phase 2 — Momentum (Days 31-60)</div><div class="phase-desc">Convert conversations to trial rides. Activate EA relationships. Close your first clients.</div></div>
+    <div id="cal-phase2"></div>
+
+    <!-- Phase 3 -->
+    <div class="phase-header phase-3" style="margin-top:8px;"><div class="phase-title" style="color:var(--green);">Phase 3 — Dominance (Days 61-90)</div><div class="phase-desc">Expand accounts, build referral engine, establish OD Black as Atlanta's #1 executive car service.</div></div>
+    <div id="cal-phase3"></div>
+  </div>
+
+  <!-- TAB 8: WAR ROOM -->
+  <div class="panel" id="panel-strategy">
+    <div class="sec-tag">Executive Domination</div>
+    <div class="sec-h">Odyssey Black War Room</div>
+    <div class="sec-d">The strategic playbook to become Atlanta's #1 black car service for Fortune 500 executives.</div>
+
+    <!-- 5 Pillars -->
+    <div class="strat-pillar">
+      <div class="strat-pillar-num">01</div>
+      <div class="strat-pillar-title">Own the Routes, Not the Rides</div>
+      <div class="strat-pillar-body">
+        <strong>The play:</strong> Every Fortune 500 executive flying ATL-NYC on Monday morning is a standing reservation waiting to happen. Your goal is not to get booked once — it is to own their departure slot permanently.<br><br>
+        <strong>How:</strong> When a prospect has a predictable travel pattern (Mon/Thu, ATL-NYC), propose a standing reservation by name. "I want to own your Monday 6AM to LaGuardia." That specificity closes deals that generic pitches cannot.<br><br>
+        <strong>Revenue math:</strong> One executive, ATL-NYC weekly = $3,200/month. Ten executives on standing routes = $32,000 MRR. This is the recurring contract model that separates you from every rideshare and one-off car service in Atlanta.
+      </div>
+    </div>
+
+    <div class="strat-pillar">
+      <div class="strat-pillar-num">02</div>
+      <div class="strat-pillar-title">The EA Network Is Your Sales Force</div>
+      <div class="strat-pillar-body">
+        <strong>The play:</strong> Executive assistants control access to every C-suite calendar in Atlanta. Most car services ignore them. You will treat them like the VIP decision-makers they are.<br><br>
+        <strong>How:</strong> Build a relationship with every EA in your pipeline before you ever contact their executive. Send them value first — a relevant industry article, a genuine compliment on how well they manage a complex schedule. Then make the pitch: "I want to make your job easier." An EA who trusts you will put you on the standing travel list without the executive ever receiving a cold pitch.<br><br>
+        <strong>The multiplier:</strong> One EA at Delta Air Lines manages 3-5 C-suite executives. One relationship = five clients.
+      </div>
+    </div>
+
+    <div class="strat-pillar">
+      <div class="strat-pillar-num">03</div>
+      <div class="strat-pillar-title">Event Windows Are Revenue Windows</div>
+      <div class="strat-pillar-body">
+        <strong>The play:</strong> Every major Atlanta business event — ATL CEO Summit, Buckhead Business Association, Georgia 500 conference, Atlanta Business Chronicle events — concentrates your ideal clients in one place at one time with elevated transportation needs.<br><br>
+        <strong>How:</strong> Use Event Mode in the app. Identify every speaker and VIP attendee 2-3 weeks before the event. Score them all. Send event-specific outreach: "I'll be handling executive transportation for several attendees at the ATL CEO Summit next Thursday. I'd like to take care of you as well." The transportation need is real and immediate — you are solving a problem they have right now.<br><br>
+        <strong>The compounding effect:</strong> Executives talk to each other at events. One satisfied client at a conference becomes a referral source for every executive in the room who asks "who was your driver?"
+      </div>
+    </div>
+
+    <div class="strat-pillar">
+      <div class="strat-pillar-num">04</div>
+      <div class="strat-pillar-title">The Trial Ride Is the Product Demo</div>
+      <div class="strat-pillar-body">
+        <strong>The play:</strong> No executive will commit to a recurring service they have never experienced. Remove every barrier to that first ride. Make it impossible to say no.<br><br>
+        <strong>How:</strong> Offer a complimentary or deeply discounted first ride framed as a professional courtesy — not a promotion. "I would like to take care of your next airport departure as my introduction. No obligation." Confirm 24 hours before with a personal message. Send driver information and a photo the morning of. Follow up within 48 hours with a genuine question about the experience.<br><br>
+        <strong>The close rate:</strong> An executive who experiences the service converts at 60-70%. The trial ride is not a cost — it is your highest-ROI marketing investment.
+      </div>
+    </div>
+
+    <div class="strat-pillar">
+      <div class="strat-pillar-num">05</div>
+      <div class="strat-pillar-title">Corporate Account Expansion</div>
+      <div class="strat-pillar-body">
+        <strong>The play:</strong> One executive at a Fortune 500 company is the door. The entire C-suite is the prize. Once you have one active client at Delta, UPS, or Coca-Cola, you have social proof inside that organization.<br><br>
+        <strong>How:</strong> After 30 days with any new client, ask directly: "Who else on your leadership team travels frequently? I would like to extend the same service." Most executives will name 2-3 colleagues without hesitation. Use the Company Intel tab to track every executive at that company and build a coordinated account strategy.<br><br>
+        <strong>The endgame:</strong> A corporate account agreement with a Fortune 500 company — where OD Black is the designated ground transportation provider for all executive travel — is worth $15,000-50,000 per month in recurring revenue.
+      </div>
+    </div>
+
+    <!-- Channels -->
+    <div style="margin-top:32px;">
+      <div class="sec-tag">Channel Strategy</div>
+      <div class="sec-h" style="font-size:22px;">Where and How to Reach Them</div>
+      <div class="channel-grid">
+        <div class="channel-card">
+          <div class="channel-name">LinkedIn — Cold Outreach</div>
+          <div class="channel-body">Best for: VP and above with active profiles.<br>Approach: Connection request with a personalized note referencing their specific route or recent promotion. Keep it under 3 sentences. No pitch in the first message — lead with relevance.<br><strong style="color:var(--text);">Conversion target: 15% reply rate</strong></div>
+        </div>
+        <div class="channel-card">
+          <div class="channel-name">EA Email — The Side Door</div>
+          <div class="channel-body">Best for: C-suite with high EA influence scores.<br>Approach: Find the EA on LinkedIn or company directory. Send a 150-word email focused entirely on making their job easier. Propose a standing booking arrangement. No jargon, no luxury language.<br><strong style="color:var(--text);">Conversion target: 25% reply rate</strong></div>
+        </div>
+        <div class="channel-card">
+          <div class="channel-name">Event Networking — In Person</div>
+          <div class="channel-body">Best for: Anyone attending Atlanta business events.<br>Approach: Attend Chamber of Commerce mixers, Atlanta Business Chronicle events, industry conferences. Have one sentence ready: "I run Odyssey Black — we handle ground transportation for Fortune 500 executives across Atlanta." Let them ask questions.<br><strong style="color:var(--text);">Conversion target: 40% follow-up rate</strong></div>
+        </div>
+        <div class="channel-card">
+          <div class="channel-name">Referral — The Multiplier</div>
+          <div class="channel-body">Best for: Every active client you have right now.<br>Approach: Ask every client after their 3rd ride: "Who on your team travels as much as you do? I would love to take care of them." Make it a habit, not a favor request. Offer a complimentary ride credit for referrals that convert.<br><strong style="color:var(--text);">Conversion target: 1 referral per 2 clients</strong></div>
+        </div>
+        <div class="channel-card">
+          <div class="channel-name">Hotel Concierge Partnerships</div>
+          <div class="channel-body">Best for: Out-of-town executives staying at Buckhead / Midtown hotels.<br>Approach: Partner with concierge teams at W Atlanta, Four Seasons, St. Regis, Intercontinental. Leave professional cards, offer a referral fee or reciprocal value. Every concierge recommendation carries the trust weight of a personal referral.<br><strong style="color:var(--text);">Target: 3 hotel partnerships in 90 days</strong></div>
+        </div>
+        <div class="channel-card">
+          <div class="channel-name">Corporate Travel Managers</div>
+          <div class="channel-body">Best for: Large Fortune 500 companies with centralized travel programs.<br>Approach: Identify the Director of Corporate Travel or Travel Operations at your target companies. This person manages ground transportation budgets and vendor relationships. One meeting with them bypasses every executive entirely.<br><strong style="color:var(--text);">Target: 5 travel manager meetings in 90 days</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI War Room -->
+    <div class="war-room-ai" style="margin-top:32px;">
+      <div class="sec-tag">AI Advisor</div>
+      <div class="sec-h" style="font-size:22px;">Get Strategic Advice</div>
+      <div class="sec-d">Ask anything about your acquisition strategy, a specific prospect, or how to close a deal.</div>
+      <div class="card">
+        <div class="g1"><textarea id="wr-question" placeholder="e.g. How do I approach the CFO at Delta Air Lines? What should I do when an executive says they already use Uber Black? How do I build a corporate account at NCR?" style="min-height:90px;"></textarea></div>
+        <div class="btns">
+          <button class="btn btn-gold" onclick="askWarRoom()">Get Strategy Advice <div class="spin" id="sp-wr"></div></button>
+          <button class="btn btn-outline" onclick="askDailyBriefing()">Today's Briefing <div class="spin" id="sp-brief"></div></button>
+        </div>
+      </div>
+      <div class="ai-box" id="wr-box"><span class="ai-label">Strategic Advice</span><button class="copy-btn" onclick="copyText('wr-ai')">Copy</button><div class="ai-text" id="wr-ai"></div></div>
+    </div>
+  </div>
+
+
+  <!-- TAB 9: MARKET EXPANSION -->
+  <div class="panel" id="panel-markets">
+    <div class="sec-tag">Market Intelligence</div>
+    <div class="sec-h">Market Expansion Engine</div>
+    <div class="sec-d">Three-tier targeting system. Fortune 500 executives, mid-market businesses, and hospitality / medical / event sectors. Each tier has its own scoring model, decision-maker profile, and outreach strategy.</div>
+
+    <!-- Google Places Search -->
+    <div class="card" style="margin-bottom:24px;">
+      <div class="sec-tag" style="margin-bottom:6px;">Live Business Search</div>
+      <div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:4px;">Find Atlanta Prospects by Category</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:16px;">Search hotels, medical practices, event venues, and mid-market companies in Atlanta. Powered by Google Places API. Results are scored automatically.</div>
+
+      <div class="api-key-row" id="places-key-row">
+        <label>Google Places API Key</label>
+        <input type="password" id="places-api-key" placeholder="Paste your API key here — stored locally, never sent anywhere except Google">
+        <button class="btn btn-outline" style="padding:8px 14px;font-size:9px;" onclick="savePlacesKey()">Save Key</button>
+        <a href="https://console.cloud.google.com/apis/library/places-backend.googleapis.com" target="_blank" style="font-size:10px;color:var(--blue);white-space:nowrap;text-decoration:none;">Get Free Key &#8599;</a>
+      </div>
+      <div id="places-key-saved" style="display:none;font-size:10px;color:var(--green);margin-bottom:14px;">&#10003; API key saved</div>
+
+      <div class="search-bar">
+        <div style="flex:1.5;">
+          <label>Search Category</label>
+          <select id="places-category">
+            <option value="hotel">Hotels &amp; Hospitality</option>
+            <option value="hospital|doctor|medical_office">Medical &amp; Wellness</option>
+            <option value="event_venue|banquet_hall">Event Venues &amp; Planners</option>
+            <option value="lawyer">Law Firms</option>
+            <option value="finance|accounting">Financial Services</option>
+            <option value="real_estate_agency">Commercial Real Estate</option>
+            <option value="spa|beauty_salon">High-End Wellness &amp; Spas</option>
+            <option value="corporate_office|establishment">Corporate Offices</option>
+          </select>
+        </div>
+        <div style="flex:1;">
+          <label>Atlanta Neighborhood</label>
+          <select id="places-area">
+            <option value="Buckhead, Atlanta GA">Buckhead</option>
+            <option value="Midtown, Atlanta GA">Midtown</option>
+            <option value="Downtown, Atlanta GA">Downtown Atlanta</option>
+            <option value="Sandy Springs, GA">Sandy Springs</option>
+            <option value="Perimeter Center, Atlanta GA">Perimeter / Dunwoody</option>
+            <option value="Alpharetta, GA">Alpharetta</option>
+            <option value="Atlanta, GA">All Atlanta</option>
+          </select>
+        </div>
+        <div style="flex:0.8;">
+          <label>Min Rating</label>
+          <select id="places-rating">
+            <option value="0">Any rating</option>
+            <option value="3.5">3.5+ stars</option>
+            <option value="4.0" selected>4.0+ stars</option>
+            <option value="4.5">4.5+ stars</option>
+          </select>
+        </div>
+        <button class="btn btn-gold" onclick="searchPlaces()" style="margin-top:22px;">Search <div class="spin" id="sp-places"></div></button>
+      </div>
+
+      <div id="places-status" class="search-status" style="display:none;"></div>
+      <div id="places-results" style="display:none;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <div id="places-count" style="font-size:12px;color:var(--muted);"></div>
+          <button class="btn btn-outline" style="padding:6px 14px;font-size:9px;" onclick="addAllPlacesToPipeline()">Add All HOT to Market Pipeline</button>
+        </div>
+        <div class="places-grid" id="places-grid"></div>
+      </div>
+      <div id="places-no-key" style="padding:12px;background:rgba(231,76,60,0.06);border:1px solid rgba(231,76,60,0.2);border-radius:1px;font-size:12px;color:#e74c3c;display:none;">
+        &#9888; Add your Google Places API key above to enable live search. The key is free for up to 200 searches per month.
+      </div>
+    </div>
+
+    <!-- Tier Overview -->
+    <div class="tier-grid">
+      <div class="tier-card">
+        <div class="tier-card-num" style="color:var(--gold);">T1</div>
+        <div class="tier-card-name" style="color:var(--gold);">Fortune 500</div>
+        <div class="tier-card-rev">$3K-50K/mo</div>
+        <div class="tier-card-desc">C-suite executives with standing route potential. Longest sales cycle, highest lifetime value. Use Prospect Builder for all Tier 1 targets.</div>
+      </div>
+      <div class="tier-card">
+        <div class="tier-card-num" style="color:var(--green);">T2</div>
+        <div class="tier-card-name" style="color:var(--green);">Mid-Market</div>
+        <div class="tier-card-rev">$2K-8K/mo</div>
+        <div class="tier-card-desc">50-999 employee companies. Law firms, consulting groups, healthcare groups, tech companies. Faster to close, strong recurring volume.</div>
+      </div>
+      <div class="tier-card">
+        <div class="tier-card-num" style="color:var(--blue);">T3</div>
+        <div class="tier-card-name" style="color:var(--blue);">Volume Partners</div>
+        <div class="tier-card-rev">$1.5K-5K/mo</div>
+        <div class="tier-card-desc">Hotels, medical practices, event venues, wellness centers. Volume-based partnerships. Fastest to close, builds cash flow while Tier 1 develops.</div>
+      </div>
+    </div>
+
+    <!-- Market Segments -->
+    <div class="sec-tag" style="margin-bottom:8px;">Tier 3 — Volume Partner Segments</div>
+    <div class="sec-d">These are businesses with repeat daily transportation demand. They are currently sending clients and staff to Uber and Lyft. Your job is to intercept that demand.</div>
+
+    <!-- Hotels -->
+    <div class="market-card" id="mc-hotels">
+      <div class="market-card-header" onclick="toggleMarket('hotels')">
+        <div style="display:flex;align-items:center;">
+          <span class="market-icon">🏨</span>
+          <div><div class="market-name">Hotels & Hospitality</div><div class="market-sub">Concierge desks, corporate guests, event transportation</div></div>
+        </div>
+        <div class="market-score"><div class="market-score-num" id="hotel-score">0</div><div class="market-score-lbl">Demand Score</div></div>
+      </div>
+      <div class="market-card-body" id="mb-hotels">
+        <div style="margin-top:14px;">
+          <div class="sec-tag" style="margin-bottom:8px;">Why Hotels Are Priority #1</div>
+          <p style="font-size:12px;color:var(--muted);line-height:1.8;margin-bottom:12px;">Hotel concierge desks order 10-30 rides per day for guests. Corporate guests staying in Buckhead or Midtown are frequently Fortune 500 executives who need reliable transportation to ATL airport or meetings. One concierge relationship equals a stream of daily bookings. A concierge who trusts you will recommend you over Uber every time because Uber reflects on them when it goes wrong — you do not.</p>
+          <div class="biz-score-grid">
+            <div class="biz-score-item"><div class="biz-score-label">Target Hotels</div><div class="biz-score-val">W Atlanta, Four Seasons, St. Regis Buckhead, Loews, Grand Hyatt, Intercontinental, Kimpton Sylvan</div></div>
+            <div class="biz-score-item"><div class="biz-score-label">Est. Monthly Value</div><div class="biz-score-val" style="color:var(--green);">$2,000 - $6,000 per hotel partner</div></div>
+            <div class="biz-score-item"><div class="biz-score-label">Sales Cycle</div><div class="biz-score-val">1-2 weeks. In-person introduction preferred.</div></div>
+            <div class="biz-score-item"><div class="biz-score-label">Ride Likelihood Score</div><div class="biz-score-val" style="color:var(--gold);">95/100 — Daily demand confirmed</div></div>
+          </div>
+          <div class="sec-tag" style="margin-bottom:8px;">Decision Makers</div>
+          <div class="decision-maker-row"><div class="dm-role">Concierge Manager</div><div class="dm-approach">Your primary contact. Visits in person with a professional card and one-page info sheet. Offer a referral arrangement: $10-20 credit per booking they send.</div></div>
+          <div class="decision-maker-row"><div class="dm-role">Director of Guest Services</div><div class="dm-approach">Signs off on preferred vendor relationships. Request a 15-minute meeting after the concierge is warm.</div></div>
+          <div class="decision-maker-row"><div class="dm-role">General Manager</div><div class="dm-approach">Corporate account level. Target for a formal preferred vendor agreement covering all hotel transportation needs.</div></div>
+        </div>
+        <div class="market-prospect-form">
+          <div class="sec-tag" style="margin-bottom:12px;">Score a Hotel Prospect</div>
+          <div class="g2">
+            <div><label>Hotel Name</label><input type="text" id="ht-name" placeholder="e.g. W Atlanta Midtown"></div>
+            <div><label>Location</label><select id="ht-location"><option value="buckhead">Buckhead</option><option value="midtown">Midtown</option><option value="downtown">Downtown</option><option value="airport">Airport Corridor</option><option value="perimeter">Perimeter / Sandy Springs</option></select></div>
+          </div>
+          <div class="g2">
+            <div><label>Hotel Tier</label><select id="ht-tier"><option value="luxury">Luxury (5-star)</option><option value="upscale">Upscale (4-star)</option><option value="business">Business Class</option></select></div>
+            <div><label>Primary Guest Type</label><select id="ht-guests"><option value="corporate">Corporate / business travelers</option><option value="mixed">Mixed corporate and leisure</option><option value="event">Event and conference heavy</option><option value="luxury-leisure">Luxury leisure</option></select></div>
+          </div>
+          <div class="g1"><label>Contact Name and Role (if known)</label><input type="text" id="ht-contact" placeholder="e.g. Marcus Webb, Concierge Manager"></div>
+          <div class="btns">
+            <button class="btn btn-gold" onclick="scoreHotel()">Score This Hotel <div class="spin" id="sp-ht"></div></button>
+            <button class="btn btn-outline" onclick="generateHotelOutreach()">Generate Outreach <div class="spin" id="sp-ht2"></div></button>
+          </div>
+          <div class="ai-box" id="hotel-ai-box"><span class="ai-label">Hotel Strategy</span><button class="copy-btn" onclick="copyText('hotel-ai')">Copy</button><div class="ai-text" id="hotel-ai"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Medical -->
+    <div class="market-card" id="mc-medical">
+      <div class="market-card-header" onclick="toggleMarket('medical')">
+        <div style="display:flex;align-items:center;">
+          <span class="market-icon">🏥</span>
+          <div><div class="market-name">Medical & Wellness</div><div class="market-sub">Surgery centers, concierge medicine, high-end spas</div></div>
+        </div>
+        <div class="market-score"><div class="market-score-num" id="med-score">0</div><div class="market-score-lbl">Demand Score</div></div>
+      </div>
+      <div class="market-card-body" id="mb-medical">
+        <div style="margin-top:14px;">
+          <div class="sec-tag" style="margin-bottom:8px;">Why Medical Is High-Value</div>
+          <p style="font-size:12px;color:var(--muted);line-height:1.8;margin-bottom:12px;">Surgery centers and concierge medical practices regularly need transportation for patients who cannot drive post-procedure. These clients value discretion and reliability above all else — exactly Odyssey Black's positioning. High-end spas and wellness centers serving executives have the same need. This is a recession-resistant segment that Uber handles poorly due to inconsistency.</p>
+          <div class="biz-score-grid">
+            <div class="biz-score-item"><div class="biz-score-label">Target Businesses</div><div class="biz-score-val">Surgery centers, concierge doctor practices, Emory executive health, high-end med spas, plastic surgery practices</div></div>
+            <div class="biz-score-item"><div class="biz-score-label">Est. Monthly Value</div><div class="biz-score-val" style="color:var(--green);">$1,500 - $4,000 per practice partner</div></div>
+            <div class="biz-score-item"><div class="biz-score-label">Sales Cycle</div><div class="biz-score-val">1-3 weeks. Office manager is the key contact.</div></div>
+            <div class="biz-score-item"><div class="biz-score-label">Ride Likelihood Score</div><div class="biz-score-val" style="color:var(--gold);">82/100 — Consistent weekly demand</div></div>
+          </div>
+          <div class="sec-tag" style="margin-bottom:8px;">Decision Makers</div>
+          <div class="decision-maker-row"><div class="dm-role">Office Manager</div><div class="dm-approach">Primary contact. Email first with a focus on patient experience and HIPAA-safe discretion. No patient names — just reliable, private transportation.</div></div>
+          <div class="decision-maker-row"><div class="dm-role">Practice Manager</div><div class="dm-approach">Signs preferred vendor agreements. Emphasize liability reduction — a professional car service reduces their risk versus sending patients to Uber.</div></div>
+          <div class="decision-maker-row"><div class="dm-role">Physician Owner</div><div class="dm-approach">For concierge practices only. Direct approach works here. Lead with patient experience and your discretion guarantee.</div></div>
+        </div>
+        <div class="market-prospect-form">
+          <div class="sec-tag" style="margin-bottom:12px;">Score a Medical Prospect</div>
+          <div class="g2">
+            <div><label>Practice / Center Name</label><input type="text" id="med-name" placeholder="e.g. Atlanta Center for Cosmetic Surgery"></div>
+            <div><label>Practice Type</label><select id="med-type"><option value="surgery">Surgery Center</option><option value="concierge">Concierge Medicine</option><option value="medspa">Medical Spa</option><option value="wellness">Executive Wellness</option><option value="dental">Cosmetic Dental</option></select></div>
+          </div>
+          <div class="g2">
+            <div><label>Patient Profile</label><select id="med-patients"><option value="executive">Executive / high-net-worth</option><option value="mixed-high">Mixed, skewing affluent</option><option value="general">General professional</option></select></div>
+            <div><label>Procedure Volume</label><select id="med-volume"><option value="high">High (10+ procedures/week)</option><option value="moderate">Moderate (5-10/week)</option><option value="low">Low (under 5/week)</option></select></div>
+          </div>
+          <div class="g1"><label>Contact Name and Role (if known)</label><input type="text" id="med-contact" placeholder="e.g. Sandra Torres, Practice Manager"></div>
+          <div class="btns">
+            <button class="btn btn-gold" onclick="scoreMedical()">Score This Practice <div class="spin" id="sp-med"></div></button>
+            <button class="btn btn-outline" onclick="generateMedicalOutreach()">Generate Outreach <div class="spin" id="sp-med2"></div></button>
+          </div>
+          <div class="ai-box" id="medical-ai-box"><span class="ai-label">Medical Strategy</span><button class="copy-btn" onclick="copyText('medical-ai')">Copy</button><div class="ai-text" id="medical-ai"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Events -->
+    <div class="market-card" id="mc-events">
+      <div class="market-card-header" onclick="toggleMarket('events')">
+        <div style="display:flex;align-items:center;">
+          <span class="market-icon">🎭</span>
+          <div><div class="market-name">Event Planners & Venues</div><div class="market-sub">Corporate events, weddings, private VIP functions</div></div>
+        </div>
+        <div class="market-score"><div class="market-score-num" id="ev-score">0</div><div class="market-score-lbl">Demand Score</div></div>
+      </div>
+      <div class="market-card-body" id="mb-events">
+        <div style="margin-top:14px;">
+          <div class="sec-tag" style="margin-bottom:8px;">Why Events Generate High Ticket Revenue</div>
+          <p style="font-size:12px;color:var(--muted);line-height:1.8;margin-bottom:12px;">Corporate events and private VIP functions require coordinated group transportation — something Uber cannot reliably execute. One corporate event with 20 executives moving from a Midtown hotel to a venue and back can be $3,000-8,000 in a single evening. Event planners who trust you become repeat referral sources for every event they plan. This segment also produces the fastest single-transaction revenue.</p>
+          <div class="biz-score-grid">
+            <div class="biz-score-item"><div class="biz-score-label">Target Businesses</div><div class="biz-score-val">Corporate event planners, luxury wedding planners, Atlanta venues (Biltmore, W, Fox Theatre), DMC companies</div></div>
+            <div class="biz-score-item"><div class="biz-score-label">Est. Per-Event Value</div><div class="biz-score-val" style="color:var(--green);">$1,500 - $8,000 per event</div></div>
+            <div class="biz-score-item"><div class="biz-score-label">Sales Cycle</div><div class="biz-score-val">Immediate for booked events. Relationship-based for ongoing partnerships.</div></div>
+            <div class="biz-score-item"><div class="biz-score-label">Ride Likelihood Score</div><div class="biz-score-val" style="color:var(--gold);">78/100 — Event-driven, high per-booking value</div></div>
+          </div>
+          <div class="sec-tag" style="margin-bottom:8px;">Decision Makers</div>
+          <div class="decision-maker-row"><div class="dm-role">Event Coordinator</div><div class="dm-approach">Your primary contact. Lead with reliability and group coordination capability. Offer to handle logistics for one event as an introduction.</div></div>
+          <div class="decision-maker-row"><div class="dm-role">Venue Manager</div><div class="dm-approach">Venues recommend transportation providers to every event client. A preferred vendor relationship here produces passive referrals.</div></div>
+          <div class="decision-maker-row"><div class="dm-role">Corporate Planner</div><div class="dm-approach">Manages multiple events per year. One satisfied corporate planner accounts = 8-15 events annually.</div></div>
+        </div>
+        <div class="market-prospect-form">
+          <div class="sec-tag" style="margin-bottom:12px;">Score an Event Prospect</div>
+          <div class="g2">
+            <div><label>Company / Venue Name</label><input type="text" id="ev-name" placeholder="e.g. Atlanta Event Management Group"></div>
+            <div><label>Business Type</label><select id="ev-type"><option value="corporate-planner">Corporate Event Planner</option><option value="venue">Event Venue</option><option value="luxury-wedding">Luxury Wedding Planner</option><option value="dmc">DMC / Destination Company</option><option value="entertainment">Entertainment / Talent Agency</option></select></div>
+          </div>
+          <div class="g2">
+            <div><label>Event Frequency</label><select id="ev-freq"><option value="weekly">Weekly events</option><option value="biweekly">Bi-weekly</option><option value="monthly">Monthly</option><option value="seasonal">Seasonal / occasional</option></select></div>
+            <div><label>Client Profile</label><select id="ev-clients"><option value="corporate">Corporate / Fortune 500</option><option value="luxury">Luxury private clients</option><option value="mixed">Mixed</option></select></div>
+          </div>
+          <div class="g1"><label>Contact Name and Role (if known)</label><input type="text" id="ev-contact" placeholder="e.g. Lisa Chen, Senior Event Coordinator"></div>
+          <div class="btns">
+            <button class="btn btn-gold" onclick="scoreEvent()">Score This Prospect <div class="spin" id="sp-ev2"></div></button>
+            <button class="btn btn-outline" onclick="generateEventOutreach()">Generate Outreach <div class="spin" id="sp-ev3"></div></button>
+          </div>
+          <div class="ai-box" id="event-market-ai-box"><span class="ai-label">Event Strategy</span><button class="copy-btn" onclick="copyText('event-market-ai')">Copy</button><div class="ai-text" id="event-market-ai"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mid-Market -->
+    <div class="market-card" id="mc-midmarket">
+      <div class="market-card-header" onclick="toggleMarket('midmarket')">
+        <div style="display:flex;align-items:center;">
+          <span class="market-icon">🏢</span>
+          <div><div class="market-name">Mid-Market Companies</div><div class="market-sub">50-999 employees — law firms, consulting, tech, healthcare groups</div></div>
+        </div>
+        <div class="market-score"><div class="market-score-num" id="mm-score">0</div><div class="market-score-lbl">Demand Score</div></div>
+      </div>
+      <div class="market-card-body" id="mb-midmarket">
+        <div style="margin-top:14px;">
+          <div class="sec-tag" style="margin-bottom:8px;">Why Mid-Market Closes Faster</div>
+          <p style="font-size:12px;color:var(--muted);line-height:1.8;margin-bottom:12px;">Mid-market companies have the same executive travel needs as Fortune 500 firms but far fewer gatekeepers. The managing partner at a 150-person law firm is the decision-maker and can say yes on the first call. They have partners and associates traveling to court, client meetings, and depositions daily. They do not have a corporate travel department — they are using Uber and hating the inconsistency. You are the professional alternative they have been looking for.</p>
+          <div class="biz-score-grid">
+            <div class="biz-score-item"><div class="biz-score-label">Top Sectors in Atlanta</div><div class="biz-score-val">Law firms, private equity, consulting groups, technology companies, healthcare management groups, commercial real estate</div></div>
+            <div class="biz-score-item"><div class="biz-score-label">Est. Monthly Value</div><div class="biz-score-val" style="color:var(--green);">$2,000 - $8,000 per account</div></div>
+            <div class="biz-score-item"><div class="biz-score-label">Sales Cycle</div><div class="biz-score-val">3-7 days. Decision-maker is accessible and empowered.</div></div>
+            <div class="biz-score-item"><div class="biz-score-label">Ride Likelihood Score</div><div class="biz-score-val" style="color:var(--gold);">88/100 — Daily travel, no current solution</div></div>
+          </div>
+          <div class="sec-tag" style="margin-bottom:8px;">Decision Makers</div>
+          <div class="decision-maker-row"><div class="dm-role">Managing Partner</div><div class="dm-approach">For law firms and consulting: direct LinkedIn or email. Lead with professionalism and eliminating the Uber inconsistency problem for client-facing travel.</div></div>
+          <div class="decision-maker-row"><div class="dm-role">Office Manager</div><div class="dm-approach">Often controls all vendor relationships including travel. Treat exactly like an EA — build the relationship first, then get introduced to the decision-maker.</div></div>
+          <div class="decision-maker-row"><div class="dm-role">COO / Operations Director</div><div class="dm-approach">In tech and healthcare groups. Focus on operational reliability and the cost of executive time wasted on unreliable rideshare.</div></div>
+        </div>
+        <div class="market-prospect-form">
+          <div class="sec-tag" style="margin-bottom:12px;">Score a Mid-Market Prospect</div>
+          <div class="g2">
+            <div><label>Company Name</label><input type="text" id="mm-name" placeholder="e.g. Troutman Pepper (Atlanta office)"></div>
+            <div><label>Industry</label><select id="mm-industry"><option value="law">Law Firm</option><option value="pe">Private Equity / VC</option><option value="consulting">Consulting</option><option value="tech">Technology</option><option value="healthcare">Healthcare Group</option><option value="realestate">Commercial Real Estate</option><option value="finance">Financial Services</option><option value="other">Other Professional Services</option></select></div>
+          </div>
+          <div class="g3">
+            <div><label>Company Size</label><select id="mm-size"><option value="50-100">50-100 employees</option><option value="100-250">100-250 employees</option><option value="250-500">250-500 employees</option><option value="500-999">500-999 employees</option></select></div>
+            <div><label>Travel Intensity</label><select id="mm-travel"><option value="heavy">Heavy — daily client/court travel</option><option value="moderate">Moderate — several times weekly</option><option value="light">Light — occasional</option></select></div>
+            <div><label>Atlanta Presence</label><select id="mm-atl"><option value="hq">HQ in Atlanta</option><option value="office">Major Atlanta office</option><option value="regional">Regional presence</option></select></div>
+          </div>
+          <div class="g1"><label>Contact Name and Role (if known)</label><input type="text" id="mm-contact" placeholder="e.g. David Park, Managing Partner"></div>
+          <div class="btns">
+            <button class="btn btn-gold" onclick="scoreMidMarket()">Score This Company <div class="spin" id="sp-mm"></div></button>
+            <button class="btn btn-outline" onclick="generateMidMarketOutreach()">Generate Outreach <div class="spin" id="sp-mm2"></div></button>
+          </div>
+          <div class="ai-box" id="mm-ai-box"><span class="ai-label">Mid-Market Strategy</span><button class="copy-btn" onclick="copyText('mm-ai')">Copy</button><div class="ai-text" id="mm-ai"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ride Likelihood Calculator -->
+    <div style="margin-top:28px;">
+      <div class="sec-tag" style="margin-bottom:6px;">Ride Likelihood Calculator</div>
+      <div class="sec-h" style="font-size:22px;">Any Business, Any Sector</div>
+      <div class="sec-d">Score any business to determine how likely they are to have regular transportation demand and whether Odyssey Black is the right fit.</div>
+      <div class="card">
+        <div class="g2">
+          <div><label>Business Name</label><input type="text" id="rl-name" placeholder="Any Atlanta business"></div>
+          <div><label>Business Type</label>
+            <select id="rl-type">
+              <option value="hotel">Hotel / Hospitality</option>
+              <option value="corporate">Corporate Office</option>
+              <option value="law">Law Firm</option>
+              <option value="medical">Medical / Wellness</option>
+              <option value="events">Event Venue / Planner</option>
+              <option value="finance">Financial Services</option>
+              <option value="tech">Technology</option>
+              <option value="realestate">Real Estate</option>
+              <option value="entertainment">Entertainment / Media</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="g3">
+          <div><label>Near Airport or I-285?</label><select id="rl-airport"><option value="yes">Yes — within 20 min of ATL</option><option value="moderate">Moderate — 20-40 min</option><option value="no">No — over 40 min</option></select></div>
+          <div><label>Has Reception / Concierge?</label><select id="rl-concierge"><option value="yes">Yes</option><option value="no">No</option></select></div>
+          <div><label>Hosts External Clients?</label><select id="rl-clients"><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="occasional">Occasionally</option><option value="no">Rarely</option></select></div>
+        </div>
+        <div class="g2">
+          <div><label>Estimated Staff Who Travel</label><select id="rl-staff"><option value="many">Many (10+)</option><option value="some">Some (3-10)</option><option value="few">Few (1-3)</option></select></div>
+          <div><label>Current Transportation Solution</label><select id="rl-current"><option value="uber">Uber / Lyft (rideshare)</option><option value="mixed">Mixed — some rideshare, some car service</option><option value="service">Existing car service</option><option value="own">Company vehicles</option><option value="unknown">Unknown</option></select></div>
+        </div>
+        <div class="btns">
+          <button class="btn btn-gold" onclick="calcRideLikelihood()">Calculate Ride Likelihood <div class="spin" id="sp-rl"></div></button>
+        </div>
+        <div class="ai-box" id="rl-ai-box"><span class="ai-label">Ride Likelihood Analysis</span><button class="copy-btn" onclick="copyText('rl-ai')">Copy</button><div class="ai-text" id="rl-ai"></div></div>
+      </div>
+    </div>
+  </div>
+
 </div>
 <div class="notif" id="notif"></div>
 
@@ -703,7 +1278,10 @@ var SIG_SCORES={'sig-hired':3,'sig-office':2,'sig-earnings':1,'sig-speaking':2,'
 var SIG_LABELS={'sig-hired':'Recently hired/promoted','sig-office':'Company opening ATL office','sig-earnings':'Upcoming earnings/board meeting','sig-speaking':'Speaking at ATL event','sig-reloc':'Relocating to Atlanta','sig-travel':'Increased travel activity'};
 var CHIP_IDS={'sig-hired':'chip-hired','sig-office':'chip-office','sig-earnings':'chip-earnings','sig-speaking':'chip-speaking','sig-reloc':'chip-reloc','sig-travel':'chip-travel'};
 
-function switchTab(n,el){document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});el.classList.add('active');document.getElementById('panel-'+n).classList.add('active');if(n==='pipeline'){renderPipeline();}if(n==='company'){buildCoMap();}}
+function switchTab(n,el){document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});el.classList.add('active');document.getElementById('panel-'+n).classList.add('active');if(n==='pipeline'){renderPipeline();}if(n==='company'){buildCoMap();}if(n==='calendar'){initCalendar();updateKPIs();}if(n==='markets'){
+    var savedKey=localStorage.getItem('ob-places-key');
+    if(savedKey){document.getElementById('places-key-row').style.display='none';document.getElementById('places-key-saved').style.display='block';}
+  }}
 
 function toggleSig(sid,cid){var cb=document.getElementById(sid);var chip=document.getElementById(cid);cb.checked=!cb.checked;if(cb.checked){chip.classList.add('on');}else{chip.classList.remove('on');}refreshBM();}
 function refreshBM(){var total=0;Object.keys(SIG_SCORES).forEach(function(id){var el=document.getElementById(id);if(el&&el.checked){total+=SIG_SCORES[id];}});total=Math.min(total,10);var num=document.getElementById('bm-num'),fill=document.getElementById('bm-fill'),desc=document.getElementById('bm-desc');num.textContent=total;fill.style.width=(total*10)+'%';var c,d;if(total===0){c='var(--muted)';d='No signals active';}else if(total<=3){c='#e67e22';d='Mild timing - monitor';}else if(total<=6){c='var(--yellow)';d='Good timing - reach out soon';}else if(total<=8){c='var(--green)';d='Strong timing - act this week';}else{c='var(--gold)';d='PEAK MOMENT - reach out today';}num.style.color=c;fill.style.background=c;desc.style.color=c;desc.textContent=d;return total;}
@@ -1596,6 +2174,641 @@ function showEventModeBar(active,evData){
   }else if(bar){
     bar.classList.remove('active');
   }
+}
+
+
+// ══════════════════════════════════════════════════════════
+// 90-DAY CALENDAR SYSTEM
+// ══════════════════════════════════════════════════════════
+var CAL_TASKS = {
+  phase1: [
+    {week:1, title:'Week 1 — Target List', focus:'Build your 25 HOT prospects', tasks:[
+      {id:'w1t1', title:'Apollo Search Setup', detail:'Run 3 searches: CEO, CFO, COO in Atlanta with 1000+ employees. Export each CSV.', tag:'prospect'},
+      {id:'w1t2', title:'Import & Score All Prospects', detail:'Drop each CSV into Apollo Import. Review HOT and STRONG scores. Identify your top 25.', tag:'prospect'},
+      {id:'w1t3', title:'Add Top 25 to Pipeline', detail:'Manually score your top 25 in Prospect Builder. Set travel routes and timing signals.', tag:'prospect'},
+      {id:'w1t4', title:'Research Top 10', detail:'Use Research Executive on your 10 highest-scored prospects. Read every result carefully.', tag:'prospect'}
+    ]},
+    {week:2, title:'Week 2 — EA Intelligence', focus:'Find and profile every assistant', tasks:[
+      {id:'w2t1', title:'Identify EAs for Top 10', detail:'Search LinkedIn: company name + Executive Assistant or Chief of Staff. Find names and emails.', tag:'prospect'},
+      {id:'w2t2', title:'Build EA Profiles', detail:'Add EA Intelligence data for each prospect. Communication style, responsiveness, personality.', tag:'prospect'},
+      {id:'w2t3', title:'Generate 10 Approach Strategies', detail:'Run Generate Approach Strategy for all 10 top prospects. Read each one. Note the recommended channel.', tag:'outreach'},
+      {id:'w2t4', title:'Identify 2 Atlanta Events (Next 30 Days)', detail:'Search ATL CEO Summit, Atlanta Business Chronicle, Buckhead Business events. Add to calendar.', tag:'prospect'}
+    ]},
+    {week:3, title:'Week 3 — First Outreach Wave', focus:'Send 10 personalized messages', tasks:[
+      {id:'w3t1', title:'Send 5 EA Emails', detail:'Use Assistant Mode for your top 5 High-EA-Influence prospects. Personalize with route data.', tag:'outreach'},
+      {id:'w3t2', title:'Send 5 Executive LinkedIn DMs', detail:'Use Executive Mode for remaining 5. Research first, then generate. Keep under 150 words.', tag:'outreach'},
+      {id:'w3t3', title:'Mark All as Contacted', detail:'Advance all 10 to Contacted stage in pipeline. Set follow-up dates 3 days out.', tag:'followup'},
+      {id:'w3t4', title:'Score 5 New Prospects', detail:'Keep pipeline full. Score 5 new prospects from Apollo. Add the best 3 to pipeline.', tag:'prospect'}
+    ]},
+    {week:4, title:'Week 4 — Follow-Up & First Responses', focus:'Work every reply and change angles on silence', tasks:[
+      {id:'w4t1', title:'Follow Up Wave 1 (No Response)', detail:'Click Follow-up on all Contacted prospects with no reply. AI generates a new angle automatically.', tag:'followup'},
+      {id:'w4t2', title:'Handle Positive Responses', detail:'For anyone who replied positively — advance to next stage. Generate a call script and schedule a call.', tag:'close'},
+      {id:'w4t3', title:'LinkedIn Connection Follow-Up', detail:'For anyone who connected but did not reply — send a 2nd message from a different angle (route-based hook).', tag:'followup'},
+      {id:'w4t4', title:'Score Week 4 Prospects', detail:'Add 5 more prospects to pipeline. Focus on companies with multiple executives already in pipeline.', tag:'prospect'}
+    ]}
+  ],
+  phase2: [
+    {week:5, title:'Week 5 — Trial Ride Offers', focus:'Convert conversations to scheduled rides', tasks:[
+      {id:'w5t1', title:'Offer Trial Rides to 5 Prospects', detail:'Anyone in Asst Engaged or Contacted with positive response gets a complimentary first ride offer.', tag:'close'},
+      {id:'w5t2', title:'Third Touch — Channel Switch', detail:'Everyone still silent after 2 touches: switch channels. Email → call. LinkedIn → email. Use Call Script builder.', tag:'outreach'},
+      {id:'w5t3', title:'Attend 1 Atlanta Business Event', detail:'Chamber of Commerce, Atlanta Business Chronicle, or industry mixer. Bring cards. Have your 1-sentence intro ready.', tag:'prospect'},
+      {id:'w5t4', title:'Contact 2 Hotel Concierges', detail:'W Atlanta, Four Seasons, or St Regis Buckhead. Introduce Odyssey Black. Leave materials. Propose a referral arrangement.', tag:'account'}
+    ]},
+    {week:6, title:'Week 6 — Trial Execution', focus:'Deliver flawless trial rides', tasks:[
+      {id:'w6t1', title:'Pre-Ride Confirmation Protocol', detail:'For every trial scheduled: confirm 24hrs before, send driver info and photo morning of, text when en route.', tag:'close'},
+      {id:'w6t2', title:'Post-Ride Follow-Up (48hrs)', detail:'Follow up with every trial rider within 48 hours. Ask one genuine question about experience. Propose recurring.', tag:'close'},
+      {id:'w6t3', title:'Advance Trial Done Prospects', detail:'Anyone who completed a trial: advance to Active Client or Trial Done in pipeline. Generate account strategy.', tag:'account'},
+      {id:'w6t4', title:'Second Outreach Wave — 10 New Prospects', detail:'Repeat the Week 3 outreach process with 10 new prospects. You should now have 25+ in pipeline.', tag:'outreach'}
+    ]},
+    {week:7, title:'Week 7 — Account Activation', focus:'Convert trial clients to recurring', tasks:[
+      {id:'w7t1', title:'Propose Standing Reservations', detail:'For every trial client: propose a specific standing booking using their travel route and pattern data.', tag:'close'},
+      {id:'w7t2', title:'Build Company Intel Maps', detail:'Go to Company Intel tab. Build maps for all companies with 2+ prospects. Generate account strategies.', tag:'account'},
+      {id:'w7t3', title:'First Referral Asks', detail:'Ask every active client: "Who else on your team travels frequently?" Document every name they mention.', tag:'account'},
+      {id:'w7t4', title:'EA Champion Activation', detail:'For every EA who responded positively: deepen the relationship. Ask them to introduce you to another exec.', tag:'account'}
+    ]},
+    {week:8, title:'Week 8 — Momentum Review', focus:'Audit what is working and double down', tasks:[
+      {id:'w8t1', title:'Pipeline Revenue Audit', detail:'Check pipeline revenue stat. Calculate actual vs projected monthly value. Identify top 5 by conversion probability.', tag:'close'},
+      {id:'w8t2', title:'Channel Performance Review', detail:'Which channel generated the most positive responses? LinkedIn, EA email, event, or referral? Double the winner.', tag:'outreach'},
+      {id:'w8t3', title:'Contact 2 Corporate Travel Managers', detail:'Identify Director of Corporate Travel at Delta, UPS, or Coca-Cola. This is your biggest account opportunity.', tag:'account'},
+      {id:'w8t4', title:'Score 10 New Prospects for Phase 3', detail:'Build your Phase 3 target list. Focus on companies where you already have 1+ active clients.', tag:'prospect'}
+    ]}
+  ],
+  phase3: [
+    {week:9, title:'Week 9 — Corporate Account Push', focus:'Build company-wide relationships', tasks:[
+      {id:'w9t1', title:'Corporate Account Pitch — Top 3 Companies', detail:'For companies with 2+ active clients: generate a corporate account expansion strategy. Schedule a meeting.', tag:'account'},
+      {id:'w9t2', title:'Referral System Activation', detail:'Formalize referral program: every client who refers a new booking gets a complimentary ride credit.', tag:'account'},
+      {id:'w9t3', title:'Event Calendar — Next 30 Days', detail:'Identify all Atlanta business events in the next 30 days. Score every speaker and VIP attendee.', tag:'prospect'},
+      {id:'w9t4', title:'Follow Up All Stalled Prospects', detail:'Anyone in Contacted or Asst Engaged for 30+ days with no movement: new angle or graceful exit.', tag:'followup'}
+    ]},
+    {week:10, title:'Week 10 — Scale What Works', focus:'Systemize your best-performing channels', tasks:[
+      {id:'w10t1', title:'Build 3 Reusable Outreach Templates', detail:'Take your 3 highest-performing generated messages. Save as starting templates for future outreach.', tag:'outreach'},
+      {id:'w10t2', title:'Second Hotel Partnership Push', detail:'Add 2 more hotel concierge partnerships. Target Loews Atlanta, Grand Hyatt Buckhead, Kimpton Sylvan.', tag:'account'},
+      {id:'w10t3', title:'LinkedIn Presence Build', detail:'Post 2 pieces of content: one about Atlanta executive travel, one about OD Black differentiation. Tag prospects.', tag:'outreach'},
+      {id:'w10t4', title:'Corporate Travel Manager Meetings', detail:'Follow up on Week 8 contacts. The goal is one in-person meeting this week.', tag:'account'}
+    ]},
+    {week:11, title:'Week 11 — Referral Engine', focus:'Turn clients into a sales team', tasks:[
+      {id:'w11t1', title:'Client Satisfaction Check-In', detail:'Personal outreach to every active client. Not a pitch — a genuine check-in. Ask for one piece of feedback.', tag:'close'},
+      {id:'w11t2', title:'Referral Ask — Second Round', detail:'Ask every client who has had 3+ rides for a specific referral. Name the person you want to meet.', tag:'account'},
+      {id:'w11t3', title:'Score All Referred Names', detail:'Every name given by a referral: add to pipeline immediately. Score them. Set referral source.', tag:'prospect'},
+      {id:'w11t4', title:'Advance Corporate Account Conversations', detail:'Any company where you have had a corporate travel meeting: follow up with a specific proposal.', tag:'account'}
+    ]},
+    {week:12, title:'Week 12 — 90-Day Debrief', focus:'Measure, learn, and set the next 90-day target', tasks:[
+      {id:'w12t1', title:'Full Pipeline Revenue Audit', detail:'Calculate total MRR from all active, recurring, and corporate clients. Compare to $9,000 target.', tag:'close'},
+      {id:'w12t2', title:'Identify Your 3 Best Clients', detail:'Who converted fastest? What channel? What approach? These are your templates for the next 90 days.', tag:'close'},
+      {id:'w12t3', title:'Set Next 90-Day Targets', detail:'Based on current MRR and pipeline velocity: set new targets for clients 4-10. Plan Phase 2 expansion.', tag:'prospect'},
+      {id:'w12t4', title:'Thank Your Champions', detail:'Personal thank-you to every EA, referral source, and hotel concierge who helped this quarter.', tag:'account'}
+    ]}
+  ]
+};
+
+var calProgress = JSON.parse(localStorage.getItem('ob-cal-progress') || '{}');
+
+function initCalendar(){
+  renderCalPhase('cal-phase1', CAL_TASKS.phase1);
+  renderCalPhase('cal-phase2', CAL_TASKS.phase2);
+  renderCalPhase('cal-phase3', CAL_TASKS.phase3);
+  updateCalProgress();
+  updateKPIs();
+}
+
+function renderCalPhase(containerId, weeks){
+  var el = document.getElementById(containerId);
+  if(!el){return;}
+  el.innerHTML = weeks.map(function(w){
+    var taskHTML = w.tasks.map(function(t){
+      var done = calProgress[t.id];
+      var tagCls = 'ct-'+t.tag;
+      var tagLabel = {prospect:'Prospecting',outreach:'Outreach',followup:'Follow-up',close:'Closing',account:'Account'}[t.tag]||t.tag;
+      return '<div class="cal-task'+(done?' done':'')+'">'+
+        '<div class="cal-task-check'+(done?' checked':'')+'" onclick="toggleCalTask(\"'+t.id+'\")">'+' '+(done?'&#10003;':'')+'</div>'+
+        '<div class="cal-task-body">'+
+          '<div class="cal-task-title">'+t.title+'</div>'+
+          '<div class="cal-task-detail">'+t.detail+'</div>'+
+          '<span class="cal-task-tag '+tagCls+'">'+tagLabel+'</span>'+
+        '</div>'+
+      '</div>';
+    }).join('');
+    return '<div class="cal-week card">'+
+      '<div class="cal-week-header">'+
+        '<div class="cal-week-num">W'+w.week+'</div>'+
+        '<div><div class="cal-week-title">'+w.title+'</div><div class="cal-week-focus">Focus: '+w.focus+'</div></div>'+
+      '</div>'+
+      '<div class="cal-tasks">'+taskHTML+'</div>'+
+    '</div>';
+  }).join('');
+}
+
+function toggleCalTask(id){
+  calProgress[id] = !calProgress[id];
+  localStorage.setItem('ob-cal-progress', JSON.stringify(calProgress));
+  initCalendar();
+}
+
+function updateCalProgress(){
+  var allTasks = [];
+  ['phase1','phase2','phase3'].forEach(function(ph){
+    CAL_TASKS[ph].forEach(function(w){ w.tasks.forEach(function(t){ allTasks.push(t.id); }); });
+  });
+  var done = allTasks.filter(function(id){ return calProgress[id]; }).length;
+  var pct = Math.round((done/allTasks.length)*100);
+  var progEl = document.getElementById('cal-progress');
+  var pctEl = document.getElementById('cal-pct');
+  var doneEl = document.getElementById('cal-tasks-done');
+  if(progEl){progEl.style.width = pct+'%';}
+  if(pctEl){pctEl.textContent = pct+'%';}
+  if(doneEl){doneEl.textContent = done+' of '+allTasks.length+' tasks completed';}
+}
+
+function updateKPIs(){
+  var total = pipeline.length;
+  var contacted = pipeline.filter(function(p){ return p.stage !== 'identified'; }).length;
+  var trials = pipeline.filter(function(p){ return p.stage === 'trial-sched' || p.stage === 'trial-done' || p.stage === 'active' || p.stage === 'recurring' || p.stage === 'corporate'; }).length;
+  var clients = pipeline.filter(function(p){ return p.stage === 'active' || p.stage === 'recurring' || p.stage === 'corporate'; }).length;
+  var kpis = [{id:'kpi-pipeline',val:total,target:25,gap:'pipeline'},{id:'kpi-contacted',val:contacted,target:15,gap:'contacted'},{id:'kpi-trials',val:trials,target:5,gap:'trials'},{id:'kpi-clients',val:clients,target:3,gap:'clients'}];
+  kpis.forEach(function(k){
+    var el = document.getElementById(k.id);
+    var gapEl = document.getElementById(k.id+'-gap');
+    if(el){el.textContent = k.val; el.style.color = k.val >= k.target ? 'var(--gold)' : k.val >= k.target*0.6 ? 'var(--green)' : 'var(--text)';}
+    if(gapEl){gapEl.textContent = k.val+' of '+k.target+' '+(k.val>=k.target?'— TARGET HIT ✓':'remaining');}
+  });
+}
+
+function resetCalendar(){
+  if(!confirm('Reset all calendar progress?')){return;}
+  calProgress = {};
+  localStorage.removeItem('ob-cal-progress');
+  initCalendar();
+  notify('Calendar reset');
+}
+
+// ══════════════════════════════════════════════════════════
+// WAR ROOM — AI STRATEGIC ADVISOR
+// ══════════════════════════════════════════════════════════
+async function askWarRoom(){
+  var q = document.getElementById('wr-question').value.trim();
+  if(!q){notify('Enter a question first');return;}
+  var sp = document.getElementById('sp-wr');
+  var box = document.getElementById('wr-box');
+  var out = document.getElementById('wr-ai');
+  sp.classList.add('on'); box.classList.remove('show');
+  var pipelineSummary = 'Pipeline: '+pipeline.length+' total, '+pipeline.filter(function(p){return p.convProb==='High';}).length+' High Conv, '+pipeline.filter(function(p){return p.stage==='active'||p.stage==='recurring'||p.stage==='corporate';}).length+' active clients.';
+  var revTotal = pipeline.filter(function(p){return p.stage==='active'||p.stage==='recurring'||p.stage==='corporate';}).reduce(function(s,p){return s+(p.monthlyValue||0);},0);
+  try{
+    out.textContent = await callAI([
+      'You are the senior strategic advisor for Odyssey Black VIP Transportation in Atlanta — an elite black car service targeting Fortune 500 executives.',
+      'Business context: '+pipelineSummary+' Est monthly revenue: $'+revTotal.toLocaleString()+'.',
+      'Your goal is to help Odyssey Black become the #1 executive black car service in Atlanta.',
+      'Core differentiators: reliability, discretion, professional chauffeurs, flight tracking, last-minute availability, standing route ownership.',
+      'Target market: Fortune 500 C-suite and VP-level executives in Atlanta metro area.',
+      '',
+      'Question from the founder: '+q,
+      '',
+      'Give specific, tactical, immediately actionable advice. Reference real Atlanta companies, executives, and venues where relevant.',
+      'Be direct and strategic. No generic advice. Treat this as a senior-level business conversation.',
+      'If the question involves a specific prospect or company, give a tailored answer for that exact situation.'
+    ], 1200);
+    box.classList.add('show');
+  }catch(e){out.textContent='Error: '+e.message;box.classList.add('show');}
+  sp.classList.remove('on');
+}
+
+async function askDailyBriefing(){
+  var sp = document.getElementById('sp-brief');
+  var box = document.getElementById('wr-box');
+  var out = document.getElementById('wr-ai');
+  sp.classList.add('on'); box.classList.remove('show');
+  var today = new Date().toISOString().slice(0,10);
+  var overdue = pipeline.filter(function(p){return p.followUp&&p.followUp<today;});
+  var highConv = pipeline.filter(function(p){return p.convProb==='High'&&p.stage!=='active'&&p.stage!=='recurring'&&p.stage!=='corporate';});
+  var trialsPending = pipeline.filter(function(p){return p.stage==='trial-sched';});
+  var trialsDone = pipeline.filter(function(p){return p.stage==='trial-done';});
+  var revTotal = pipeline.filter(function(p){return p.stage==='active'||p.stage==='recurring'||p.stage==='corporate';}).reduce(function(s,p){return s+(p.monthlyValue||0);},0);
+  var overdueNames = overdue.slice(0,3).map(function(p){return p.name+' ('+p.stage+')';}).join(', ');
+  var highConvNames = highConv.slice(0,3).map(function(p){return p.name+' at '+p.company+' ('+p.convProb+' conv, BM:'+p.bmScore+')';}).join(', ');
+  try{
+    out.textContent = await callAI([
+      'You are the strategic advisor for Odyssey Black VIP Transportation in Atlanta.',
+      'Generate a sharp daily briefing for the founder based on current pipeline data.',
+      'Today: '+today,
+      'Pipeline: '+pipeline.length+' total prospects',
+      'High conversion (not yet active): '+highConv.length+(highConvNames?' — '+highConvNames:''),
+      'Overdue follow-ups: '+overdue.length+(overdueNames?' — '+overdueNames:''),
+      'Trial rides scheduled: '+trialsPending.length,
+      'Trial rides completed awaiting close: '+trialsDone.length,
+      'Current MRR: $'+revTotal.toLocaleString(),
+      '',
+      'Write a 5-part daily briefing:',
+      '1. PRIORITY TODAY — the single most important action to take right now',
+      '2. FOLLOW-UP URGENCY — who needs contact today and exactly what to say',
+      '3. PIPELINE HEALTH — honest assessment of where things stand',
+      '4. REVENUE OPPORTUNITY — nearest revenue to close and how to close it',
+      '5. ONE STRATEGIC MOVE — one thing to do this week that compounds over time',
+      '',
+      'Be specific about names and companies where data is available. Be direct. No filler.'
+    ], 1000);
+    box.classList.add('show');
+  }catch(e){out.textContent='Error: '+e.message;box.classList.add('show');}
+  sp.classList.remove('on');
+}
+
+
+// ══════════════════════════════════════════════════════════
+// MARKET EXPANSION ENGINE
+// ══════════════════════════════════════════════════════════
+function toggleMarket(id){
+  var body=document.getElementById('mb-'+id);
+  if(body){body.classList.toggle('open');}
+}
+
+function scoreHotel(){
+  var name=document.getElementById('ht-name').value.trim();
+  if(!name){notify('Enter hotel name');return;}
+  var loc=document.getElementById('ht-location').value;
+  var tier=document.getElementById('ht-tier').value;
+  var guests=document.getElementById('ht-guests').value;
+  var score=0;
+  if(tier==='luxury'){score+=30;}else if(tier==='upscale'){score+=22;}else{score+=14;}
+  if(loc==='buckhead'||loc==='midtown'){score+=25;}else if(loc==='downtown'){score+=18;}else if(loc==='airport'){score+=20;}else{score+=10;}
+  if(guests==='corporate'){score+=30;}else if(guests==='event'){score+=25;}else if(guests==='mixed-high'){score+=20;}else{score+=10;}
+  var el=document.getElementById('hotel-score');if(el){el.textContent=score;}
+  notify('Hotel demand score: '+score+'/85');
+}
+
+async function generateHotelOutreach(){
+  var name=document.getElementById('ht-name').value.trim()||'Atlanta hotel';
+  var loc=document.getElementById('ht-location').value;
+  var tier=document.getElementById('ht-tier').value;
+  var guests=document.getElementById('ht-guests').value;
+  var contact=document.getElementById('ht-contact').value.trim();
+  var sp=document.getElementById('sp-ht2');var box=document.getElementById('hotel-ai-box');var out=document.getElementById('hotel-ai');
+  sp.classList.add('on');box.classList.remove('show');
+  try{
+    out.textContent=await callAI([
+      'You write business development outreach for Odyssey Black VIP Transportation in Atlanta.',
+      'You are targeting a hotel concierge or guest services team, NOT an individual guest.',
+      'Hotel: '+name+' | Location: '+loc+' | Tier: '+tier+' | Guest type: '+guests,
+      'Contact: '+(contact||'Concierge Manager'),
+      'Write a concise in-person introduction script AND a follow-up email for this hotel partnership pitch.',
+      'POSITIONING: Odyssey Black wants to be the hotel preferred ground transportation partner.',
+      'Key messages: your guests deserve better than Uber. We eliminate wait times, surge pricing, and driver inconsistency.',
+      'Professional chauffeurs, flight tracking, 24/7 availability, one invoice.',
+      'Offer: a referral credit arrangement ($15-20 per completed booking referred).',
+      'IN-PERSON SCRIPT: Under 60 seconds. What to say when walking up to the concierge desk.',
+      'FOLLOW-UP EMAIL: Under 150 words. After the in-person visit.',
+      'Tone: warm, peer-to-peer, professional. Not salesy.'
+    ],800);
+    box.classList.add('show');
+  }catch(e){out.textContent='Error: '+e.message;box.classList.add('show');}
+  sp.classList.remove('on');
+}
+
+function scoreMedical(){
+  var name=document.getElementById('med-name').value.trim();
+  if(!name){notify('Enter practice name');return;}
+  var type=document.getElementById('med-type').value;
+  var patients=document.getElementById('med-patients').value;
+  var volume=document.getElementById('med-volume').value;
+  var score=0;
+  if(type==='surgery'){score+=30;}else if(type==='concierge'){score+=28;}else if(type==='medspa'){score+=22;}else if(type==='wellness'){score+=20;}else{score+=16;}
+  if(patients==='executive'){score+=30;}else if(patients==='mixed-high'){score+=22;}else{score+=12;}
+  if(volume==='high'){score+=25;}else if(volume==='moderate'){score+=18;}else{score+=8;}
+  var el=document.getElementById('med-score');if(el){el.textContent=score;}
+  notify('Medical demand score: '+score+'/85');
+}
+
+async function generateMedicalOutreach(){
+  var name=document.getElementById('med-name').value.trim()||'Atlanta medical practice';
+  var type=document.getElementById('med-type').value;
+  var patients=document.getElementById('med-patients').value;
+  var contact=document.getElementById('med-contact').value.trim();
+  var sp=document.getElementById('sp-med2');var box=document.getElementById('medical-ai-box');var out=document.getElementById('medical-ai');
+  sp.classList.add('on');box.classList.remove('show');
+  var typeLabel={surgery:'surgery center',concierge:'concierge medical practice',medspa:'medical spa',wellness:'executive wellness center',dental:'cosmetic dental practice'}[type]||'medical practice';
+  try{
+    out.textContent=await callAI([
+      'You write business development outreach for Odyssey Black VIP Transportation in Atlanta.',
+      'You are targeting the office manager or practice manager of a '+typeLabel+', NOT a patient.',
+      'Practice: '+name+' | Patient profile: '+patients,
+      'Contact: '+(contact||'Office Manager'),
+      'Write a cold email proposing Odyssey Black as the practice preferred patient and staff transportation partner.',
+      'KEY POINTS: Patients who cannot drive post-procedure need reliable, discreet transportation.',
+      'Odyssey Black offers: verified professional drivers, privacy guarantee, on-time pickup, patient dignity.',
+      'POSITIONING: Reduce liability and improve patient experience. Uber is not appropriate for post-procedure patients.',
+      'HIPAA angle: no patient data required. Simply a reliable transportation referral.',
+      'Keep under 180 words. Include a subject line.',
+      'End with: a 10-minute call or request to be added to their preferred vendor list.',
+      'Tone: professional, calm, trustworthy. This is a clinical setting.'
+    ],800);
+    box.classList.add('show');
+  }catch(e){out.textContent='Error: '+e.message;box.classList.add('show');}
+  sp.classList.remove('on');
+}
+
+function scoreEvent(){
+  var name=document.getElementById('ev-name').value.trim();
+  if(!name){notify('Enter business name');return;}
+  var type=document.getElementById('ev-type').value;
+  var freq=document.getElementById('ev-freq').value;
+  var clients=document.getElementById('ev-clients').value;
+  var score=0;
+  if(type==='corporate-planner'){score+=30;}else if(type==='venue'){score+=25;}else if(type==='dmc'){score+=28;}else if(type==='luxury-wedding'){score+=20;}else{score+=15;}
+  if(freq==='weekly'){score+=30;}else if(freq==='biweekly'){score+=22;}else if(freq==='monthly'){score+=15;}else{score+=8;}
+  if(clients==='corporate'){score+=25;}else if(clients==='luxury'){score+=22;}else{score+=14;}
+  var el=document.getElementById('ev-score');if(el){el.textContent=score;}
+  notify('Event demand score: '+score+'/85');
+}
+
+async function generateEventOutreach(){
+  var name=document.getElementById('ev-name').value.trim()||'Atlanta event company';
+  var type=document.getElementById('ev-type').value;
+  var freq=document.getElementById('ev-freq').value;
+  var clients=document.getElementById('ev-clients').value;
+  var contact=document.getElementById('ev-contact').value.trim();
+  var sp=document.getElementById('sp-ev3');var box=document.getElementById('event-market-ai-box');var out=document.getElementById('event-market-ai');
+  sp.classList.add('on');box.classList.remove('show');
+  var typeLabel={
+    'corporate-planner':'corporate event planning company',
+    'venue':'event venue',
+    'luxury-wedding':'luxury wedding planning company',
+    'dmc':'destination management company',
+    'entertainment':'entertainment and talent agency'
+  }[type]||'event company';
+  try{
+    out.textContent=await callAI([
+      'You write business development outreach for Odyssey Black VIP Transportation in Atlanta.',
+      'You are targeting an event coordinator or venue manager at a '+typeLabel+'.',
+      'Company: '+name+' | Event frequency: '+freq+' | Client profile: '+clients,
+      'Contact: '+(contact||'Event Coordinator / Venue Manager'),
+      'Write a cold email proposing Odyssey Black as their preferred group transportation partner.',
+      'KEY DIFFERENTIATORS vs Uber for events: coordinated group logistics, punctuality guaranteed, no surge pricing on event nights, professional presentation for client-facing moments.',
+      'PITCH: Every event you plan deserves transportation that matches the quality of your work.',
+      'OFFER: Handle transportation for one upcoming event as an introduction — no obligation.',
+      'Keep under 180 words. Include a subject line.',
+      'End with a specific ask: a 15-minute call or to be included in their next event vendor briefing.',
+      'Tone: creative, professional, partner-oriented. Not vendor-to-client.'
+    ],800);
+    box.classList.add('show');
+  }catch(e){out.textContent='Error: '+e.message;box.classList.add('show');}
+  sp.classList.remove('on');
+}
+
+function scoreMidMarket(){
+  var name=document.getElementById('mm-name').value.trim();
+  if(!name){notify('Enter company name');return;}
+  var industry=document.getElementById('mm-industry').value;
+  var size=document.getElementById('mm-size').value;
+  var travel=document.getElementById('mm-travel').value;
+  var atl=document.getElementById('mm-atl').value;
+  var score=0;
+  var indScore={law:28,pe:30,consulting:26,tech:22,healthcare:24,realestate:20,finance:26,other:16};
+  score+=indScore[industry]||16;
+  var sizeScore={'50-100':16,'100-250':20,'250-500':24,'500-999':28};
+  score+=sizeScore[size]||16;
+  if(travel==='heavy'){score+=25;}else if(travel==='moderate'){score+=16;}else{score+=8;}
+  if(atl==='hq'){score+=20;}else if(atl==='office'){score+=14;}else{score+=8;}
+  var el=document.getElementById('mm-score');if(el){el.textContent=score;}
+  notify('Mid-market demand score: '+score+'/103');
+}
+
+async function generateMidMarketOutreach(){
+  var name=document.getElementById('mm-name').value.trim()||'Atlanta company';
+  var industry=document.getElementById('mm-industry').value;
+  var size=document.getElementById('mm-size').value;
+  var travel=document.getElementById('mm-travel').value;
+  var contact=document.getElementById('mm-contact').value.trim();
+  var sp=document.getElementById('sp-mm2');var box=document.getElementById('mm-ai-box');var out=document.getElementById('mm-ai');
+  sp.classList.add('on');box.classList.remove('show');
+  var indLabel={law:'law firm',pe:'private equity firm',consulting:'consulting group',tech:'technology company',healthcare:'healthcare management group',realestate:'commercial real estate firm',finance:'financial services firm',other:'professional services company'}[industry]||'company';
+  try{
+    out.textContent=await callAI([
+      'You write business development outreach for Odyssey Black VIP Transportation in Atlanta.',
+      'You are targeting a decision-maker at a mid-market '+indLabel+' in Atlanta.',
+      'Company: '+name+' | Size: '+size+' employees | Travel intensity: '+travel,
+      'Contact: '+(contact||'Managing Partner / Office Manager / COO'),
+      'Write a cold email OR LinkedIn DM (your choice of best channel for this industry) proposing Odyssey Black as their professional ground transportation solution.',
+      'KEY INSIGHT: Mid-market firms have Fortune 500-level travel needs but are currently using Uber because they lack a dedicated travel program.',
+      'POSITIONING: Odyssey Black is the transportation infrastructure for growing Atlanta businesses.',
+      'PAIN POINTS to address: Uber surge pricing, inconsistent drivers, lack of professionalism for client-facing moments, no account management.',
+      'OFFER: A complimentary first ride for the managing partner or a 30-day trial account.',
+      'Keep under 200 words. Include a subject line if email.',
+      'Tone: peer-to-peer, direct, not salesy. Treat them as equals.'
+    ],800);
+    box.classList.add('show');
+  }catch(e){out.textContent='Error: '+e.message;box.classList.add('show');}
+  sp.classList.remove('on');
+}
+
+async function calcRideLikelihood(){
+  var name=document.getElementById('rl-name').value.trim()||'Atlanta business';
+  var type=document.getElementById('rl-type').value;
+  var airport=document.getElementById('rl-airport').value;
+  var concierge=document.getElementById('rl-concierge').value;
+  var clients=document.getElementById('rl-clients').value;
+  var staff=document.getElementById('rl-staff').value;
+  var current=document.getElementById('rl-current').value;
+  var sp=document.getElementById('sp-rl');var box=document.getElementById('rl-ai-box');var out=document.getElementById('rl-ai');
+  sp.classList.add('on');box.classList.remove('show');
+  var score=0;
+  var typeScores={hotel:30,corporate:28,law:26,medical:22,events:24,finance:26,tech:20,realestate:18,entertainment:22,other:14};
+  score+=typeScores[type]||14;
+  if(airport==='yes'){score+=20;}else if(airport==='moderate'){score+=12;}else{score+=4;}
+  if(concierge==='yes'){score+=15;}
+  if(clients==='daily'){score+=20;}else if(clients==='weekly'){score+=14;}else if(clients==='occasional'){score+=8;}else{score+=2;}
+  if(staff==='many'){score+=15;}else if(staff==='some'){score+=10;}else{score+=4;}
+  if(current==='uber'){score+=15;}else if(current==='mixed'){score+=10;}else if(current==='unknown'){score+=8;}else{score+=2;}
+  var likelihood=score>=90?'VERY HIGH':score>=70?'HIGH':score>=50?'MODERATE':score>=30?'LOW':'MINIMAL';
+  try{
+    out.textContent=await callAI([
+      'You are a business development analyst for Odyssey Black VIP Transportation in Atlanta.',
+      'Analyze this business prospect for transportation demand potential:',
+      'Business: '+name+' | Type: '+type,
+      'Near ATL airport: '+airport+' | Has reception/concierge: '+concierge,
+      'External client frequency: '+clients+' | Staff who travel: '+staff,
+      'Current transport solution: '+current,
+      'Calculated Ride Likelihood Score: '+score+'/105 ('+likelihood+')',
+      '',
+      'Provide a concise Ride Likelihood Analysis with:',
+      '1. DEMAND ASSESSMENT — how much transportation demand does this business likely have per week',
+      '2. ODYSSEY BLACK FIT — is this a good fit (High / Medium / Low) and why',
+      '3. ESTIMATED MONTHLY VALUE — realistic revenue estimate if converted',
+      '4. DECISION MAKER — who to contact first and what role',
+      '5. OPENING PITCH — one sentence that speaks directly to their specific transportation pain',
+      '',
+      'Be specific to the business type. No generic advice.'
+    ],700);
+    box.classList.add('show');
+  }catch(e){out.textContent='Error: '+e.message;box.classList.add('show');}
+  sp.classList.remove('on');
+}
+
+
+// ══════════════════════════════════════════════════════════
+// GOOGLE PLACES SEARCH ENGINE
+// ══════════════════════════════════════════════════════════
+var placesResults = [];
+
+function savePlacesKey(){
+  var key = document.getElementById('places-api-key').value.trim();
+  if(!key){notify('Paste your API key first'); return;}
+  localStorage.setItem('ob-places-key', key);
+  document.getElementById('places-api-key').value = '••••••••••••••••••••••••••••••••••••••';
+  document.getElementById('places-key-row').style.display = 'none';
+  document.getElementById('places-key-saved').style.display = 'block';
+  notify('API key saved');
+}
+
+function getPlacesKey(){
+  var saved = localStorage.getItem('ob-places-key');
+  if(saved){ return saved; }
+  var input = document.getElementById('places-api-key').value.trim();
+  if(input && !input.startsWith('•')){ return input; }
+  return null;
+}
+
+function scorePlaceProspect(place, category){
+  var score = 0;
+  var rating = place.rating || 0;
+  var reviews = place.user_ratings_total || 0;
+  var name = (place.name || '').toLowerCase();
+  var types = place.types || [];
+
+  if(rating >= 4.5){ score += 25; }
+  else if(rating >= 4.0){ score += 18; }
+  else if(rating >= 3.5){ score += 10; }
+
+  if(reviews >= 200){ score += 20; }
+  else if(reviews >= 50){ score += 14; }
+  else if(reviews >= 10){ score += 8; }
+
+  if(category === 'hotel'){
+    if(name.includes('w ') || name.includes('four seasons') || name.includes('st. regis') || name.includes('ritz') || name.includes('waldorf') || name.includes('loews') || name.includes('intercontinental')){ score += 30; }
+    else if(name.includes('hyatt') || name.includes('westin') || name.includes('marriott') || name.includes('hilton') || name.includes('sheraton') || name.includes('kimpton')){ score += 22; }
+    else { score += 12; }
+  } else if(category.includes('hospital') || category.includes('medical') || category.includes('doctor')){
+    if(name.includes('surgery') || name.includes('plastic') || name.includes('cosmetic') || name.includes('concierge') || name.includes('executive')){ score += 28; }
+    else if(name.includes('spa') || name.includes('wellness') || name.includes('aesthetic')){ score += 22; }
+    else { score += 12; }
+  } else if(category.includes('event') || category.includes('banquet')){
+    if(reviews >= 100){ score += 25; }
+    else { score += 15; }
+  } else if(category === 'lawyer'){
+    if(name.includes('llp') || name.includes('llc') || name.includes('partners') || name.includes('associates')){ score += 25; }
+    else { score += 15; }
+  } else {
+    score += 15;
+  }
+
+  if(place.business_status === 'OPERATIONAL'){ score += 5; }
+  return Math.min(score, 95);
+}
+
+function getPlaceTier(score){
+  if(score >= 75){ return 'HOT'; }
+  if(score >= 55){ return 'STRONG'; }
+  if(score >= 35){ return 'QUALIFIED'; }
+  return 'LOW';
+}
+
+function getPlaceTierClass(score){
+  if(score >= 75){ return 't-hot'; }
+  if(score >= 55){ return 't-strong'; }
+  if(score >= 35){ return 't-qual'; }
+  return 't-low';
+}
+
+async function searchPlaces(){
+  var key = getPlacesKey();
+  if(!key){
+    document.getElementById('places-no-key').style.display = 'block';
+    document.getElementById('places-results').style.display = 'none';
+    return;
+  }
+  document.getElementById('places-no-key').style.display = 'none';
+
+  var category = document.getElementById('places-category').value;
+  var area = document.getElementById('places-area').value;
+  var minRating = parseFloat(document.getElementById('places-rating').value) || 0;
+  var sp = document.getElementById('sp-places');
+  var status = document.getElementById('places-status');
+  var results = document.getElementById('places-results');
+
+  sp.classList.add('on');
+  status.style.display = 'block';
+  status.textContent = 'Searching Atlanta for ' + category + ' businesses...';
+  results.style.display = 'none';
+
+  var query = encodeURIComponent(category.split('|')[0] + ' in ' + area);
+  var url = 'https://maps.googleapis.com/maps/api/place/textsearch/json?query=' + query + '&key=' + key;
+
+  try{
+    var res = await fetch('https://corsproxy.io/?' + encodeURIComponent(url));
+    var data = await res.json();
+
+    if(data.status === 'REQUEST_DENIED' || data.status === 'INVALID_REQUEST'){
+      status.textContent = 'API key error: ' + (data.error_message || data.status) + '. Check your key has Places API enabled.';
+      status.style.color = '#e74c3c';
+      sp.classList.remove('on');
+      return;
+    }
+
+    var places = (data.results || []).filter(function(p){
+      return !minRating || (p.rating && p.rating >= minRating);
+    });
+
+    placesResults = places.map(function(p){
+      var score = scorePlaceProspect(p, category);
+      return { name: p.name, address: p.formatted_address, rating: p.rating, reviews: p.user_ratings_total, placeId: p.place_id, types: p.types, score: score, tier: getPlaceTier(score), tierClass: getPlaceTierClass(score), category: category, area: area };
+    });
+
+    placesResults.sort(function(a,b){ return b.score - a.score; });
+
+    status.textContent = placesResults.length + ' businesses found in ' + area + '. Sorted by demand score.';
+    status.style.color = 'var(--muted)';
+    renderPlacesGrid();
+    results.style.display = 'block';
+    document.getElementById('places-count').textContent = placesResults.length + ' results — ' + placesResults.filter(function(p){ return p.tier === 'HOT'; }).length + ' HOT, ' + placesResults.filter(function(p){ return p.tier === 'STRONG'; }).length + ' Strong';
+
+  } catch(err){
+    status.textContent = 'Search failed: ' + err.message + '. Check your API key and try again.';
+    status.style.color = '#e74c3c';
+  }
+  sp.classList.remove('on');
+}
+
+function renderPlacesGrid(){
+  var grid = document.getElementById('places-grid');
+  if(!grid){ return; }
+  grid.innerHTML = placesResults.map(function(p, i){
+    var stars = p.rating ? '&#9733; ' + p.rating : 'No rating';
+    var reviews = p.reviews ? ' (' + p.reviews + ' reviews)' : '';
+    return '<div class="place-card" id="pc-' + i + '" onclick="selectPlace(' + i + ')">' +
+      '<div class="place-score-badge ' + p.tierClass + '">' + p.score + '</div>' +
+      '<div class="place-name">' + p.name + '</div>' +
+      '<div class="place-address">' + (p.address || '') + '</div>' +
+      '<div class="place-rating">' + stars + '<span style="color:var(--muted);">' + reviews + '</span></div>' +
+      '<span class="place-type-tag">' + p.tier + '</span>' +
+      '</div>';
+  }).join('');
+}
+
+function selectPlace(idx){
+  var p = placesResults[idx];
+  if(!p){ return; }
+  document.querySelectorAll('.place-card').forEach(function(el){ el.classList.remove('selected'); });
+  var card = document.getElementById('pc-' + idx);
+  if(card){ card.classList.add('selected'); }
+  document.getElementById('rl-name').value = p.name;
+  var typeMap = { hotel: 'hotel', 'hospital|doctor|medical_office': 'medical', 'event_venue|banquet_hall': 'events', lawyer: 'law', 'finance|accounting': 'finance', real_estate_agency: 'realestate', 'spa|beauty_salon': 'medical', 'corporate_office|establishment': 'corporate' };
+  var rlType = document.getElementById('rl-type');
+  if(rlType){ rlType.value = typeMap[p.category] || 'other'; }
+  notify(p.name + ' loaded into Ride Likelihood Calculator — scroll down to score');
+  document.getElementById('rl-ai-box').classList.remove('show');
+}
+
+function addAllPlacesToPipeline(){
+  var hot = placesResults.filter(function(p){ return p.tier === 'HOT' || p.tier === 'STRONG'; });
+  if(hot.length === 0){ notify('No HOT or STRONG prospects found'); return; }
+  notify(hot.length + ' HOT/STRONG prospects ready — use Ride Likelihood Calculator to generate full strategy for each');
 }
 
 function copyText(id){var t=document.getElementById(id).textContent;navigator.clipboard.writeText(t).then(function(){notify('Copied to clipboard');});}
