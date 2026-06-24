@@ -517,6 +517,14 @@ textarea{resize:vertical;min-height:75px;}
 .tc-why{font-size:var(--fs-xs);color:var(--muted);line-height:var(--lh-relaxed);margin-bottom:11px;}
 .tc-fill-btn{width:100%;background:var(--gold);color:var(--black);border:none;padding:9px;font-size:var(--fs-xs);letter-spacing:var(--ls-wider);text-transform:uppercase;font-family:var(--ff-ui);font-weight:700;cursor:pointer;border-radius:1px;transition:opacity 0.15s;}
 .tc-fill-btn:hover{opacity:0.85;}
+.tc-contact{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:9px;align-items:center;}
+.tc-location{display:inline-flex;align-items:center;gap:4px;font-size:var(--fs-xs);color:var(--muted);background:rgba(255,255,255,0.04);border:1px solid var(--border);padding:2px 8px;border-radius:1px;}
+.tc-email-chip{display:inline-flex;align-items:center;gap:4px;font-size:var(--fs-xs);color:var(--blue);background:rgba(52,152,219,0.07);border:1px solid rgba(52,152,219,0.25);padding:2px 8px;border-radius:1px;cursor:pointer;transition:all 0.15s;font-family:monospace;}
+.tc-email-chip:hover{background:rgba(52,152,219,0.14);border-color:rgba(52,152,219,0.5);}
+.tc-email-chip.unknown{color:var(--muted);background:none;border-color:var(--border);cursor:default;font-family:var(--ff-ui);}
+.tc-li-btn{display:inline-flex;align-items:center;gap:4px;font-size:var(--fs-xs);color:var(--gold);background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.25);padding:2px 8px;border-radius:1px;text-decoration:none;transition:all 0.15s;}
+.tc-li-btn:hover{background:rgba(201,168,76,0.14);border-color:var(--gold);}
+.tc-email-note{font-size:10px;color:var(--muted);opacity:0.75;margin-top:2px;font-style:italic;}
 .tf-status{font-size:var(--fs-sm);color:var(--muted);padding:8px 0 2px;}
 .tf-error{font-size:var(--fs-sm);color:#e74c3c;padding:8px 0 2px;}
 .tf-verify-note{font-size:var(--fs-xs);color:rgba(201,168,76,0.7);margin-top:10px;padding:8px 12px;border:1px solid rgba(201,168,76,0.2);border-radius:1px;background:rgba(201,168,76,0.03);}
@@ -3750,11 +3758,14 @@ async function findCompanyTargets(){
       '- Atlanta-headquartered or Atlanta-connected leadership',
       '',
       'Return ONLY a valid JSON array. Zero explanation, zero markdown fences, zero other text. Exactly this structure:',
-      '[{"name":"First Last","title":"Full Title","travel":"Heavy","atl":"Headquartered here","industry":"Financial Services / Banking","why":"One specific sentence on why this executive is a strong ground transportation prospect."}]',
+      '[{"name":"First Last","title":"Full Title","travel":"Heavy","atl":"Headquartered here","industry":"Financial Services / Banking","why":"One specific sentence on why this executive is a strong ground transportation prospect.","city":"Atlanta, GA","emailFormat":"firstname.lastname@company.com","emailNote":"standard format — verify before sending"}]',
       '',
       'travel must be exactly one of: Heavy | Moderate | Light',
       'atl must be exactly one of: Headquartered here | Regional / major office | Visiting / remote',
       'industry must be exactly one of: Airline / Aviation | Financial Services / Banking | Technology | Healthcare / Pharma | Real Estate / Development | Legal / Law Firm | Private Equity / VC | Consulting | Energy / Utilities | Manufacturing / Logistics | Entertainment / Media | Other Fortune 500',
+      'city: the city and state where this executive primarily works (e.g. "Atlanta, GA" or "New York, NY")',
+      'emailFormat: construct the most likely email address for this executive using the company\'s known email pattern and their name. Example: if the company uses firstname.lastname@company.com format, write "john.smith@delta.com". If the format is unknown, write "unknown — check company website".',
+      'emailNote: one of "standard format", "common format — verify before sending", "format varies — verify", or "unknown — check LinkedIn or company website"',
       '',
       'Use real verified executives if you have reliable data. If a name is uncertain, use a realistic title placeholder and note "Verify on LinkedIn" at the end of the why field.',
       'If you have no reliable data on this company at all, return exactly: [{"error":"No reliable executive data found for ' + company + '. Try their LinkedIn company page or website leadership section."}]'
@@ -3793,6 +3804,25 @@ function renderTargetCards(company){
   grid.innerHTML = tfResults.map(function(t, i){
     var travelCls = t.travel === 'Heavy' ? 'tcb-heavy' : t.travel === 'Moderate' ? 'tcb-moderate' : 'tcb-light';
     var atlShort = t.atl === 'Headquartered here' ? 'ATL HQ' : t.atl === 'Regional / major office' ? 'ATL Office' : 'Visiting';
+
+    // Location chip
+    var locationChip = t.city ? '<span class="tc-location">&#128205; ' + t.city + '</span>' : '';
+
+    // Email chip — copyable if known, greyed if unknown
+    var emailKnown = t.emailFormat && t.emailFormat.indexOf('unknown') === -1 && t.emailFormat.indexOf('check') === -1;
+    var emailChip = t.emailFormat
+      ? (emailKnown
+          ? '<span class="tc-email-chip" title="Click to copy email" onclick="event.stopPropagation();copyEmailFormat(\'' + t.emailFormat.replace(/'/g, "\\'") + '\')">&#9993; ' + t.emailFormat + '</span>'
+          : '<span class="tc-email-chip unknown">&#9993; format unknown</span>')
+      : '';
+
+    // Email verify note
+    var emailNote = emailKnown && t.emailNote ? '<div class="tc-email-note">&#9432; ' + t.emailNote + '</div>' : '';
+
+    // LinkedIn search URL from name + company
+    var liQuery = encodeURIComponent((t.name || '') + ' ' + company);
+    var liBtn = t.name ? '<a class="tc-li-btn" href="https://www.linkedin.com/search/results/people/?keywords=' + liQuery + '" target="_blank" onclick="event.stopPropagation()">&#128279; LinkedIn</a>' : '';
+
     return '<div class="target-card" id="tc-' + i + '" onclick="selectTarget(' + i + ')">' +
       '<div class="tc-name">' + (t.name || 'Executive') + '</div>' +
       '<div class="tc-title">' + (t.title || '') + '</div>' +
@@ -3800,10 +3830,16 @@ function renderTargetCards(company){
         '<span class="tc-badge ' + travelCls + '">' + (t.travel || 'Moderate') + ' Travel</span>' +
         '<span class="tc-badge tcb-atl">' + atlShort + '</span>' +
       '</div>' +
+      '<div class="tc-contact">' + locationChip + emailChip + liBtn + '</div>' +
+      (emailNote ? emailNote : '') +
       '<div class="tc-why">' + (t.why || '') + '</div>' +
       '<button class="tc-fill-btn">Pre-fill Scoring Form &#8595;</button>' +
     '</div>';
   }).join('');
+}
+
+function copyEmailFormat(email){
+  navigator.clipboard.writeText(email).then(function(){ notify('Copied: ' + email); });
 }
 
 function selectTarget(idx){
@@ -3847,7 +3883,8 @@ function selectTarget(idx){
     var formEl = document.getElementById('p-name');
     if(formEl){ formEl.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
   }, 100);
-  notify(t.name + ' pre-filled — add EA data and timing signals, then Calculate Score');
+  var emailHint = t.emailFormat && t.emailFormat.indexOf('unknown') === -1 ? ' · Email: ' + t.emailFormat : '';
+  notify(t.name + ' pre-filled' + emailHint + ' — add EA data and timing signals, then Calculate Score');
 }
 </script>
 </body>
