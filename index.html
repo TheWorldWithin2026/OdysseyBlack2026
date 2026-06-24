@@ -390,6 +390,137 @@ textarea{resize:vertical;min-height:75px;}
   .wrap{padding:20px 16px 60px;}
   .pipe-inner{grid-template-columns:repeat(8,minmax(180px,1fr));}
 }
+
+/* ── COMMAND CENTER ── */
+.command-center{background:rgba(255,255,255,0.02);border-bottom:1px solid var(--border);padding:11px 36px;display:flex;align-items:center;gap:0;flex-wrap:wrap;}
+.cc-stat{display:flex;flex-direction:column;align-items:center;padding:6px 20px;border-right:1px solid var(--border);}
+.cc-stat:last-of-type{border-right:none;}
+.cc-num{font-family:var(--ff-display);font-size:var(--fs-2xl);font-weight:300;line-height:1.1;}
+.cc-label{font-size:10px;letter-spacing:var(--ls-widest);text-transform:uppercase;color:var(--muted);margin-top:2px;font-weight:600;}
+.cc-gap-wrap{display:flex;flex-direction:column;align-items:center;padding:6px 20px;border-right:1px solid var(--border);}
+.cc-gap-inner{display:flex;align-items:center;gap:10px;}
+.cc-gap-bar{width:72px;height:4px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden;margin-top:5px;}
+.cc-gap-fill{height:4px;border-radius:3px;transition:width 0.5s ease;}
+.cc-actions{flex:1;display:flex;gap:8px;align-items:center;justify-content:flex-end;padding-left:20px;}
+.cc-badge-urgent{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;background:rgba(231,76,60,0.08);border:1px solid rgba(231,76,60,0.3);color:#e74c3c;font-size:var(--fs-xs);letter-spacing:var(--ls-wide);text-transform:uppercase;font-weight:700;border-radius:1px;cursor:pointer;transition:background 0.2s;}
+.cc-badge-urgent:hover{background:rgba(231,76,60,0.14);}
+.cc-badge-ok{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;background:rgba(46,204,113,0.06);border:1px solid rgba(46,204,113,0.25);color:var(--green);font-size:var(--fs-xs);letter-spacing:var(--ls-wide);text-transform:uppercase;font-weight:700;border-radius:1px;}
+.cc-briefing-bar{display:none;background:rgba(201,168,76,0.04);border-bottom:1px solid rgba(201,168,76,0.15);padding:14px 36px;}
+.cc-briefing-text{flex:1;font-size:var(--fs-sm);color:var(--text);line-height:1.75;white-space:pre-wrap;}
+
+/* ── TODAY'S ACTION QUEUE ── */
+.action-queue{margin-bottom:24px;}
+.aq-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.aq-title{font-size:var(--fs-xs);letter-spacing:var(--ls-widest);text-transform:uppercase;color:var(--gold);font-weight:700;}
+.aq-count{font-size:var(--fs-xs);color:var(--muted);}
+.aq-items{display:flex;flex-direction:column;gap:7px;}
+.aq-item{display:flex;align-items:flex-start;gap:12px;padding:11px 14px;background:var(--card);border:1px solid var(--border);border-radius:1px;border-left:3px solid var(--border);}
+.aq-item.aq-critical{border-left-color:#e74c3c;}
+.aq-item.aq-high{border-left-color:var(--gold);}
+.aq-item.aq-medium{border-left-color:var(--yellow);}
+.aq-item.aq-low{border-left-color:var(--blue);}
+.aq-icon{font-size:15px;flex-shrink:0;margin-top:1px;}
+.aq-body{flex:1;min-width:0;}
+.aq-prospect{font-size:var(--fs-base);font-weight:600;color:var(--text);margin-bottom:1px;}
+.aq-detail{font-size:var(--fs-sm);color:var(--muted);line-height:var(--lh-snug);}
+.aq-btn{flex-shrink:0;background:none;border:1px solid var(--border);color:var(--muted);padding:5px 11px;font-size:var(--fs-xs);letter-spacing:var(--ls-wide);text-transform:uppercase;cursor:pointer;font-family:var(--ff-ui);border-radius:1px;font-weight:600;white-space:nowrap;transition:all 0.15s;}
+.aq-btn:hover{border-color:var(--gold);color:var(--gold);}
+.aq-empty{text-align:center;color:var(--muted);font-size:var(--fs-sm);padding:18px;background:var(--card);border:1px solid var(--border);border-radius:1px;line-height:var(--lh-relaxed);}
+
+/* ── TRIAL RIDE ENGINE ── */
+.trial-suite{margin-top:9px;background:rgba(155,89,182,0.05);border:1px solid rgba(155,89,182,0.22);border-radius:1px;overflow:hidden;}
+.trial-suite-hd{padding:7px 12px;background:rgba(155,89,182,0.1);display:flex;align-items:center;justify-content:space-between;}
+.trial-suite-title{font-size:var(--fs-xs);letter-spacing:var(--ls-wide);text-transform:uppercase;color:#9b59b6;font-weight:700;}
+.trial-suite-sub{font-size:var(--fs-xs);color:#9b59b6;opacity:0.7;}
+.trial-suite-btns{display:flex;gap:5px;padding:8px 10px;flex-wrap:wrap;}
+.ts-btn{background:none;border:1px solid rgba(155,89,182,0.3);color:#9b59b6;padding:5px 10px;font-size:var(--fs-xs);letter-spacing:0.03em;text-transform:uppercase;cursor:pointer;font-family:var(--ff-ui);border-radius:1px;font-weight:600;transition:all 0.15s;display:inline-flex;align-items:center;gap:4px;}
+.ts-btn:hover{background:rgba(155,89,182,0.1);border-color:#9b59b6;}
+.ts-btn-gold{border-color:rgba(201,168,76,0.35);color:var(--gold);}
+.ts-btn-gold:hover{background:var(--gold-dim);border-color:var(--gold);}
+.ts-out{display:none;padding:10px 12px;font-size:var(--fs-sm);color:var(--text);white-space:pre-wrap;line-height:var(--lh-relaxed);border-top:1px solid rgba(155,89,182,0.18);background:rgba(0,0,0,0.12);position:relative;}
+.ts-out.show{display:block;}
+.ts-copy-btn{position:absolute;top:7px;right:8px;background:none;border:1px solid var(--border);color:var(--muted);padding:3px 9px;font-size:var(--fs-xs);cursor:pointer;font-family:var(--ff-ui);border-radius:1px;text-transform:uppercase;font-weight:500;}
+.ts-copy-btn:hover{border-color:var(--gold);color:var(--gold);}
+
+/* ── EDIT MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.78);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px;}
+.modal-overlay.open{display:flex;}
+.modal-box{background:var(--card);border:1px solid rgba(201,168,76,0.25);border-radius:2px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;}
+.modal-hd{display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid var(--border);}
+.modal-title{font-family:var(--ff-display);font-size:var(--fs-xl);font-weight:400;}
+.modal-x{background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;padding:0;line-height:1;transition:color 0.15s;}
+.modal-x:hover{color:var(--text);}
+.modal-bd{padding:20px 22px;}
+.modal-ft{padding:12px 22px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end;}
+
+/* ── MESSAGE HISTORY ── */
+.msg-history{margin-top:8px;padding-top:8px;border-top:1px solid rgba(30,30,30,0.8);}
+.msg-history-tog{font-size:var(--fs-xs);color:var(--muted);cursor:pointer;letter-spacing:var(--ls-wide);text-transform:uppercase;font-weight:500;background:none;border:none;font-family:var(--ff-ui);padding:0;transition:color 0.15s;}
+.msg-history-tog:hover{color:var(--gold);}
+.msg-list{display:none;margin-top:6px;}
+.msg-list.open{display:block;}
+.msg-row{font-size:var(--fs-xs);color:var(--muted);padding:5px 0;border-bottom:1px solid rgba(30,30,30,0.6);display:flex;align-items:center;gap:7px;}
+.msg-row:last-child{border-bottom:none;}
+.msg-ch{color:var(--gold);font-weight:700;text-transform:uppercase;letter-spacing:0.05em;flex-shrink:0;}
+.msg-date{opacity:0.65;flex-shrink:0;}
+.msg-preview{flex:1;opacity:0.7;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.msg-outcome{background:none;border:1px solid var(--border);color:var(--muted);padding:2px 5px;font-size:10px;font-family:var(--ff-ui);border-radius:1px;cursor:pointer;flex-shrink:0;}
+.msg-outcome.sent{color:var(--yellow);border-color:rgba(241,196,15,0.3);}
+.msg-outcome.replied{color:var(--green);border-color:rgba(46,204,113,0.3);}
+.msg-outcome.converted{color:var(--gold);border-color:rgba(201,168,76,0.3);}
+
+/* ── REFERRAL ENGINE ── */
+.referral-section{margin-top:8px;padding-top:8px;border-top:1px solid rgba(46,204,113,0.15);}
+.referral-meta{font-size:var(--fs-xs);color:var(--muted);margin-bottom:6px;line-height:1.6;}
+.referral-meta span{color:var(--green);font-weight:600;}
+.ref-out{display:none;font-size:var(--fs-sm);background:rgba(46,204,113,0.05);border:1px solid rgba(46,204,113,0.2);padding:9px 11px;margin-top:7px;border-radius:1px;white-space:pre-wrap;color:var(--text);line-height:var(--lh-relaxed);}
+.ref-out.show{display:block;}
+
+/* ── REVENUE INTELLIGENCE LABELS ── */
+.rev-on-track{color:var(--gold);}
+.rev-close{color:var(--yellow);}
+.rev-behind{color:#e74c3c;}
+
+@media(max-width:640px){
+  .command-center{padding:10px 16px;gap:0;}
+  .cc-stat,.cc-gap-wrap{padding:6px 12px;}
+  .aq-item{flex-direction:column;gap:8px;}
+  .aq-btn{align-self:flex-start;}
+  .trial-suite-btns{flex-direction:column;}
+}
+
+/* ── COMPANY TARGET FINDER ── */
+.target-finder{background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.2);border-radius:2px;margin-bottom:28px;overflow:hidden;}
+.target-finder-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;cursor:pointer;transition:background 0.2s;}
+.target-finder-header:hover{background:rgba(201,168,76,0.07);}
+.target-finder-title{font-size:var(--fs-xs);letter-spacing:var(--ls-widest);text-transform:uppercase;color:var(--gold);font-weight:700;}
+.target-finder-sub{font-size:var(--fs-sm);color:var(--muted);margin-top:3px;}
+.tf-arrow{font-size:10px;color:var(--gold);transition:transform 0.25s;margin-left:12px;flex-shrink:0;}
+.tf-arrow.open{transform:rotate(180deg);}
+.target-finder-body{display:none;padding:0 20px 22px;border-top:1px solid rgba(201,168,76,0.15);}
+.target-finder-body.open{display:block;}
+.tf-search-row{display:flex;gap:10px;margin-top:16px;margin-bottom:6px;align-items:flex-end;}
+.tf-search-row input{flex:1;}
+.tf-hint{font-size:var(--fs-xs);color:var(--muted);margin-bottom:16px;opacity:0.8;}
+.target-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px;}
+.target-card{background:var(--card);border:1px solid var(--border);padding:16px;border-radius:1px;cursor:pointer;transition:all 0.2s;position:relative;}
+.target-card:hover{border-color:rgba(201,168,76,0.5);background:rgba(201,168,76,0.04);}
+.target-card.selected{border-color:var(--gold);background:rgba(201,168,76,0.08);}
+.tc-name{font-family:var(--ff-display);font-size:var(--fs-lg);font-weight:500;margin-bottom:3px;line-height:var(--lh-tight);}
+.tc-title{font-size:var(--fs-xs);color:var(--muted);margin-bottom:10px;line-height:var(--lh-snug);letter-spacing:0.01em;}
+.tc-badges{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:9px;}
+.tc-badge{font-size:var(--fs-xs);letter-spacing:var(--ls-wide);text-transform:uppercase;padding:2px 8px;border-radius:1px;font-weight:600;}
+.tcb-heavy{background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.3);color:var(--gold);}
+.tcb-moderate{background:rgba(241,196,15,0.1);border:1px solid rgba(241,196,15,0.3);color:var(--yellow);}
+.tcb-light{background:rgba(122,112,96,0.1);border:1px solid var(--border);color:var(--muted);}
+.tcb-atl{background:rgba(46,204,113,0.08);border:1px solid rgba(46,204,113,0.25);color:var(--green);}
+.tc-why{font-size:var(--fs-xs);color:var(--muted);line-height:var(--lh-relaxed);margin-bottom:11px;}
+.tc-fill-btn{width:100%;background:var(--gold);color:var(--black);border:none;padding:9px;font-size:var(--fs-xs);letter-spacing:var(--ls-wider);text-transform:uppercase;font-family:var(--ff-ui);font-weight:700;cursor:pointer;border-radius:1px;transition:opacity 0.15s;}
+.tc-fill-btn:hover{opacity:0.85;}
+.tf-status{font-size:var(--fs-sm);color:var(--muted);padding:8px 0 2px;}
+.tf-error{font-size:var(--fs-sm);color:#e74c3c;padding:8px 0 2px;}
+.tf-verify-note{font-size:var(--fs-xs);color:rgba(201,168,76,0.7);margin-top:10px;padding:8px 12px;border:1px solid rgba(201,168,76,0.2);border-radius:1px;background:rgba(201,168,76,0.03);}
+@media(max-width:640px){.target-cards{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
@@ -397,6 +528,50 @@ textarea{resize:vertical;min-height:75px;}
   <div><div class="logo-text">Odyssey Black</div><div class="logo-sub">Executive Acquisition Suite</div></div>
   <div class="badge">Atlanta &middot; Premium Ground</div>
 </header>
+
+<!-- COMMAND CENTER -->
+<div class="command-center" id="command-center">
+  <div class="cc-stat">
+    <div class="cc-num" id="cc-mrr" style="color:var(--gold);">$0</div>
+    <div class="cc-label">Current MRR</div>
+  </div>
+  <div class="cc-gap-wrap">
+    <div class="cc-gap-inner">
+      <div>
+        <div class="cc-num" id="cc-gap" style="color:#e74c3c;">$9K</div>
+        <div class="cc-label">To Target</div>
+      </div>
+      <div>
+        <div class="cc-gap-bar"><div class="cc-gap-fill" id="cc-gap-fill" style="width:0%;background:#e74c3c;"></div></div>
+        <div style="font-size:10px;letter-spacing:0.06em;text-transform:uppercase;font-weight:600;margin-top:3px;" id="cc-gap-pct" class="rev-behind">0% of $9K</div>
+      </div>
+    </div>
+  </div>
+  <div class="cc-stat">
+    <div class="cc-num" id="cc-pipe-val" style="color:var(--blue);">$0</div>
+    <div class="cc-label">Pipeline Value</div>
+  </div>
+  <div class="cc-stat">
+    <div class="cc-num" id="cc-high-conv" style="color:var(--green);">0</div>
+    <div class="cc-label">High Conv</div>
+  </div>
+  <div class="cc-stat" style="border-right:none;">
+    <div class="cc-num" id="cc-urgent-num" style="color:var(--muted);">0</div>
+    <div class="cc-label">Urgent Today</div>
+  </div>
+  <div class="cc-actions">
+    <div id="cc-status"></div>
+    <button class="btn btn-ghost" style="padding:6px 14px;font-size:var(--fs-xs);" onclick="document.querySelectorAll('.tab')[2].click()">Pipeline</button>
+    <button class="btn btn-outline" style="padding:6px 14px;font-size:var(--fs-xs);" onclick="generateDailyBriefingCC()">Today&#x27;s Briefing <div class="spin" id="sp-cc" style="width:11px;height:11px;border-width:1.5px;"></div></button>
+  </div>
+</div>
+<div class="cc-briefing-bar" id="cc-briefing-bar">
+  <div style="display:flex;align-items:flex-start;gap:14px;">
+    <div class="cc-briefing-text" id="cc-briefing-text"></div>
+    <button onclick="document.getElementById('cc-briefing-bar').style.display='none'" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:20px;flex-shrink:0;margin-top:-2px;">&times;</button>
+  </div>
+</div>
+
 <div class="wrap">
   <div class="tabs">
     <button class="tab active" onclick="switchTab('prospect',this)">Prospect Builder</button>
@@ -412,6 +587,28 @@ textarea{resize:vertical;min-height:75px;}
 
   <!-- TAB 1: PROSPECT BUILDER -->
   <div class="panel active" id="panel-prospect">
+
+    <!-- COMPANY TARGET FINDER -->
+    <div class="target-finder">
+      <div class="target-finder-header" onclick="toggleTargetFinder()">
+        <div>
+          <div class="target-finder-title">&#9654; Find Executives at a Company</div>
+          <div class="target-finder-sub">Type any company name — get C-suite targets ready to score in one click</div>
+        </div>
+        <div class="tf-arrow" id="tf-arrow">&#9660;</div>
+      </div>
+      <div class="target-finder-body" id="tf-body">
+        <div class="tf-search-row">
+          <input type="text" id="tf-company" placeholder="e.g. Delta Air Lines, NCR Voyix, Truist Financial, Coca-Cola..." onkeydown="if(event.key==='Enter')findCompanyTargets()">
+          <button class="btn btn-gold" onclick="findCompanyTargets()">Find Targets <div class="spin" id="sp-tf"></div></button>
+        </div>
+        <div class="tf-hint">Works best with Fortune 500 and major Atlanta mid-market companies. Click any card to pre-fill the scoring form below.</div>
+        <div id="tf-status" class="tf-status" style="display:none;"></div>
+        <div class="target-cards" id="tf-cards" style="display:none;"></div>
+        <div class="tf-verify-note" id="tf-verify" style="display:none;">&#9432; AI-generated executive data. Always verify names and titles on LinkedIn or the company website before outreach.</div>
+      </div>
+    </div>
+
     <div class="sec-tag">Step 01</div>
     <div class="sec-h">Score and Qualify a Prospect</div>
     <div class="sec-d">Enter executive details, select timing signals, and add EA intelligence for a complete acquisition score.</div>
@@ -783,6 +980,15 @@ textarea{resize:vertical;min-height:75px;}
     <div class="sec-tag">Your Prospects</div>
     <div class="sec-h">Acquisition Pipeline</div>
     <div class="sec-d">8-stage pipeline tracking real business progression. Click a card to advance. Green border = active buying moment.</div>
+
+    <!-- Today's Action Queue -->
+    <div class="action-queue" id="action-queue">
+      <div class="aq-header">
+        <div class="aq-title">&#9889; Today&#x27;s Action Queue</div>
+        <div class="aq-count" id="aq-count"></div>
+      </div>
+      <div class="aq-items" id="aq-items"></div>
+    </div>
 
     <!-- Event Mode Bar -->
     <div class="event-mode-bar" id="event-mode-bar">
@@ -1271,7 +1477,7 @@ textarea{resize:vertical;min-height:75px;}
         <div class="market-prospect-form">
           <div class="sec-tag" style="margin-bottom:12px;">Score an Event Prospect</div>
           <div class="g2">
-            <div><label>Company / Venue Name</label><input type="text" id="ev-name" placeholder="e.g. Atlanta Event Management Group"></div>
+            <div><label>Company / Venue Name</label><input type="text" id="ev-mkt-name" placeholder="e.g. Atlanta Event Management Group"></div>
             <div><label>Business Type</label><select id="ev-type"><option value="corporate-planner">Corporate Event Planner</option><option value="venue">Event Venue</option><option value="luxury-wedding">Luxury Wedding Planner</option><option value="dmc">DMC / Destination Company</option><option value="entertainment">Entertainment / Talent Agency</option></select></div>
           </div>
           <div class="g2">
@@ -1374,6 +1580,69 @@ textarea{resize:vertical;min-height:75px;}
   </div>
 
 </div>
+<!-- EDIT PROSPECT MODAL -->
+<div class="modal-overlay" id="edit-modal" onclick="if(event.target===this)closeEditModal()">
+  <div class="modal-box">
+    <div class="modal-hd">
+      <div class="modal-title">Edit Prospect</div>
+      <button class="modal-x" onclick="closeEditModal()">&times;</button>
+    </div>
+    <div class="modal-bd">
+      <input type="hidden" id="edit-pid">
+      <div class="g2">
+        <div><label>Name</label><input type="text" id="edit-name" placeholder="Full name"></div>
+        <div><label>Title</label><input type="text" id="edit-title" placeholder="Job title"></div>
+      </div>
+      <div class="g2">
+        <div><label>Company</label><input type="text" id="edit-company" placeholder="Company name"></div>
+        <div><label>Est. Monthly Value ($)</label><input type="number" id="edit-value" placeholder="e.g. 3200" min="0"></div>
+      </div>
+      <div class="g2">
+        <div><label>Travel Frequency</label>
+          <select id="edit-travel">
+            <option value="heavy">Heavy — weekly flights</option>
+            <option value="moderate">Moderate — 2-3x per month</option>
+            <option value="light">Light — occasional</option>
+          </select>
+        </div>
+        <div><label>Pipeline Stage</label>
+          <select id="edit-stage">
+            <option value="identified">Identified</option>
+            <option value="contacted">Contacted</option>
+            <option value="assistant">Asst Engaged</option>
+            <option value="trial-sched">Trial Scheduled</option>
+            <option value="trial-done">Trial Done</option>
+            <option value="active">Active Client</option>
+            <option value="recurring">Recurring</option>
+            <option value="corporate">Corporate Account</option>
+          </select>
+        </div>
+      </div>
+      <div class="g2">
+        <div><label>Competitor They Currently Use</label>
+          <select id="edit-competitor">
+            <option value="">Unknown / not mentioned</option>
+            <option value="uber-black">Uber Black</option>
+            <option value="lyft-lux">Lyft Lux</option>
+            <option value="carey">Carey International</option>
+            <option value="execucar">ExecuCar</option>
+            <option value="empire-cls">Empire CLS</option>
+            <option value="boston-coach">Boston Coach / Groundlink</option>
+            <option value="corporate-fleet">Corporate fleet / own driver</option>
+            <option value="other">Other car service</option>
+          </select>
+        </div>
+        <div><label>Referral Source (if applicable)</label><input type="text" id="edit-ref-source" placeholder="e.g. John Smith at Delta"></div>
+      </div>
+      <div class="g1"><label>Notes</label><textarea id="edit-notes" style="min-height:60px;" placeholder="Any additional intel, preferences, or context..."></textarea></div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-ghost" onclick="closeEditModal()">Cancel</button>
+      <button class="btn btn-gold" onclick="saveEditProspect()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
 <div class="notif" id="notif"></div>
 
 <script>
@@ -1608,6 +1877,7 @@ async function generateOutreach(){
   try{
     out.textContent=await callAI(['You write outreach for Odyssey Black VIP Transportation in Atlanta, premium black car service for Fortune 500 executives.','Differentiators: reliability, discretion, professional chauffeurs, flight tracking, last-minute availability, recurring route ownership.','Write '+chL[ch]+' for:','Name: '+name,'Role: '+title,'Tone: '+tL[tone],travelHint||'',clientHint||'',convHint||'','Verified Research: '+(research||'None available'),'Additional Context: '+(ctx||'None'),'RULES: Only reference facts from Verified Research. Do NOT invent details not in research.','If travel route data is available, reference it specifically as a hook (e.g. Mon/Thu ATL-NYC stands out as a predictable route worth owning).','If client type is High-Frequency Traveler, lead with standing reservation concept. If Corporate Account, lead with company-wide reliability.','Do not sound like a mass email. Include a soft call to action.',ch==='email'?'Include a compelling subject line.':''],1000);
     box.classList.add('show');
+    if(pipePros){ saveMessage(pipePros.id, pipePros.name, ch, out.textContent); }
   }catch(e){out.textContent='Error: '+e.message;box.classList.add('show');}
   sp.classList.remove('on');
 }
@@ -1638,6 +1908,7 @@ async function genEAOutreach(){
   try{
     out.textContent=await callAI(['You write outreach for Odyssey Black VIP Transportation in Atlanta, a professional black car service for Fortune 500 executives.','You are writing to an executive assistant or office coordinator. Treat them as a VIP, not a gatekeeper.','Assistant Name: '+aName,'Assistant Role: '+rL[aRole],'Executive they support: '+execInfo,eaRouteHint||'',eaPatternHint||'','Assistant Intelligence Profile: '+intelStr,'Channel: Write as a '+commLabel,'TONE GUIDANCE based on their profile: '+toneGuide,'CONTACT RECOMMENDATION: '+contactRec,'CORE POSITIONING: Odyssey Black eliminates transportation stress — one contact, proactive flight tracking, seamless last-minute changes, one monthly invoice.','RULES: Do not use luxury or prestige language. Focus on making their job easier.','If route data available, reference a specific standing booking proposal.','Keep under 180 words. Include a subject line.','End with a specific low-friction ask appropriate for their personality type.'],1000);
     box.classList.add('show');
+    if(pipePros3){ saveMessage(pipePros3.id, pipePros3.name, 'ea-outreach', out.textContent); }
   }catch(e){out.textContent='Error: '+e.message;box.classList.add('show');}
   sp.classList.remove('on');
 }
@@ -1681,6 +1952,7 @@ function addToPipeline(){
   pipeline.push(saved);
   localStorage.setItem('ob-pipeline',JSON.stringify(pipeline));
   notify(currentP.name+' added — est. $'+saved.monthlyValue.toLocaleString()+'/mo');
+  renderCommandCenter();
 }
 
 function renderPipeline(){
@@ -1719,7 +1991,12 @@ function renderPipeline(){
         '<select class="pipe-action-btn" style="padding:3px 6px;font-size:var(--fs-xs);cursor:pointer;" onchange="event.stopPropagation();setResponseStatus('+p.id+',this.value)"><option value="none"'+(p.responseStatus==='none'?' selected':'')+'>No response</option><option value="positive"'+(p.responseStatus==='positive'?' selected':'')+'>Responded +</option><option value="pending"'+(p.responseStatus==='pending'?' selected':'')+'>Waiting</option><option value="negative"'+(p.responseStatus==='negative'?' selected':'')+'>Declined</option></select>'+
         '<button class="pipe-action-btn" onclick="event.stopPropagation();setMonthlyValue('+p.id+')">$Value</button>'+
         '<button class="pipe-action-btn" onclick="event.stopPropagation();moveStage('+p.id+')">Advance &rarr;</button>'+
+        '<button class="pipe-action-btn" onclick="event.stopPropagation();openEditModal('+p.id+')" style="color:var(--blue);border-color:rgba(52,152,219,0.35);">Edit</button>'+
+        '<button class="pipe-action-btn" onclick="event.stopPropagation();deleteProspect('+p.id+')" style="color:#e74c3c;border-color:rgba(231,76,60,0.3);">Remove</button>'+
         '</div>'+
+        getTrialSuiteHTML(p)+
+        getReferralHTML(p)+
+        getMsgHistoryHTML(p)+
         '</div>';
     }).join('');
     document.getElementById('cnt-'+stage).textContent=cols[stage].length;
@@ -1733,6 +2010,8 @@ function renderPipeline(){
   var overdueCount=pipeline.filter(function(p){return p.followUp&&p.followUp<today;}).length;
   document.getElementById('st-bm').textContent=overdueCount>0?overdueCount+' overdue':pipeline.filter(function(p){return p.bmScore&&p.bmScore>=7;}).length+' active';
   document.getElementById('pipe-empty').style.display=pipeline.length?'none':'block';
+  renderActionQueue();
+  renderCommandCenter();
 }
 
 function moveStage(id){
@@ -2066,6 +2345,7 @@ async function generateFollowUp(id){
     ],700);
     var outEl=document.getElementById('fu-out-'+id);
     if(outEl){outEl.textContent=msg;outEl.style.display='block';}
+    saveMessage(p.id, p.name, 'follow-up', msg);
   }catch(e){
     var outEl=document.getElementById('fu-out-'+id);
     if(outEl){outEl.textContent='Error: '+e.message;outEl.style.display='block';}
@@ -2610,7 +2890,7 @@ async function generateMedicalOutreach(){
 }
 
 function scoreEvent(){
-  var name=document.getElementById('ev-name').value.trim();
+  var name=document.getElementById('ev-mkt-name').value.trim();
   if(!name){notify('Enter business name');return;}
   var type=document.getElementById('ev-type').value;
   var freq=document.getElementById('ev-freq').value;
@@ -2624,7 +2904,7 @@ function scoreEvent(){
 }
 
 async function generateEventOutreach(){
-  var name=document.getElementById('ev-name').value.trim()||'Atlanta event company';
+  var name=document.getElementById('ev-mkt-name').value.trim()||'Atlanta event company';
   var type=document.getElementById('ev-type').value;
   var freq=document.getElementById('ev-freq').value;
   var clients=document.getElementById('ev-clients').value;
@@ -2916,8 +3196,659 @@ function addAllPlacesToPipeline(){
   notify(hot.length + ' HOT/STRONG prospects ready — use Ride Likelihood Calculator to generate full strategy for each');
 }
 
+// ══════════════════════════════════════════════════════════
+// 1. COMMAND CENTER
+// ══════════════════════════════════════════════════════════
+var MRR_TARGET = 9000;
+
+function renderCommandCenter(){
+  var active = pipeline.filter(function(p){ return p.stage==='active'||p.stage==='recurring'||p.stage==='corporate'; });
+  var mrr = active.reduce(function(s,p){ return s+(p.monthlyValue||0); },0);
+  var pipeVal = pipeline.filter(function(p){ return p.convProb==='High'&&p.stage!=='active'&&p.stage!=='recurring'&&p.stage!=='corporate'; }).reduce(function(s,p){ return s+(p.monthlyValue||0); },0);
+  var highConv = pipeline.filter(function(p){ return p.convProb==='High'&&p.stage!=='active'&&p.stage!=='recurring'&&p.stage!=='corporate'; }).length;
+  var gap = Math.max(0, MRR_TARGET - mrr);
+  var pct = Math.min(100, Math.round((mrr/MRR_TARGET)*100));
+  var today = new Date().toISOString().slice(0,10);
+  var overdueCount = pipeline.filter(function(p){ return p.followUp&&p.followUp<today; }).length;
+  var trialDoneCount = pipeline.filter(function(p){ return p.stage==='trial-done'; }).length;
+  var urgentTotal = overdueCount + trialDoneCount;
+  var gapColor = pct>=100?'var(--gold)':pct>=60?'var(--yellow)':'#e74c3c';
+  var gapClass = pct>=100?'rev-on-track':pct>=60?'rev-close':'rev-behind';
+
+  function setEl(id,val){ var e=document.getElementById(id); if(e)e.textContent=val; }
+  function setStyle(id,prop,val){ var e=document.getElementById(id); if(e)e.style[prop]=val; }
+  function setClass(id,cls){ var e=document.getElementById(id); if(e)e.className=cls; }
+  function setHTML(id,html){ var e=document.getElementById(id); if(e)e.innerHTML=html; }
+
+  setEl('cc-mrr','$'+mrr.toLocaleString());
+  setEl('cc-gap', gap===0?'Target Hit':'$'+gap.toLocaleString());
+  setStyle('cc-gap','color',gapColor);
+  setStyle('cc-gap-fill','width',pct+'%');
+  setStyle('cc-gap-fill','background',gapColor);
+  setEl('cc-gap-pct', pct+'% of $'+MRR_TARGET.toLocaleString());
+  setClass('cc-gap-pct', gapClass);
+  setEl('cc-pipe-val','$'+pipeVal.toLocaleString());
+  setEl('cc-high-conv',highConv);
+  setEl('cc-urgent-num',urgentTotal);
+  setStyle('cc-urgent-num','color',urgentTotal>0?'#e74c3c':'var(--green)');
+
+  var statusEl = document.getElementById('cc-status');
+  if(statusEl){
+    if(urgentTotal>0){
+      statusEl.innerHTML='<div class="cc-badge-urgent" onclick="document.querySelectorAll(\'.tab\')[2].click()">&#9888; '+urgentTotal+' Urgent</div>';
+    } else if(mrr>=MRR_TARGET){
+      statusEl.innerHTML='<div class="cc-badge-ok">&#10003; Target Hit</div>';
+    } else if(pipeline.length>0){
+      statusEl.innerHTML='<div class="cc-badge-ok">&#10003; On Track</div>';
+    } else {
+      statusEl.innerHTML='';
+    }
+  }
+}
+
+async function generateDailyBriefingCC(){
+  var sp=document.getElementById('sp-cc');
+  var bar=document.getElementById('cc-briefing-bar');
+  var txt=document.getElementById('cc-briefing-text');
+  sp.classList.add('on');
+  if(bar) bar.style.display='none';
+  var today=new Date().toISOString().slice(0,10);
+  var dayName=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][new Date().getDay()];
+  var active=pipeline.filter(function(p){return p.stage==='active'||p.stage==='recurring'||p.stage==='corporate';});
+  var mrr=active.reduce(function(s,p){return s+(p.monthlyValue||0);},0);
+  var gap=Math.max(0,MRR_TARGET-mrr);
+  var overdue=pipeline.filter(function(p){return p.followUp&&p.followUp<today;});
+  var trialDone=pipeline.filter(function(p){return p.stage==='trial-done';});
+  var trialSched=pipeline.filter(function(p){return p.stage==='trial-sched';});
+  var highConv=pipeline.filter(function(p){return p.convProb==='High'&&p.stage!=='active'&&p.stage!=='recurring'&&p.stage!=='corporate';});
+  try{
+    var result=await callAI([
+      'You are the strategic advisor for Odyssey Black VIP Transportation in Atlanta — premium black car for Fortune 500 executives.',
+      'Generate a sharp '+dayName+' morning briefing. Today: '+today,
+      'MRR: $'+mrr.toLocaleString()+' | Target: $'+MRR_TARGET.toLocaleString()+' | Gap: $'+gap.toLocaleString(),
+      'Pipeline: '+pipeline.length+' total prospects',
+      'Overdue follow-ups: '+overdue.length+(overdue.length?'  — '+overdue.slice(0,3).map(function(p){return p.name;}).join(', '):''),
+      'Trial rides done awaiting close: '+trialDone.length+(trialDone.length?' — '+trialDone.map(function(p){return p.name+' ('+p.company+')';}).join(', '):''),
+      'Trial rides scheduled: '+trialSched.length+(trialSched.length?' — '+trialSched.map(function(p){return p.name;}).join(', '):''),
+      'High conversion not yet active: '+highConv.length+(highConv.length?' — '+highConv.slice(0,3).map(function(p){return p.name+' at '+p.company;}).join(', '):''),
+      '',
+      'Write a tight 5-line morning briefing:',
+      'PRIORITY — the one action that makes the biggest difference today',
+      'CLOSE — who is nearest to revenue and exactly what to do right now',
+      'OUTREACH — who needs a new angle or follow-up today',
+      'TRIAL — any pre-ride prep or post-ride close actions needed',
+      'MOMENTUM — one compounding action to do this week',
+      '',
+      'Be specific with names. Direct. No filler. Under 180 words total.'
+    ],600);
+    if(txt) txt.textContent=result;
+    if(bar) bar.style.display='block';
+  }catch(e){
+    if(txt) txt.textContent='Could not generate briefing: '+e.message;
+    if(bar) bar.style.display='block';
+  }
+  sp.classList.remove('on');
+}
+
+
+// ══════════════════════════════════════════════════════════
+// 2. TODAY'S ACTION QUEUE
+// ══════════════════════════════════════════════════════════
+function renderActionQueue(){
+  var el=document.getElementById('aq-items');
+  var cntEl=document.getElementById('aq-count');
+  if(!el){return;}
+  var today=new Date().toISOString().slice(0,10);
+  var actions=[];
+
+  // CRITICAL: Trial Done → close now
+  pipeline.filter(function(p){return p.stage==='trial-done';}).forEach(function(p){
+    actions.push({cls:'aq-critical',icon:'⭐',name:p.name,co:p.company,detail:'Trial complete — 48-hr close window. Propose standing reservation now.',id:p.id,label:'Post-Ride Close',fn:'generateTrialPostRide('+p.id+')'});
+  });
+
+  // HIGH: Overdue follow-ups
+  pipeline.filter(function(p){return p.followUp&&p.followUp<today&&p.stage!=='active'&&p.stage!=='recurring'&&p.stage!=='corporate';}).slice(0,3).forEach(function(p){
+    var daysOver=Math.ceil((new Date()-new Date(p.followUp))/86400000);
+    actions.push({cls:'aq-high',icon:'⚠️',name:p.name,co:p.company,detail:'Follow-up overdue '+daysOver+' day'+(daysOver!==1?'s':'')+'. Stage: '+getStageLabel(p.stage)+'. Last response: '+(RESPONSE_LABELS[p.responseStatus||'none']||'None'),id:p.id,label:'Generate Follow-up',fn:'generateFollowUp('+p.id+')'});
+  });
+
+  // HIGH: Trial Scheduled → confirm
+  pipeline.filter(function(p){return p.stage==='trial-sched';}).forEach(function(p){
+    actions.push({cls:'aq-high',icon:'🚗',name:p.name,co:p.company,detail:'Trial ride scheduled. Send pre-ride confirmation and driver brief before pickup.',id:p.id,label:'Pre-Ride Confirm',fn:'generateTrialPreRide('+p.id+')'});
+  });
+
+  // MEDIUM: High conv stuck 5+ days in Contacted
+  pipeline.filter(function(p){return p.convProb==='High'&&p.stage==='contacted'&&p.lastContact;}).forEach(function(p){
+    var days=Math.floor((new Date()-new Date(p.lastContact))/86400000);
+    if(days>=5){ actions.push({cls:'aq-medium',icon:'💡',name:p.name,co:p.company,detail:days+' days since contact, no movement. High conversion prospect — try EA route or switch channels.',id:p.id,label:'New Angle',fn:'generateFollowUp('+p.id+')'}); }
+  });
+
+  // MEDIUM: Follow-up due today
+  pipeline.filter(function(p){return p.followUp===today&&p.stage!=='active'&&p.stage!=='recurring'&&p.stage!=='corporate';}).forEach(function(p){
+    if(actions.findIndex(function(a){return a.id===p.id;})===-1){
+      actions.push({cls:'aq-medium',icon:'📅',name:p.name,co:p.company,detail:'Follow-up due today. Stage: '+getStageLabel(p.stage)+'.',id:p.id,label:'Generate Follow-up',fn:'generateFollowUp('+p.id+')'});
+    }
+  });
+
+  // LOW: Active clients without referral ask
+  pipeline.filter(function(p){return (p.stage==='active'||p.stage==='recurring')&&!p.referralAskSent;}).slice(0,2).forEach(function(p){
+    if(actions.length<7){ actions.push({cls:'aq-low',icon:'🤝',name:p.name,co:p.company,detail:'Active client — request a referral. Each active client can expand your pipeline.',id:p.id,label:'Referral Ask',fn:'generateReferralAsk('+p.id+')'}); }
+  });
+
+  actions=actions.slice(0,6);
+  if(cntEl) cntEl.textContent=actions.length+' action'+(actions.length!==1?'s':'')+' today';
+
+  if(actions.length===0){
+    el.innerHTML='<div class="aq-empty">&#10003; Queue is clear. Add prospects, set follow-up dates, and schedule trial rides to populate this queue.</div>';
+    return;
+  }
+  el.innerHTML=actions.map(function(a){
+    return '<div class="aq-item '+a.cls+'">'+
+      '<div class="aq-icon">'+a.icon+'</div>'+
+      '<div class="aq-body">'+
+        '<div class="aq-prospect">'+a.name+' <span style="color:var(--muted);font-weight:400;">&middot; '+a.co+'</span></div>'+
+        '<div class="aq-detail">'+a.detail+'</div>'+
+      '</div>'+
+      '<button class="aq-btn" onclick="event.stopPropagation();'+a.fn+'">'+a.label+'</button>'+
+    '</div>';
+  }).join('');
+}
+
+
+// ══════════════════════════════════════════════════════════
+// 3. TRIAL RIDE ENGINE
+// ══════════════════════════════════════════════════════════
+function getTrialSuiteHTML(p){
+  if(p.stage!=='trial-sched'&&p.stage!=='trial-done'){return '';}
+  var isSched=p.stage==='trial-sched';
+  var preBtn=isSched?'<button class="ts-btn" onclick="event.stopPropagation();generateTrialPreRide('+p.id+')" style="display:inline-flex;align-items:center;gap:4px;">📧 Pre-Ride Confirm <div class="spin" id="ts-pre-'+p.id+'" style="width:10px;height:10px;border-width:1.5px;border-color:rgba(155,89,182,0.3);border-top-color:#9b59b6;"></div></button>'+
+    '<button class="ts-btn" onclick="event.stopPropagation();generateTrialDriverBrief('+p.id+')" style="display:inline-flex;align-items:center;gap:4px;">🚗 Driver Brief <div class="spin" id="ts-db-'+p.id+'" style="width:10px;height:10px;border-width:1.5px;border-color:rgba(155,89,182,0.3);border-top-color:#9b59b6;"></div></button>':'';
+  var postBtn=!isSched?'<button class="ts-btn" onclick="event.stopPropagation();generateTrialPostRide('+p.id+')" style="display:inline-flex;align-items:center;gap:4px;">⭐ Post-Ride Close <div class="spin" id="ts-post-'+p.id+'" style="width:10px;height:10px;border-width:1.5px;border-color:rgba(155,89,182,0.3);border-top-color:#9b59b6;"></div></button>':'';
+  var propBtn='<button class="ts-btn ts-btn-gold" onclick="event.stopPropagation();generateStandingProposal('+p.id+')" style="display:inline-flex;align-items:center;gap:4px;">📋 Standing Proposal <div class="spin" id="ts-sp-'+p.id+'" style="width:10px;height:10px;border-width:1.5px;"></div></button>';
+  return '<div class="trial-suite">'+
+    '<div class="trial-suite-hd">'+
+      '<span class="trial-suite-title">'+(isSched?'⚡ Trial Ride Suite':'⭐ Close The Deal Suite')+'</span>'+
+      '<span class="trial-suite-sub">'+(isSched?'Confirm · Brief · Propose':'Post-ride close + standing proposal')+'</span>'+
+    '</div>'+
+    '<div class="trial-suite-btns">'+preBtn+postBtn+propBtn+'</div>'+
+    '<div class="ts-out" id="ts-out-'+p.id+'"><button class="ts-copy-btn" onclick="event.stopPropagation();copyTsOut('+p.id+')">Copy</button><div id="ts-txt-'+p.id+'"></div></div>'+
+  '</div>';
+}
+
+function copyTsOut(id){
+  var el=document.getElementById('ts-txt-'+id);
+  if(el){navigator.clipboard.writeText(el.textContent).then(function(){notify('Copied');});}
+}
+
+async function generateTrialPreRide(id){
+  var p=pipeline.find(function(x){return x.id===id;}); if(!p){return;}
+  var sp=document.getElementById('ts-pre-'+id);
+  var box=document.getElementById('ts-out-'+id);
+  var txt=document.getElementById('ts-txt-'+id);
+  if(sp)sp.classList.add('on');
+  if(txt)txt.textContent='Generating...';
+  if(box)box.classList.add('show');
+  var td=p.travelData||{};
+  try{
+    var result=await callAI([
+      'You write executive communications for Odyssey Black VIP Transportation in Atlanta.',
+      'Executive: '+p.name+', '+p.title+' at '+p.company,
+      'Trial ride SCHEDULED. Generate pre-ride communication.',
+      'Route: '+(td.route1||'To be confirmed')+' | Airport: '+(td.airport||'ATL')+' | Party: '+(td.companions||'solo'),
+      '',
+      'Generate TWO items:',
+      '',
+      '1. PRE-RIDE CONFIRMATION EMAIL — send 24 hours before',
+      'Confirm pickup details. Driver will contact morning-of. Flight tracking active. Your personal cell. Invite questions.',
+      'Subject line required. Under 120 words. Calm, personal, professional.',
+      '',
+      '2. MORNING-OF TEXT — send 2 hours before pickup',
+      'Under 40 words. Driver name, vehicle description, ETA to pickup, your number.',
+      '',
+      'No luxury language. Focus entirely on reliability and zero friction.'
+    ],700);
+    if(txt)txt.textContent=result;
+    saveMessage(p.id,p.name,'trial-pre-ride',result);
+  }catch(e){if(txt)txt.textContent='Error: '+e.message;}
+  if(sp)sp.classList.remove('on');
+}
+
+async function generateTrialDriverBrief(id){
+  var p=pipeline.find(function(x){return x.id===id;}); if(!p){return;}
+  var sp=document.getElementById('ts-db-'+id);
+  var box=document.getElementById('ts-out-'+id);
+  var txt=document.getElementById('ts-txt-'+id);
+  if(sp)sp.classList.add('on');
+  if(txt)txt.textContent='Generating...';
+  if(box)box.classList.add('show');
+  var td=p.travelData||{};
+  var eaName=p.ea&&p.ea.active?p.ea.name:'';
+  try{
+    var result=await callAI([
+      'You write driver briefing cards for Odyssey Black VIP Transportation.',
+      'Generate a driver briefing card for this trial ride:',
+      '',
+      'PASSENGER: '+p.name+', '+p.title+' at '+p.company,
+      'TIER: '+getTier(p.score)+' prospect | Conversion probability: '+p.convProb,
+      'ROUTE: '+(td.route1||'Confirm with dispatch'),
+      'TRAVEL PARTY: '+(td.companions==='solo'?'Solo traveler':'Traveling with others'),
+      'EA CONTACT: '+(eaName||'N/A — direct contact'),
+      'NOTES: '+(p.notes||'None on file'),
+      '',
+      'Brief sections:',
+      'WHO THEY ARE — role and significance (2 sentences)',
+      'HOW TO ADDRESS THEM — name and tone guidance',
+      'WHAT TO KNOW — any intel affecting service',
+      'NEVER DO — topics or behaviors to avoid',
+      'THE GOAL — this is a trial ride. What does success look like.',
+      '',
+      'Quick-read format. 2 minutes max. Direct and specific.'
+    ],600);
+    if(txt)txt.textContent=result;
+  }catch(e){if(txt)txt.textContent='Error: '+e.message;}
+  if(sp)sp.classList.remove('on');
+}
+
+async function generateTrialPostRide(id){
+  var p=pipeline.find(function(x){return x.id===id;}); if(!p){return;}
+  var sp=document.getElementById('ts-post-'+id);
+  var box=document.getElementById('ts-out-'+id);
+  var txt=document.getElementById('ts-txt-'+id);
+  if(sp)sp.classList.add('on');
+  if(txt)txt.textContent='Generating...';
+  if(box)box.classList.add('show');
+  var td=p.travelData||{};
+  var ctInfo=p.clientTypeInfo||{type:'Unknown',desc:''};
+  try{
+    var result=await callAI([
+      'You write executive outreach for Odyssey Black VIP Transportation in Atlanta.',
+      'Executive just completed their TRIAL RIDE. Highest-leverage moment — 60-70% convert here.',
+      '',
+      'Executive: '+p.name+', '+p.title+' at '+p.company,
+      'Client Type: '+ctInfo.type+' — '+ctInfo.desc,
+      'Primary Route: '+(td.route1||'Not specified')+' | Pattern: '+(td.pattern||'variable'),
+      '',
+      'Generate TWO post-ride messages:',
+      '',
+      '1. SAME-DAY THANK YOU TEXT — send within 2 hours of drop-off',
+      'Under 50 words. Genuine, specific, not salesy. One soft question about experience.',
+      '',
+      '2. 48-HOUR CLOSE EMAIL — send 2 days later. This is the close.',
+      'Subject line required.',
+      ctInfo.type.includes('High-Freq')?'Propose a SPECIFIC standing slot by name: e.g. "Monday 5:45AM to ATL International — locked in permanently."':'',
+      ctInfo.type.includes('Corporate')?'Propose extending the service to the rest of the leadership team.':'',
+      ctInfo.type.includes('Event')?'Propose handling their next event transportation now.':'',
+      'Under 180 words. Peer tone. One specific ask. Not desperate.',
+      '',
+      'Tone: warm, confident. A professional proposing a business arrangement.'
+    ],900);
+    if(txt)txt.textContent=result;
+    saveMessage(p.id,p.name,'trial-post-ride',result);
+  }catch(e){if(txt)txt.textContent='Error: '+e.message;}
+  if(sp)sp.classList.remove('on');
+}
+
+async function generateStandingProposal(id){
+  var p=pipeline.find(function(x){return x.id===id;}); if(!p){return;}
+  var sp=document.getElementById('ts-sp-'+id);
+  var box=document.getElementById('ts-out-'+id);
+  var txt=document.getElementById('ts-txt-'+id);
+  if(sp)sp.classList.add('on');
+  if(txt)txt.textContent='Generating...';
+  if(box)box.classList.add('show');
+  var td=p.travelData||{};
+  var ctInfo=p.clientTypeInfo||{type:'',desc:''};
+  try{
+    var result=await callAI([
+      'You write formal business proposals for Odyssey Black VIP Transportation in Atlanta.',
+      '',
+      'Generate a STANDING ROUTE PROPOSAL — a concise, persuasive email proposing a standing reservation.',
+      '',
+      'Executive: '+p.name+', '+p.title+' at '+p.company,
+      'Client Type: '+ctInfo.type,
+      'Primary Route: '+(td.route1||'ATL to primary destination')+(td.route2?' and '+td.route2:''),
+      'Travel Pattern: '+(td.pattern||'variable'),
+      'Primary Airport: '+(td.airport||'Hartsfield-Jackson ATL'),
+      'Travel Party: '+(td.companions||'solo'),
+      '',
+      'Proposal requirements:',
+      '1. Reference their specific route and pattern by name — not generic',
+      '2. Propose a specific standing slot tied to their pattern (e.g. "Monday 5:45AM to ATL permanently")',
+      '3. Define standing reservation: same driver, same pickup window, no booking required each trip, monthly invoice',
+      '4. State a realistic monthly value based on their travel frequency',
+      '5. One specific ask: a one-month trial of the standing arrangement',
+      '',
+      'Subject line required. Under 220 words.',
+      'Tone: peer-level business proposal. Specific. Confident. Not salesy.',
+      'NEVER use: luxury, elite, premium, world-class, unparalleled.',
+      'ALWAYS use: ownership, predictability, zero friction, professional consistency.'
+    ],900);
+    if(txt)txt.textContent=result;
+    saveMessage(p.id,p.name,'standing-proposal',result);
+  }catch(e){if(txt)txt.textContent='Error: '+e.message;}
+  if(sp)sp.classList.remove('on');
+}
+
+
+// ══════════════════════════════════════════════════════════
+// 4. PIPELINE EDIT + DELETE
+// ══════════════════════════════════════════════════════════
+function openEditModal(id){
+  var p=pipeline.find(function(x){return x.id===id;}); if(!p){return;}
+  document.getElementById('edit-pid').value=id;
+  document.getElementById('edit-name').value=p.name||'';
+  document.getElementById('edit-title').value=p.title||'';
+  document.getElementById('edit-company').value=p.company||'';
+  document.getElementById('edit-value').value=p.monthlyValue||'';
+  document.getElementById('edit-travel').value=p.travel||'moderate';
+  document.getElementById('edit-stage').value=p.stage||'identified';
+  document.getElementById('edit-competitor').value=p.competitor||'';
+  document.getElementById('edit-ref-source').value=p.referralSource||'';
+  document.getElementById('edit-notes').value=p.notes||'';
+  document.getElementById('edit-modal').classList.add('open');
+}
+
+function closeEditModal(){
+  document.getElementById('edit-modal').classList.remove('open');
+}
+
+function saveEditProspect(){
+  var id=parseInt(document.getElementById('edit-pid').value);
+  var p=pipeline.find(function(x){return x.id===id;}); if(!p){closeEditModal();return;}
+  var nameVal=document.getElementById('edit-name').value.trim();
+  var titleVal=document.getElementById('edit-title').value.trim();
+  var coVal=document.getElementById('edit-company').value.trim();
+  var valNum=parseInt(document.getElementById('edit-value').value)||0;
+  if(nameVal)p.name=nameVal;
+  if(titleVal)p.title=titleVal;
+  if(coVal)p.company=coVal;
+  if(valNum>0)p.monthlyValue=valNum;
+  p.travel=document.getElementById('edit-travel').value;
+  p.stage=document.getElementById('edit-stage').value;
+  p.competitor=document.getElementById('edit-competitor').value;
+  p.referralSource=document.getElementById('edit-ref-source').value.trim();
+  p.notes=document.getElementById('edit-notes').value.trim();
+  p.convProb=calcConvProb(p);
+  localStorage.setItem('ob-pipeline',JSON.stringify(pipeline));
+  closeEditModal();
+  renderPipeline();
+  notify(p.name+' updated');
+}
+
+function deleteProspect(id){
+  var p=pipeline.find(function(x){return x.id===id;}); if(!p){return;}
+  if(!confirm('Remove '+p.name+' from pipeline? This cannot be undone.')){return;}
+  pipeline=pipeline.filter(function(x){return x.id!==id;});
+  localStorage.setItem('ob-pipeline',JSON.stringify(pipeline));
+  renderPipeline();
+  notify(p.name+' removed from pipeline');
+}
+
+
+// ══════════════════════════════════════════════════════════
+// 5. MESSAGE HISTORY
+// ══════════════════════════════════════════════════════════
+var messageHistory=JSON.parse(localStorage.getItem('ob-messages')||'[]');
+
+var MSG_CH_LABELS={
+  'email':'Email','linkedin':'LinkedIn','referral':'Referral','event':'Event',
+  'voicemail':'Voicemail','follow-up':'Follow-up','ea-outreach':'EA',
+  'trial-pre-ride':'Pre-Ride','trial-post-ride':'Post-Ride',
+  'standing-proposal':'Proposal','referral-ask':'Ref Ask','call-script':'Script'
+};
+
+function saveMessage(prospectId,prospectName,channel,content){
+  if(!content||content.length<10){return;}
+  var msg={id:Date.now(),prospectId:prospectId,prospectName:prospectName,channel:channel,
+    date:new Date().toISOString().slice(0,10),
+    preview:(content.substring(0,100).replace(/\n/g,' ')+'...'),
+    outcome:'logged'};
+  messageHistory.push(msg);
+  if(messageHistory.length>300){messageHistory=messageHistory.slice(-300);}
+  localStorage.setItem('ob-messages',JSON.stringify(messageHistory));
+}
+
+function setMsgOutcome(msgId,outcome){
+  var m=messageHistory.find(function(x){return x.id===parseInt(msgId);});
+  if(m){m.outcome=outcome;localStorage.setItem('ob-messages',JSON.stringify(messageHistory));}
+}
+
+function getMsgHistoryHTML(p){
+  var msgs=messageHistory.filter(function(m){return m.prospectId===p.id;});
+  if(msgs.length===0){return '';}
+  var outOpts=function(sel){
+    return [['logged','Logged'],['sent','Sent'],['replied','Got Reply'],['converted','Converted'],['no-response','No Response']].map(function(o){
+      return '<option value="'+o[0]+'"'+(sel===o[0]?' selected':'')+'>'+o[1]+'</option>';
+    }).join('');
+  };
+  var rows=msgs.slice(-5).reverse().map(function(m){
+    var cls=m.outcome==='sent'?'sent':m.outcome==='replied'?'replied':m.outcome==='converted'?'converted':'';
+    return '<div class="msg-row">'+
+      '<span class="msg-ch">'+(MSG_CH_LABELS[m.channel]||m.channel)+'</span>'+
+      '<span class="msg-date">'+m.date+'</span>'+
+      '<span class="msg-preview">'+m.preview+'</span>'+
+      '<select class="msg-outcome '+cls+'" onchange="event.stopPropagation();setMsgOutcome('+m.id+',this.value)">'+outOpts(m.outcome)+'</select>'+
+    '</div>';
+  }).join('');
+  return '<div class="msg-history">'+
+    '<button class="msg-history-tog" onclick="event.stopPropagation();toggleMsgList(this)">&#9654; '+msgs.length+' message'+(msgs.length!==1?'s':'')+' logged</button>'+
+    '<div class="msg-list">'+rows+'</div>'+
+  '</div>';
+}
+
+function toggleMsgList(btn){
+  var list=btn.nextElementSibling;
+  if(list){
+    var open=list.classList.toggle('open');
+    btn.textContent=(open?'▼':'▶')+' '+btn.textContent.replace(/^[▶▼]\s*/,'');
+  }
+}
+
+
+// ══════════════════════════════════════════════════════════
+// 6. REFERRAL ENGINE
+// ══════════════════════════════════════════════════════════
+var COMP_LABELS={'uber-black':'Uber Black','lyft-lux':'Lyft Lux','carey':'Carey Intl','execucar':'ExecuCar','empire-cls':'Empire CLS','boston-coach':'Boston Coach','corporate-fleet':'Corporate fleet','other':'Other service'};
+
+function getReferralHTML(p){
+  if(p.stage!=='active'&&p.stage!=='recurring'&&p.stage!=='corporate'){return '';}
+  var src=p.referralSource?'<div class="referral-meta">&#8599; Referred by: <span>'+p.referralSource+'</span></div>':'';
+  var comp=p.competitor&&COMP_LABELS[p.competitor]?'<div class="referral-meta">Was using: <span style="color:var(--muted);">'+COMP_LABELS[p.competitor]+'</span></div>':'';
+  var askBtn='<button class="pipe-action-btn" onclick="event.stopPropagation();generateReferralAsk('+p.id+')" style="color:var(--green);border-color:rgba(46,204,113,0.35);display:inline-flex;align-items:center;gap:4px;">'+(p.referralAskSent?'&#10003; Ref Sent':'🤝 Referral Ask')+'<div class="spin" id="ref-sp-'+p.id+'" style="width:10px;height:10px;border-width:1.5px;border-color:rgba(46,204,113,0.2);border-top-color:var(--green);"></div></button>';
+  return '<div class="referral-section">'+src+comp+
+    '<div style="margin-bottom:4px;">'+askBtn+'</div>'+
+    '<div class="ref-out" id="ref-out-'+p.id+'"></div>'+
+  '</div>';
+}
+
+async function generateReferralAsk(id){
+  var p=pipeline.find(function(x){return x.id===id;}); if(!p){return;}
+  var sp=document.getElementById('ref-sp-'+id);
+  var out=document.getElementById('ref-out-'+id);
+  if(sp)sp.classList.add('on');
+  if(out){out.textContent='Generating...';out.classList.add('show');}
+  try{
+    var result=await callAI([
+      'You write referral ask messages for Odyssey Black VIP Transportation in Atlanta.',
+      'Client: '+p.name+', '+p.title+' at '+p.company,
+      'Active client. Goal: ask them to refer a colleague who also travels frequently.',
+      'Client type: '+(p.clientType||'unknown'),
+      '',
+      'Generate TWO referral ask messages:',
+      '',
+      '1. TEXT VERSION — under 60 words',
+      'Casual, genuine. Feels like extending a service, not asking a favor.',
+      'Hook: "Who else on your team has the same travel headache you had before we started working together?"',
+      '',
+      '2. EMAIL VERSION — under 100 words, subject line included',
+      'More formal but still warm. Mention a complimentary ride credit for referred bookings.',
+      '',
+      'SPECIFIC HOOK: "Who is the one executive at '+p.company+' whose travel is still unorganized?"',
+      '',
+      'Tone: grateful, peer-level, never desperate. This is an extension of great service.'
+    ],600);
+    if(out)out.textContent=result;
+    saveMessage(p.id,p.name,'referral-ask',result);
+    p.referralAskSent=true;
+    localStorage.setItem('ob-pipeline',JSON.stringify(pipeline));
+    renderPipeline();
+  }catch(e){if(out)out.textContent='Error: '+e.message;}
+  if(sp)sp.classList.remove('on');
+}
+
+
+// ══════════════════════════════════════════════════════════
+// 7. REVENUE INTELLIGENCE — init + hooks
+// ══════════════════════════════════════════════════════════
+// Revenue intelligence lives in Command Center (renderCommandCenter) and Action Queue.
+// Called on: page load, addToPipeline, moveStage, renderPipeline, saveEditProspect, deleteProspect.
+
+// Initialize on load
+renderCommandCenter();
+
 function copyText(id){var t=document.getElementById(id).textContent;navigator.clipboard.writeText(t).then(function(){notify('Copied to clipboard');});}
 function notify(msg){var el=document.getElementById('notif');el.textContent=msg;el.classList.add('show');setTimeout(function(){el.classList.remove('show');},2500);}
+var tfResults = [];
+var tfOpen = false;
+
+function toggleTargetFinder(){
+  var body = document.getElementById('tf-body');
+  var arrow = document.getElementById('tf-arrow');
+  tfOpen = !tfOpen;
+  if(tfOpen){
+    body.classList.add('open');
+    arrow.classList.add('open');
+    setTimeout(function(){ document.getElementById('tf-company').focus(); }, 200);
+  } else {
+    body.classList.remove('open');
+    arrow.classList.remove('open');
+  }
+}
+
+async function findCompanyTargets(){
+  var company = document.getElementById('tf-company').value.trim();
+  if(!company){ notify('Enter a company name first'); return; }
+  var sp = document.getElementById('sp-tf');
+  var statusEl = document.getElementById('tf-status');
+  var cardsEl = document.getElementById('tf-cards');
+  var verifyEl = document.getElementById('tf-verify');
+  sp.classList.add('on');
+  statusEl.style.display = 'block';
+  statusEl.className = 'tf-status';
+  statusEl.textContent = 'Researching executives at ' + company + '...';
+  cardsEl.style.display = 'none';
+  verifyEl.style.display = 'none';
+  tfResults = [];
+  try{
+    var raw = await callAI([
+      'You are a business intelligence assistant for Odyssey Black VIP Transportation in Atlanta — a premium executive black car service for Fortune 500 C-suite executives.',
+      'Company: ' + company,
+      '',
+      'Identify 6 to 8 C-suite and senior VP executives at this company who are strong prospects for premium ground transportation. Prioritize:',
+      '- CEO, President, COO, CFO, General Counsel, Chief People Officer, EVP of Operations, EVP of Sales, Chief Strategy Officer',
+      '- Roles that require frequent travel to airports, client sites, or board meetings',
+      '- Atlanta-headquartered or Atlanta-connected leadership',
+      '',
+      'Return ONLY a valid JSON array. Zero explanation, zero markdown fences, zero other text. Exactly this structure:',
+      '[{"name":"First Last","title":"Full Title","travel":"Heavy","atl":"Headquartered here","industry":"Financial Services / Banking","why":"One specific sentence on why this executive is a strong ground transportation prospect."}]',
+      '',
+      'travel must be exactly one of: Heavy | Moderate | Light',
+      'atl must be exactly one of: Headquartered here | Regional / major office | Visiting / remote',
+      'industry must be exactly one of: Airline / Aviation | Financial Services / Banking | Technology | Healthcare / Pharma | Real Estate / Development | Legal / Law Firm | Private Equity / VC | Consulting | Energy / Utilities | Manufacturing / Logistics | Entertainment / Media | Other Fortune 500',
+      '',
+      'Use real verified executives if you have reliable data. If a name is uncertain, use a realistic title placeholder and note "Verify on LinkedIn" at the end of the why field.',
+      'If you have no reliable data on this company at all, return exactly: [{"error":"No reliable executive data found for ' + company + '. Try their LinkedIn company page or website leadership section."}]'
+    ], 1400);
+
+    var clean = raw.replace(/```json/gi,'').replace(/```/gi,'').trim();
+    // Sometimes the model wraps in extra text — try to extract the JSON array
+    var start = clean.indexOf('[');
+    var end = clean.lastIndexOf(']');
+    if(start === -1 || end === -1){ throw new Error('No JSON array in response'); }
+    clean = clean.slice(start, end + 1);
+    var parsed = JSON.parse(clean);
+
+    if(parsed.length > 0 && parsed[0].error){
+      statusEl.className = 'tf-error';
+      statusEl.textContent = parsed[0].error;
+      sp.classList.remove('on');
+      return;
+    }
+
+    tfResults = parsed;
+    renderTargetCards(company);
+    statusEl.textContent = parsed.length + ' executives identified at ' + company + '. Click a card to pre-fill the scoring form.';
+    cardsEl.style.display = 'grid';
+    verifyEl.style.display = 'block';
+
+  } catch(e){
+    statusEl.className = 'tf-error';
+    statusEl.textContent = 'Could not retrieve results for "' + company + '". Try a more specific or full company name (e.g. "Delta Air Lines" not "Delta").';
+  }
+  sp.classList.remove('on');
+}
+
+function renderTargetCards(company){
+  var grid = document.getElementById('tf-cards');
+  grid.innerHTML = tfResults.map(function(t, i){
+    var travelCls = t.travel === 'Heavy' ? 'tcb-heavy' : t.travel === 'Moderate' ? 'tcb-moderate' : 'tcb-light';
+    var atlShort = t.atl === 'Headquartered here' ? 'ATL HQ' : t.atl === 'Regional / major office' ? 'ATL Office' : 'Visiting';
+    return '<div class="target-card" id="tc-' + i + '" onclick="selectTarget(' + i + ')">' +
+      '<div class="tc-name">' + (t.name || 'Executive') + '</div>' +
+      '<div class="tc-title">' + (t.title || '') + '</div>' +
+      '<div class="tc-badges">' +
+        '<span class="tc-badge ' + travelCls + '">' + (t.travel || 'Moderate') + ' Travel</span>' +
+        '<span class="tc-badge tcb-atl">' + atlShort + '</span>' +
+      '</div>' +
+      '<div class="tc-why">' + (t.why || '') + '</div>' +
+      '<button class="tc-fill-btn">Pre-fill Scoring Form &#8595;</button>' +
+    '</div>';
+  }).join('');
+}
+
+function selectTarget(idx){
+  var t = tfResults[idx];
+  if(!t){ return; }
+  // Highlight card
+  document.querySelectorAll('.target-card').forEach(function(c){ c.classList.remove('selected'); });
+  var card = document.getElementById('tc-' + idx);
+  if(card){ card.classList.add('selected'); }
+  // Pre-fill the Prospect Builder form
+  var company = document.getElementById('tf-company').value.trim();
+  document.getElementById('p-name').value = t.name || '';
+  document.getElementById('p-title').value = t.title || '';
+  document.getElementById('p-company').value = company;
+  // Match industry dropdown
+  var indEl = document.getElementById('p-industry');
+  if(indEl && t.industry){
+    for(var i = 0; i < indEl.options.length; i++){
+      if(indEl.options[i].text === t.industry){
+        indEl.selectedIndex = i;
+        break;
+      }
+    }
+  }
+  // Set travel frequency
+  var travEl = document.getElementById('p-travel');
+  if(travEl){
+    var travMap = { 'Heavy': 'heavy', 'Moderate': 'moderate', 'Light': 'light' };
+    travEl.value = travMap[t.travel] || 'moderate';
+  }
+  // Set Atlanta presence
+  var atlEl = document.getElementById('p-hq');
+  if(atlEl){
+    var atlMap = { 'Headquartered here': 'yes', 'Regional / major office': 'regional', 'Visiting / remote': 'no' };
+    atlEl.value = atlMap[t.atl] || 'yes';
+  }
+  // Refresh client type display
+  updateClientTypeDisplay();
+  // Scroll down to the form
+  setTimeout(function(){
+    var formEl = document.getElementById('p-name');
+    if(formEl){ formEl.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+  }, 100);
+  notify(t.name + ' pre-filled — add EA data and timing signals, then Calculate Score');
+}
 </script>
 </body>
 </html>
