@@ -603,6 +603,7 @@ textarea{resize:vertical;min-height:75px;}
     <button class="tab" onclick="switchTab('partners',this)">&#129309; Partners</button>
     <button class="tab" onclick="switchTab('lookalike',this)">&#128269; Lookalikes</button>
     <button class="tab" onclick="switchTab('vendor',this)">&#128196; Vendor Packet</button>
+    <button class="tab" onclick="switchTab('forecast',this)">&#128176; Forecast</button>
     <button class="tab" onclick="switchTab('script',this)">Call Script</button>
     <button class="tab" onclick="switchTab('import',this)">Apollo Import</button>
     <button class="tab" onclick="switchTab('company',this)">Company Intel</button>
@@ -1667,6 +1668,13 @@ textarea{resize:vertical;min-height:75px;}
       <div id="lk-cands"></div></div>
   </div>
 
+  <div class="panel" id="panel-forecast">
+    <div class="sec-tag">What your pipeline could be worth</div>
+    <div class="sec-h">Revenue Forecast</div>
+    <div class="sec-d">Current monthly revenue from your clients, plus what your open prospects are worth once weighted by how likely each stage is to close. Every assumption is visible and editable. This is a planning aid, not a prediction.</div>
+    <div id="fc-body"></div>
+  </div>
+
   <div class="panel" id="panel-vendor">
     <div class="sec-tag">Get approved as a vendor</div>
     <div class="sec-h">Vendor Packet &amp; Proposal</div>
@@ -1981,7 +1989,7 @@ function notify_safe(msg){
   // may not exist yet at the moment these utilities run — this wrapper is safe either way.
   try{ if(typeof notify==='function'){ notify(msg); } else { console.warn(msg); } }catch(e){ console.warn(msg); }
 }
-var APPROVED_BACKUP_KEYS=['ob-pipeline','ob-gatekeepers','ob-messages','ob-cal-progress','ob-event-mode','ob-radar','ob-vendor','ob-partners','ob-lookalike'];
+var APPROVED_BACKUP_KEYS=['ob-pipeline','ob-gatekeepers','ob-messages','ob-cal-progress','ob-event-mode','ob-radar','ob-vendor','ob-partners','ob-lookalike','ob-forecast'];
 var pendingRestore=null; // holds validated backup.keys while previewed, before the operator commits
 
 function csvCell(v){
@@ -2265,7 +2273,7 @@ var SIG_SCORES={'sig-hired':3,'sig-office':2,'sig-earnings':1,'sig-speaking':2,'
 var SIG_LABELS={'sig-hired':'Recently hired/promoted','sig-office':'Company opening ATL office','sig-earnings':'Upcoming earnings/board meeting','sig-speaking':'Speaking at ATL event','sig-reloc':'Relocating to Atlanta','sig-travel':'Increased travel activity'};
 var CHIP_IDS={'sig-hired':'chip-hired','sig-office':'chip-office','sig-earnings':'chip-earnings','sig-speaking':'chip-speaking','sig-reloc':'chip-reloc','sig-travel':'chip-travel'};
 
-function switchTab(n,el){document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});el.classList.add('active');document.getElementById('panel-'+n).classList.add('active');if(n==='pipeline'){renderPipeline();}if(n==='company'){buildCoMap();}if(n==='calendar'){initCalendar();updateKPIs();}if(n==='gatekeeper'){renderGatekeepers();}if(n==='radar'){renderRadar();}if(n==='today'){renderToday();}if(n==='results'){renderResults();}if(n==='vendor'){renderVendor();}if(n==='partners'){renderPartners();}if(n==='lookalike'){renderLookalike();}}
+function switchTab(n,el){document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});el.classList.add('active');document.getElementById('panel-'+n).classList.add('active');if(n==='pipeline'){renderPipeline();}if(n==='company'){buildCoMap();}if(n==='calendar'){initCalendar();updateKPIs();}if(n==='gatekeeper'){renderGatekeepers();}if(n==='radar'){renderRadar();}if(n==='today'){renderToday();}if(n==='results'){renderResults();}if(n==='vendor'){renderVendor();}if(n==='partners'){renderPartners();}if(n==='lookalike'){renderLookalike();}if(n==='forecast'){renderForecast();}}
 
 function toggleSig(sid,cid){var cb=document.getElementById(sid);var chip=document.getElementById(cid);cb.checked=!cb.checked;if(cb.checked){chip.classList.add('on');}else{chip.classList.remove('on');}refreshBM();}
 function refreshBM(){var total=0;Object.keys(SIG_SCORES).forEach(function(id){var el=document.getElementById(id);if(el&&el.checked){total+=SIG_SCORES[id];}});total=Math.min(total,10);var num=document.getElementById('bm-num'),fill=document.getElementById('bm-fill'),desc=document.getElementById('bm-desc');num.textContent=total;fill.style.width=(total*10)+'%';var c,d;if(total===0){c='var(--muted)';d='No signals active';}else if(total<=3){c='#e67e22';d='Mild timing - monitor';}else if(total<=6){c='var(--yellow)';d='Good timing - reach out soon';}else if(total<=8){c='var(--green)';d='Strong timing - act this week';}else{c='var(--gold)';d='PEAK MOMENT - reach out today';}num.style.color=c;fill.style.background=c;desc.style.color=c;desc.textContent=d;return total;}
@@ -5187,7 +5195,7 @@ async function cloudResolve(key,choice){
     }else{renderCloud();}
   }catch(e){cloudSet('conflict','That did not save. Check your connection and try again.');}
 }
-function cloudKeyLabel(k){return {'ob-pipeline':'Pipeline','ob-gatekeepers':'Gatekeepers','ob-messages':'Messages','ob-cal-progress':'Calendar progress','ob-event-mode':'Event mode','ob-radar':'Market Radar','ob-vendor':'Vendor packet','ob-partners':'Partners','ob-lookalike':'Lookalikes'}[k]||k;}
+function cloudKeyLabel(k){return {'ob-pipeline':'Pipeline','ob-gatekeepers':'Gatekeepers','ob-messages':'Messages','ob-cal-progress':'Calendar progress','ob-event-mode':'Event mode','ob-radar':'Market Radar','ob-vendor':'Vendor packet','ob-partners':'Partners','ob-lookalike':'Lookalikes','ob-forecast':'Forecast'}[k]||k;}
 function renderCloud(){
   var chip=document.getElementById('cloud-chip');
   var labels={off:'Cloud: off',checking:'Cloud: checking',syncing:'Cloud: syncing',synced:'Cloud: saved',error:'Cloud: not synced',conflict:'Cloud: choose data',newer:'Cloud: newer data'};
@@ -5831,6 +5839,75 @@ function digestFallback(txt){
   var ta=document.createElement('textarea');ta.value=txt;ta.setAttribute('readonly','');ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();
   var ok=false;try{ok=document.execCommand('copy');}catch(e){}
   document.body.removeChild(ta);notify(ok?'Digest copied.':'Could not copy. Select the text on screen instead.');
+}
+
+// ===== REVENUE FORECAST =====
+var FC_STAGES=['identified','contacted','assistant','trial-sched','trial-done'];
+var FC_DEFAULT_PROBS={'identified':3,'contacted':8,'assistant':15,'trial-sched':35,'trial-done':55};
+function fcClean(raw){
+  var out={probs:JSON.parse(JSON.stringify(FC_DEFAULT_PROBS)),target:0};
+  if(!raw||typeof raw!=='object'||Array.isArray(raw)){return out;}
+  if(raw.probs&&typeof raw.probs==='object'){FC_STAGES.forEach(function(k){var v=parseFloat(raw.probs[k]);if(isFinite(v)){out.probs[k]=Math.max(0,Math.min(100,Math.round(v*10)/10));}});}
+  var t=parseFloat(raw.target);if(isFinite(t)&&t>0){out.target=Math.min(t,10000000);}
+  return out;
+}
+var fcState=fcClean(loadJSON('ob-forecast',null));
+function fcSave(){saveJSON('ob-forecast',fcState);}
+function fcSetProb(stage,val){
+  if(FC_STAGES.indexOf(stage)===-1){return;}
+  var v=parseFloat(val);if(!isFinite(v)){v=FC_DEFAULT_PROBS[stage];}
+  fcState.probs[stage]=Math.max(0,Math.min(100,Math.round(v*10)/10));fcSave();renderForecast();
+}
+function fcResetProbs(){fcState.probs=JSON.parse(JSON.stringify(FC_DEFAULT_PROBS));fcSave();renderForecast();}
+function fcSetTarget(val){var v=parseFloat(String(val).replace(/[$,]/g,''));fcState.target=(isFinite(v)&&v>0)?Math.min(v,10000000):0;fcSave();renderForecast();}
+function fcMoney(n){return '$'+Math.round(n).toLocaleString();}
+function fcCompute(){
+  var pl=Array.isArray(pipeline)?pipeline:[];
+  var clients=pl.filter(function(p){return ['active','recurring','corporate'].indexOf(p.stage)!==-1;});
+  var mrr=clients.reduce(function(a,p){return a+(+p.monthlyValue||0);},0);
+  var withVal=clients.filter(function(p){return +p.monthlyValue>0;});
+  var avg=withVal.length?mrr/withVal.length:0;
+  var rows=FC_STAGES.map(function(st){
+    var list=pl.filter(function(p){return p.stage===st;});
+    var val=list.reduce(function(a,p){return a+(+p.monthlyValue||0);},0);
+    var missing=list.filter(function(p){return !(+p.monthlyValue>0);}).length;
+    var pr=fcState.probs[st];
+    return {stage:st,count:list.length,value:val,missing:missing,prob:pr,expected:val*pr/100};
+  });
+  var expected=rows.reduce(function(a,r){return a+r.expected;},0);
+  var potential=rows.reduce(function(a,r){return a+r.value;},0);
+  var rs=resultStats(pl);
+  var rate=(rs.contacted>=RESULT_MIN_SAMPLE&&rs.clients>0)?rs.clients/rs.contacted:null;
+  var goal=null;
+  if(fcState.target>0){
+    var gap=Math.max(0,fcState.target-mrr);
+    goal={target:fcState.target,gap:gap,reached:gap===0,needClients:(avg>0&&gap>0)?Math.ceil(gap/avg):null,needContacts:(avg>0&&gap>0&&rate)?Math.ceil(Math.ceil(gap/avg)/rate):null,avg:avg,rate:rate};
+  }
+  return {mrr:mrr,clientCount:clients.length,avg:avg,rows:rows,expected:expected,potential:potential,total:mrr+expected,rate:rate,contacted:rs.contacted,goal:goal};
+}
+function renderForecast(){
+  var el=document.getElementById('fc-body');if(!el){return;}
+  var f=fcCompute();
+  function tile(label,val,sub){return '<div style="flex:1;min-width:140px;"><div style="font-size:var(--fs-xs);color:var(--muted);">'+escapeHTML(label)+'</div><div style="font-size:var(--fs-xl,24px);font-weight:700;">'+escapeHTML(val)+'</div><div style="font-size:var(--fs-xs);color:var(--muted);">'+escapeHTML(sub)+'</div></div>';}
+  var tiles='<div class="card"><div class="sep-title"><span class="mini-badge mb-gold">Monthly revenue</span></div><div style="display:flex;flex-wrap:wrap;gap:16px;">'+
+    tile('Current (clients)',fcMoney(f.mrr),f.clientCount+' client'+(f.clientCount===1?'':'s')+', as you entered)')+
+    tile('Expected from pipeline',fcMoney(f.expected),'weighted by win chance')+
+    tile('Expected total',fcMoney(f.total),fcMoney(f.total*12)+' per year')+
+    tile('If every prospect won',fcMoney(f.mrr+f.potential),'upper bound, not a forecast')+'</div></div>';
+  var trs=f.rows.map(function(r){
+    return '<tr><td style="font-weight:600;">'+escapeHTML(getStageLabel(r.stage))+'</td><td>'+r.count+(r.missing?' <span style="color:var(--muted);font-size:var(--fs-xs);">('+r.missing+' with no value)</span>':'')+'</td><td>'+fcMoney(r.value)+'</td><td><input type="text" inputmode="decimal" style="width:70px;" value="'+r.prob+'" aria-label="Win chance percent for '+escapeHTML(getStageLabel(r.stage))+'" onchange="fcSetProb(\''+r.stage+'\',this.value)"> %</td><td>'+fcMoney(r.expected)+'</td></tr>';
+  }).join('');
+  var table='<div class="card"><div class="sep-title"><span class="mini-badge mb-green">By stage</span></div><div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:var(--fs-sm);min-width:520px;"><thead><tr style="text-align:left;color:var(--muted);font-size:var(--fs-xs);"><th>Stage</th><th>Prospects</th><th>Their monthly value</th><th>Win chance</th><th>Expected per month</th></tr></thead><tbody>'+trs+'</tbody></table></div>'+
+    '<div class="btns" style="margin-top:10px;">'+todayBtn('Reset win chances','fcResetProbs()')+'</div>'+
+    '<div style="font-size:var(--fs-xs);color:var(--muted);margin-top:10px;line-height:1.5;">The win chances start as placeholder guesses, not measured results. Change them to match what you actually see. Each prospect\'s monthly value is the app\'s estimate from travel frequency and group size unless you edited it in Pipeline, so treat the pipeline figures as rough. Prospects with no value are left out.</div></div>';
+  var g=f.goal,gh='';
+  if(g){
+    gh='<div style="font-size:var(--fs-sm);line-height:1.6;">Goal: <strong>'+fcMoney(g.target)+'</strong> per month. '+(g.reached?'You are at or above it with your current clients.':'Gap from current clients: <strong>'+fcMoney(g.gap)+'</strong>.')+
+      (g.needClients!==null?'<br>At your average client value of '+fcMoney(g.avg)+', that is about <strong>'+g.needClients+'</strong> more client'+(g.needClients===1?'':'s')+'.':(g.reached?'':'<br>Add a client with a monthly value to estimate how many more you need.'))+
+      (g.needContacts!==null?'<br>At your measured rate of '+Math.round(g.rate*1000)/10+'% of contacted prospects becoming clients, that is roughly <strong>'+g.needContacts+'</strong> prospects to contact.':(g.reached||g.needClients===null?'':'<br>Contacts needed: not enough data yet. Results needs at least '+RESULT_MIN_SAMPLE+' contacted prospects and one client ('+f.contacted+' contacted so far).'))+'</div>';
+  }else{gh='<div style="font-size:var(--fs-sm);color:var(--muted);">Enter a monthly revenue goal to see how many more clients you need.</div>';}
+  var goal='<div class="card"><div class="sep-title"><span class="mini-badge mb-blue">Goal</span></div><label for="fc-target">Monthly revenue goal ($)</label><input type="text" id="fc-target" inputmode="decimal" maxlength="10" value="'+(fcState.target||'')+'" onchange="fcSetTarget(this.value)" style="max-width:200px;margin-bottom:10px;">'+gh+'</div>';
+  el.innerHTML=tiles+table+goal;
 }
 </script>
 </body>
