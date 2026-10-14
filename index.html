@@ -575,7 +575,7 @@ textarea{resize:vertical;min-height:75px;}
   </div>
   <div class="cc-actions">
     <div id="cc-status"></div>
-    <button class="btn btn-ghost" style="padding:6px 14px;font-size:var(--fs-xs);" onclick="document.querySelectorAll('.tab')[2].click()">Pipeline</button>
+    <button class="btn btn-ghost" style="padding:6px 14px;font-size:var(--fs-xs);" onclick="todayGoTab('pipeline')">Pipeline</button>
     <button class="btn btn-outline" style="padding:6px 14px;font-size:var(--fs-xs);" onclick="generateDailyBriefingCC()">Today&#x27;s Briefing <div class="spin" id="sp-cc" style="width:11px;height:11px;border-width:1.5px;"></div></button>
   </div>
 </div>
@@ -588,7 +588,8 @@ textarea{resize:vertical;min-height:75px;}
 
 <div class="wrap">
   <div class="tabs">
-    <button class="tab active" onclick="switchTab('prospect',this)">Prospect Builder</button>
+    <button class="tab active" onclick="switchTab('today',this)">&#9728; Today</button>
+    <button class="tab" onclick="switchTab('prospect',this)">Prospect Builder</button>
     <button class="tab" onclick="switchTab('outreach',this)">AI Outreach</button>
     <button class="tab" onclick="switchTab('pipeline',this)">Pipeline</button>
     <button class="tab" onclick="switchTab('script',this)">Call Script</button>
@@ -602,7 +603,15 @@ textarea{resize:vertical;min-height:75px;}
   </div>
 
   <!-- TAB 1: PROSPECT BUILDER -->
-  <div class="panel active" id="panel-prospect">
+  <div class="panel active" id="panel-today">
+    <div class="sec-tag" id="today-date"></div>
+    <div class="sec-h">Today</div>
+    <div class="sec-d" id="today-summary">Everything that needs you today, in one place.</div>
+    <div id="today-body"></div>
+    <div class="btns" style="margin-top:12px;"><button class="btn btn-outline" onclick="renderToday()">Refresh</button></div>
+  </div>
+
+  <div class="panel" id="panel-prospect">
 
     <!-- COMPANY TARGET FINDER -->
     <div class="target-finder">
@@ -2162,7 +2171,7 @@ var SIG_SCORES={'sig-hired':3,'sig-office':2,'sig-earnings':1,'sig-speaking':2,'
 var SIG_LABELS={'sig-hired':'Recently hired/promoted','sig-office':'Company opening ATL office','sig-earnings':'Upcoming earnings/board meeting','sig-speaking':'Speaking at ATL event','sig-reloc':'Relocating to Atlanta','sig-travel':'Increased travel activity'};
 var CHIP_IDS={'sig-hired':'chip-hired','sig-office':'chip-office','sig-earnings':'chip-earnings','sig-speaking':'chip-speaking','sig-reloc':'chip-reloc','sig-travel':'chip-travel'};
 
-function switchTab(n,el){document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});el.classList.add('active');document.getElementById('panel-'+n).classList.add('active');if(n==='pipeline'){renderPipeline();}if(n==='company'){buildCoMap();}if(n==='calendar'){initCalendar();updateKPIs();}if(n==='gatekeeper'){renderGatekeepers();}if(n==='radar'){renderRadar();}}
+function switchTab(n,el){document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});el.classList.add('active');document.getElementById('panel-'+n).classList.add('active');if(n==='pipeline'){renderPipeline();}if(n==='company'){buildCoMap();}if(n==='calendar'){initCalendar();updateKPIs();}if(n==='gatekeeper'){renderGatekeepers();}if(n==='radar'){renderRadar();}if(n==='today'){renderToday();}}
 
 function toggleSig(sid,cid){var cb=document.getElementById(sid);var chip=document.getElementById(cid);cb.checked=!cb.checked;if(cb.checked){chip.classList.add('on');}else{chip.classList.remove('on');}refreshBM();}
 function refreshBM(){var total=0;Object.keys(SIG_SCORES).forEach(function(id){var el=document.getElementById(id);if(el&&el.checked){total+=SIG_SCORES[id];}});total=Math.min(total,10);var num=document.getElementById('bm-num'),fill=document.getElementById('bm-fill'),desc=document.getElementById('bm-desc');num.textContent=total;fill.style.width=(total*10)+'%';var c,d;if(total===0){c='var(--muted)';d='No signals active';}else if(total<=3){c='#e67e22';d='Mild timing - monitor';}else if(total<=6){c='var(--yellow)';d='Good timing - reach out soon';}else if(total<=8){c='var(--green)';d='Strong timing - act this week';}else{c='var(--gold)';d='PEAK MOMENT - reach out today';}num.style.color=c;fill.style.background=c;desc.style.color=c;desc.textContent=d;return total;}
@@ -3942,7 +3951,7 @@ function renderCommandCenter(){
   var statusEl = document.getElementById('cc-status');
   if(statusEl){
     if(urgentTotal>0){
-      statusEl.innerHTML='<div class="cc-badge-urgent" onclick="document.querySelectorAll(\'.tab\')[2].click()">&#9888; '+urgentTotal+' Urgent</div>';
+      statusEl.innerHTML='<div class="cc-badge-urgent" onclick="todayGoTab(\'pipeline\')">&#9888; '+urgentTotal+' Urgent</div>';
     } else if(mrr>=MRR_TARGET){
       statusEl.innerHTML='<div class="cc-badge-ok">&#10003; Target Hit</div>';
     } else if(pipeline.length>0){
@@ -4855,6 +4864,7 @@ async function radarScan(){
       return;
     }
     radarLastItems=Array.isArray(data.items)?data.items:[];
+    radarState.lastScanAt=new Date().toISOString();radarState.scanCache=radarLastItems.slice(0,20).map(function(it){return {id:String(it.id).slice(0,140),title:String(it.title).slice(0,300),url:String(it.url).slice(0,500),source:String(it.source||'').slice(0,100)};});radarSave();
     var fresh=radarLastItems.filter(function(it){return radarState.seen.indexOf(it.id)===-1;}).length;
     st.textContent=radarLastItems.length+' headline(s), '+fresh+' new. '+(data.queriesFailed?data.queriesFailed+' of '+data.queriesRun+' sources failed, so results may be incomplete. ':'')+'Headlines only; verify before outreach.';
     renderRadarScan();
@@ -5067,6 +5077,123 @@ document.addEventListener('visibilitychange',function(){if(document.visibilitySt
 setInterval(function(){cloudQueuePush();},120000);
 renderCloud();
 if(cloudSession){cloudReconcile({startup:true});}
+
+// ===== TODAY SCREEN =====
+// One daily view assembled from data the app already holds. It adds no new storage of its own.
+var TODAY_INACTIVE_STAGES=['active','recurring','corporate'];
+function todayDaysBetween(aStr,bStr){return Math.round((new Date(bStr+'T12:00:00')-new Date(aStr+'T12:00:00'))/86400000);}
+function todayAddDays(n){var d=new Date();d.setDate(d.getDate()+n);return atlDateStr(d);}
+function todayGoTab(name){var b=document.querySelector('.tab[onclick*="\''+name+'\'"]');if(b){switchTab(name,b);}}
+function todayStageDays(stage){return {'identified':3,'contacted':4,'assistant':3,'trial-sched':1,'trial-done':2}[stage]||3;}
+function todayLogTouch(id){
+  var p=pipeline.find(function(x){return x.id===id;});if(!p){return;}
+  p.lastContact=atlDateStr();p.followUp=todayAddDays(todayStageDays(p.stage));
+  saveJSON('ob-pipeline',pipeline);notify('Logged. Next follow-up '+p.followUp);renderToday();
+}
+function todaySnooze(id){
+  var p=pipeline.find(function(x){return x.id===id;});if(!p){return;}
+  p.followUp=todayAddDays(3);saveJSON('ob-pipeline',pipeline);notify('Snoozed to '+p.followUp);renderToday();
+}
+function todayGkSnooze(id){
+  var g=gatekeepers.find(function(x){return x.id===id;});if(!g){return;}
+  g.followup=todayAddDays(3);saveGatekeepers();notify('Snoozed to '+g.followup);renderToday();
+}
+function todayGkDone(id){
+  var g=gatekeepers.find(function(x){return x.id===id;});if(!g){return;}
+  g.lastContact=atlDateStr();g.followup=todayAddDays(7);saveGatekeepers();notify('Logged. Next follow-up '+g.followup);renderToday();
+}
+function todaySprintTick(id){radarSprintToggle(id,true);renderToday();}
+function todaySprintStart(){radarSprintStart();renderToday();}
+function todayBtn(label,fn,primary){
+  return '<button class="btn '+(primary?'btn-gold':'btn-outline')+'" style="padding:6px 12px;font-size:var(--fs-xs);" onclick="'+fn+'">'+label+'</button>';
+}
+function todayItem(cls,title,sub,buttons){
+  var colors={crit:'#e74c3c',high:'var(--gold)',med:'var(--blue)',low:'var(--muted)'};
+  return '<div style="display:flex;gap:12px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;padding:12px 0 12px 12px;border-bottom:1px solid var(--border);border-left:3px solid '+(colors[cls]||colors.low)+';margin-bottom:2px;">'+
+    '<div style="flex:1;min-width:200px;"><div style="font-size:var(--fs-sm);font-weight:600;">'+title+'</div>'+
+    '<div style="font-size:var(--fs-xs);color:var(--muted);margin-top:2px;">'+sub+'</div></div>'+
+    '<div class="btns" style="flex-wrap:wrap;gap:6px;">'+buttons.join('')+'</div></div>';
+}
+function todaySection(title,badge,html,emptyMsg){
+  return '<div class="card"><div class="sep-title"><span class="mini-badge '+badge+'">'+title+'</span></div>'+(html||'<div style="font-size:var(--fs-sm);color:var(--muted);">'+emptyMsg+'</div>')+'</div>';
+}
+function renderToday(){
+  var body=document.getElementById('today-body');if(!body){return;}
+  var today=atlDateStr();
+  var dateEl=document.getElementById('today-date');
+  if(dateEl){dateEl.textContent=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',weekday:'long',month:'long',day:'numeric'}).format(new Date());}
+  var total=0;
+  // 1. Pipeline
+  var rows=[];
+  var open=pipeline.filter(function(p){return TODAY_INACTIVE_STAGES.indexOf(p.stage)===-1;});
+  open.filter(function(p){return p.stage==='trial-done';}).forEach(function(p){
+    rows.push({r:0,h:todayItem('crit',escapeHTML(p.name)+' &middot; '+escapeHTML(p.company||''),'Trial ride done. Close within 48 hours.',[todayBtn('Open Pipeline','todayGoTab(\'pipeline\')',true),todayBtn('Log touch','todayLogTouch('+p.id+')')])});
+  });
+  open.filter(function(p){return p.stage==='trial-sched';}).forEach(function(p){
+    rows.push({r:1,h:todayItem('high',escapeHTML(p.name)+' &middot; '+escapeHTML(p.company||''),'Trial ride scheduled. Confirm and brief the driver.',[todayBtn('Open Pipeline','todayGoTab(\'pipeline\')',true)])});
+  });
+  open.filter(function(p){return p.followUp&&p.followUp<today&&p.stage!=='trial-done';}).forEach(function(p){
+    var d=todayDaysBetween(p.followUp,today);
+    rows.push({r:2-Math.min(d,100)/1000,h:todayItem('high',escapeHTML(p.name)+' &middot; '+escapeHTML(p.company||''),'Follow-up overdue '+d+' day'+(d===1?'':'s')+'. Stage: '+escapeHTML(getStageLabel(p.stage)),[todayBtn('Write message','quickOutreach('+p.id+')',true),todayBtn('Log touch','todayLogTouch('+p.id+')'),todayBtn('Snooze 3d','todaySnooze('+p.id+')')])});
+  });
+  open.filter(function(p){return p.followUp===today;}).forEach(function(p){
+    rows.push({r:3,h:todayItem('med',escapeHTML(p.name)+' &middot; '+escapeHTML(p.company||''),'Follow-up due today. Stage: '+escapeHTML(getStageLabel(p.stage)),[todayBtn('Write message','quickOutreach('+p.id+')',true),todayBtn('Log touch','todayLogTouch('+p.id+')'),todayBtn('Snooze 3d','todaySnooze('+p.id+')')])});
+  });
+  open.filter(function(p){return p.convProb==='High'&&p.stage==='contacted'&&p.lastContact&&todayDaysBetween(p.lastContact,today)>=5&&!(p.followUp&&p.followUp<=today);}).forEach(function(p){
+    rows.push({r:4,h:todayItem('med',escapeHTML(p.name)+' &middot; '+escapeHTML(p.company||''),todayDaysBetween(p.lastContact,today)+' days since contact. High-potential prospect: try the assistant route or a new channel.',[todayBtn('Write message','quickOutreach('+p.id+')',true)])});
+  });
+  rows.sort(function(a,b){return a.r-b.r;});
+  total+=rows.length;
+  var pipeHtml=rows.slice(0,8).map(function(x){return x.h;}).join('')+(rows.length>8?'<div style="font-size:var(--fs-xs);color:var(--muted);padding-top:8px;">+ '+(rows.length-8)+' more in Pipeline</div>':'');
+  // 2. Gatekeepers
+  var gk=gatekeepers.filter(function(g){return g.followup&&g.followup<=today;}).sort(function(a,b){return a.followup<b.followup?-1:1;});
+  total+=gk.length;
+  var gkHtml=gk.slice(0,6).map(function(g){
+    var d=todayDaysBetween(g.followup,today);
+    return todayItem(d>0?'high':'med',escapeHTML(g.name)+' &middot; '+escapeHTML(GK_TYPE_LABELS[g.type]||g.type||''),d>0?'Follow-up overdue '+d+' day'+(d===1?'':'s'):'Follow-up due today',[todayBtn('Log contact','todayGkDone('+g.id+')',true),todayBtn('Snooze 3d','todayGkSnooze('+g.id+')'),todayBtn('Open','todayGoTab(\'gatekeeper\')')]);
+  }).join('');
+  // 3. Radar
+  var rh='';
+  var last=radarState.lastScanAt?new Date(radarState.lastScanAt):null;
+  var ageDays=last?Math.floor((Date.now()-last.getTime())/86400000):null;
+  var cache=Array.isArray(radarState.scanCache)?radarState.scanCache:[];
+  var fresh=cache.filter(function(it){return radarState.seen.indexOf(it.id)===-1;});
+  if(ageDays===null||ageDays>=3){
+    total++;rh+=todayItem('med','Check for companies moving into Perimeter',ageDays===null?'No scan yet. A scan takes a few seconds.':'Last scan was '+ageDays+' days ago.',[todayBtn('Scan now','todayScan()',true)]);
+  }
+  fresh.slice(0,3).forEach(function(it){
+    total++;
+    rh+=todayItem('high','<a href="'+escapeHTML(it.url)+'" target="_blank" rel="noopener noreferrer" style="color:var(--gold);text-decoration:underline;">'+escapeHTML(it.title)+'</a>',escapeHTML(it.source||'source unknown')+' &middot; unverified lead',[todayBtn('Open Radar','todayGoTab(\'radar\')',true)]);
+  });
+  RADAR_WATCHLIST.forEach(function(c,i){c._i=i;});
+  var nextCo=RADAR_WATCHLIST.filter(function(c){return c.tier==='A'&&!radarState.watch[c.id];}).slice(0,2);
+  nextCo.forEach(function(c){
+    total++;
+    rh+=todayItem('med','Research '+escapeHTML(c.name),escapeHTML(c.signal)+' &middot; unverified',[todayBtn('Find gatekeepers','radarFindGatekeepers('+c._i+')',true)]);
+  });
+  // 4. Sprint
+  var sh='';
+  if(!radarState.sprintStart){
+    sh=todayItem('low','30-Day Perimeter Sprint is not started','Starting it puts each week\'s tasks here.',[todayBtn('Start sprint today','todaySprintStart()',true)]);
+  }else{
+    var wk=Math.min(4,Math.floor(todayDaysBetween(radarState.sprintStart,today)/7)+1);
+    var wkObj=RADAR_SPRINT[wk-1];
+    var pending=wkObj.tasks.filter(function(t){return !radarState.sprintDone[t.id];});
+    total+=pending.length;
+    sh='<div style="font-size:var(--fs-xs);color:var(--muted);margin-bottom:6px;">Week '+wk+' of 4</div>'+
+      (pending.length?pending.map(function(t){return todayItem('low',escapeHTML(t.t),'',[todayBtn('Done','todaySprintTick(\''+t.id+'\')')]);}).join(''):'');
+  }
+  body.innerHTML=
+    todaySection('Pipeline','mb-gold',pipeHtml,'No pipeline follow-ups are due. Add prospects or set follow-up dates in Pipeline.')+
+    todaySection('Gatekeepers','mb-blue',gkHtml,'No gatekeeper follow-ups are due.')+
+    todaySection('Perimeter Radar','mb-green',rh,'Nothing new from the Radar today.')+
+    todaySection('Sprint','mb-gold',sh,'All of this week\'s sprint tasks are done.');
+  var sm=document.getElementById('today-summary');
+  if(sm){sm.textContent=total?(total+' thing'+(total===1?'':'s')+' need'+(total===1?'s':'')+' you today. Start at the top.'):'You are all caught up. Add prospects, or run a Radar scan.';}
+}
+async function todayScan(){await radarScan();renderToday();}
+
+renderToday();
 </script>
 </body>
 </html>
