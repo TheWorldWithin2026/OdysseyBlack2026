@@ -5336,7 +5336,8 @@ function renderToday(){
     todaySection('Gatekeepers','mb-blue',gkHtml,'No gatekeeper follow-ups are due.')+
     todaySection('Market Radar','mb-green',rh,'Nothing new from the Radar today.')+
     (ptList.length?todaySection('Partners','mb-blue',ptHtml,'No partner follow-ups are due.'):'')+
-    todaySection('Sprint','mb-gold',sh,'All of this week\'s sprint tasks are done.');
+    todaySection('Sprint','mb-gold',sh,'All of this week\'s sprint tasks are done.')+
+    todaySection('Weekly digest','mb-blue',(typeof TODAY_INACTIVE_STAGES!=='undefined'?digestHTML():''),'');
   var sm=document.getElementById('today-summary');
   if(sm){sm.textContent=total?(total+' thing'+(total===1?'':'s')+' need'+(total===1?'s':'')+' you today. Start at the top.'):'You are all caught up. Add prospects, or run a Radar scan.';}
 }
@@ -5766,6 +5767,70 @@ function renderLookalike(){
       '<div><label for="lk-ar-'+i+'">Area</label><select id="lk-ar-'+i+'"><option value="perimeter">Perimeter</option><option value="alpharetta">Alpharetta / North Fulton</option><option value="cobb">Cobb</option><option value="gwinnett">Gwinnett</option></select></div></div>'+
       '<div class="btns" style="margin-top:8px;"><button class="btn btn-gold" onclick="lkAddToRadar('+i+')">Add to Radar watchlist</button></div></div>';
   }).join('');
+}
+
+// ===== WEEKLY DIGEST =====
+function digestBuild(){
+  var today=atlDateStr(),weekAgo=todayAddDays(-7),nowMs=Date.now();
+  var pl=Array.isArray(pipeline)?pipeline:[];
+  var ptl=(typeof partners!=='undefined'&&Array.isArray(partners))?partners:[];
+  var L=[],F=[];
+  // Radar
+  var cache=Array.isArray(radarState.scanCache)?radarState.scanCache:[];
+  var fresh=cache.filter(function(it){return radarState.seen.indexOf(it.id)===-1;}).length;
+  var last=radarState.lastScanAt?atlDateStr(new Date(radarState.lastScanAt)):'';
+  var ageDays=last?todayDaysBetween(last,today):null;
+  var st={};Object.keys(radarState.watch||{}).forEach(function(k){var v=radarState.watch[k];st[v]=(st[v]||0)+1;});
+  L.push('Market Radar: '+(last?'last scan '+last:'no scan yet')+'; '+fresh+' headline'+(fresh===1?'':'s')+' you have not reviewed; '+(st.contacted||0)+' watchlist compan'+((st.contacted||0)===1?'y':'ies')+' contacted, '+(st.meeting||0)+' with a meeting set.');
+  // Pipeline
+  var addedWeek=pl.filter(function(p){return typeof p.id==='number'&&p.id>=nowMs-7*86400000&&p.id<=nowMs;}).length;
+  var touchedWeek=pl.filter(function(p){return p.lastContact&&p.lastContact>=weekAgo;}).length;
+  var overdue=pl.filter(function(p){return TODAY_INACTIVE_STAGES.indexOf(p.stage)===-1&&p.followUp&&p.followUp<today;}).length;
+  var trials=pl.filter(function(p){return p.stage==='trial-sched'||p.stage==='trial-done';}).length;
+  var clients=pl.filter(function(p){return ['active','recurring','corporate'].indexOf(p.stage)!==-1;});
+  var mrr=clients.reduce(function(a,p){return a+(+p.monthlyValue||0);},0);
+  L.push('Pipeline: '+addedWeek+' prospect'+(addedWeek===1?'':'s')+' added and '+touchedWeek+' contacted in the last 7 days; '+overdue+' follow-up'+(overdue===1?'':'s')+' overdue; '+trials+' in trial stages; '+clients.length+' client'+(clients.length===1?'':'s')+' ($'+mrr.toLocaleString()+' per month as you entered it).');
+  // Partners
+  var ptWeek=ptl.filter(function(p){return p.lastContact&&p.lastContact>=weekAgo;}).length;
+  var ptDue=ptl.filter(function(p){return p.status!=='dormant'&&p.nextFollow&&p.nextFollow<=today;}).length;
+  var sent=0,won=0;ptl.forEach(function(p){sent+=p.sent;won+=p.won;});
+  L.push('Partners: '+ptl.length+' tracked; '+ptWeek+' contacted in the last 7 days; '+ptDue+' follow-up'+(ptDue===1?'':'s')+' due; '+sent+' referral'+(sent===1?'':'s')+' sent, '+won+(won===1?' became a client.':' became clients.'));
+  // Sprint
+  if(radarState.sprintStart){
+    var wk=Math.min(4,Math.floor(todayDaysBetween(radarState.sprintStart,today)/7)+1);
+    var pend=RADAR_SPRINT[wk-1].tasks.filter(function(t){return !radarState.sprintDone[t.id];}).length;
+    L.push('30-day sprint: week '+wk+' of 4; '+pend+' task'+(pend===1?'':'s')+' left this week.');
+  }else{L.push('30-day sprint: not started.');}
+  // Focus
+  if(overdue>0){F.push('Clear the '+overdue+' overdue pipeline follow-up'+(overdue===1?'':'s')+' first.');}
+  if(ptDue>0){F.push('Follow up with '+ptDue+' partner'+(ptDue===1?'':'s')+' that '+(ptDue===1?'is':'are')+' due.');}
+  if(fresh>0){F.push('Review '+fresh+' new Radar headline'+(fresh===1?'':'s')+' and verify each before outreach.');}
+  if(ageDays===null||ageDays>=3){F.push('Run a Radar scan.');}
+  if(ptl.length&&!ptWeek){F.push('Contact at least one hotel or planner partner this week.');}
+  if(!pl.length){F.push('Add prospects in Prospect Builder so this digest has something to track.');}
+  if(!F.length){F.push('Keep the pace. Add new prospects and partners.');}
+  return {date:today,lines:L,focus:F};
+}
+function digestText(){
+  var d=digestBuild();
+  return 'Odyssey Black weekly digest, '+d.date+'\n\n'+d.lines.join('\n')+'\n\nFocus next week:\n'+d.focus.map(function(f){return '- '+f;}).join('\n');
+}
+function digestHTML(){
+  var d=digestBuild();
+  return '<div style="font-size:var(--fs-sm);line-height:1.6;">'+d.lines.map(function(l){return '<div style="margin-bottom:6px;">'+escapeHTML(l)+'</div>';}).join('')+'</div>'+
+    '<div style="font-size:var(--fs-sm);font-weight:600;margin-top:10px;">Focus next week</div>'+
+    '<ul style="margin:6px 0 0 18px;font-size:var(--fs-sm);">'+d.focus.map(function(f){return '<li>'+escapeHTML(f)+'</li>';}).join('')+'</ul>'+
+    '<div class="btns" style="margin-top:10px;">'+todayBtn('Copy digest','digestCopy()')+'</div>';
+}
+function digestCopy(){
+  var txt=digestText();
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(function(){notify('Digest copied.');},function(){digestFallback(txt);});}
+  else{digestFallback(txt);}
+}
+function digestFallback(txt){
+  var ta=document.createElement('textarea');ta.value=txt;ta.setAttribute('readonly','');ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();
+  var ok=false;try{ok=document.execCommand('copy');}catch(e){}
+  document.body.removeChild(ta);notify(ok?'Digest copied.':'Could not copy. Select the text on screen instead.');
 }
 </script>
 </body>
