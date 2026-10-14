@@ -35,6 +35,18 @@
 //    control without adding a new paid dependency, not a strong guarantee.
 // ============================================================================
 
+// Browsers omit the Origin header on same-site GET requests, so "no Origin" must not mean "reject".
+// Allowed when: Origin is on the list; OR no Origin and the browser says Sec-Fetch-Site: same-origin;
+// OR no Origin / no Sec-Fetch-Site and the Referer's origin is on the list. Everything else is refused.
+function requestAllowed(headers, origin, allowed) {
+  if (origin) return allowed.indexOf(origin) !== -1;
+  const h = headers || {};
+  const site = String(h['sec-fetch-site'] || h['Sec-Fetch-Site'] || '').toLowerCase();
+  if (site) return site === 'same-origin';
+  const ref = h.referer || h.Referer || '';
+  try { return allowed.indexOf(new URL(ref).origin) !== -1; } catch (e) { return false; }
+}
+
 const ALLOWED_CATEGORIES = new Set([
   'hotel', 'hospital', 'event_venue', 'lawyer',
   'finance', 'real_estate_agency', 'spa', 'corporate_office'
@@ -84,7 +96,7 @@ exports.handler = async function (event) {
     };
   }
 
-  const originAllowed = allowedOrigins.indexOf(origin) !== -1;
+  const originAllowed = requestAllowed(event.headers, origin, allowedOrigins);
 
   // The CORS header is only ever set to the specific matched origin, never '*',
   // and never set at all for a rejected origin — an unapproved caller gets no
@@ -95,7 +107,7 @@ exports.handler = async function (event) {
     'Content-Type': 'application/json',
     'X-Request-Id': requestId
   };
-  if (originAllowed) {
+  if (originAllowed && origin) {
     headers['Access-Control-Allow-Origin'] = origin;
   }
 

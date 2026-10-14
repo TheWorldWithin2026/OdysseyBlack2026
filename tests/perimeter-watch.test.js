@@ -35,6 +35,20 @@ t('safeUrl rejects non-http', safeUrl('data:text/html,x') === '' && safeUrl('htt
   t('wrong origin -> 403, no CORS header', r.statusCode === 403 && !r.headers['Access-Control-Allow-Origin']);
   r = await mod.handler({ httpMethod: 'GET', headers: {} });
   t('missing origin -> 403', r.statusCode === 403);
+  const OK = 'https://odysseyblack2026.netlify.app';
+  global.fetch = async () => ({ ok: true, text: async () => xml });
+  r = await mod.handler({ httpMethod: 'GET', headers: { 'sec-fetch-site': 'same-origin', 'x-nf-client-connection-ip': '9.9.9.1' } });
+  t('same-origin browser GET with NO Origin header is allowed (real-browser behaviour)', r.statusCode === 200 && !r.headers['Access-Control-Allow-Origin']);
+  r = await mod.handler({ httpMethod: 'GET', headers: { 'sec-fetch-site': 'cross-site' } });
+  t('cross-site request without Origin is refused', r.statusCode === 403);
+  r = await mod.handler({ httpMethod: 'GET', headers: { 'sec-fetch-site': 'none' } });
+  t('direct navigation (sec-fetch-site none) is refused', r.statusCode === 403);
+  r = await mod.handler({ httpMethod: 'GET', headers: { referer: OK + '/index.html', 'x-nf-client-connection-ip': '9.9.9.2' } });
+  t('no Origin / no sec-fetch but allowed Referer is allowed', r.statusCode === 200);
+  r = await mod.handler({ httpMethod: 'GET', headers: { referer: 'https://evil.example/x' } });
+  t('foreign Referer is refused', r.statusCode === 403);
+  r = await mod.handler({ httpMethod: 'GET', headers: {} });
+  t('no headers at all is refused', r.statusCode === 403);
   r = await mod.handler({ httpMethod: 'POST', headers: { origin: 'https://odysseyblack2026.netlify.app' } });
   t('POST -> 405 with exact-origin CORS (not *)', r.statusCode === 405 && r.headers['Access-Control-Allow-Origin'] === 'https://odysseyblack2026.netlify.app');
   // upstream failure surfaces as 502, not empty 200

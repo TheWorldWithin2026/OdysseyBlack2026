@@ -31,6 +31,18 @@ const QUERIES = [
 const AREA_TERMS = ['perimeter', 'dunwoody', 'sandy springs', 'brookhaven', 'north terraces', 'perimeter summit', 'ravinia', 'concourse'];
 const MOVE_TERMS = ['headquarters', 'hq', 'relocat', 'moving', 'moves', 'lease', 'expand', 'new office', 'opens office', 'consolidat', 'sq. ft', 'square feet', 'square-foot'];
 
+// Browsers omit the Origin header on same-site GET requests, so "no Origin" must not mean "reject".
+// Allowed when: Origin is on the list; OR no Origin and the browser says Sec-Fetch-Site: same-origin;
+// OR no Origin / no Sec-Fetch-Site and the Referer's origin is on the list. Everything else is refused.
+function requestAllowed(headers, origin, allowed) {
+  if (origin) return allowed.indexOf(origin) !== -1;
+  const h = headers || {};
+  const site = String(h['sec-fetch-site'] || h['Sec-Fetch-Site'] || '').toLowerCase();
+  if (site) return site === 'same-origin';
+  const ref = h.referer || h.Referer || '';
+  try { return allowed.indexOf(new URL(ref).origin) !== -1; } catch (e) { return false; }
+}
+
 const RATE_LIMIT_WINDOW_MS = 60000;
 const RATE_LIMIT_MAX = 10;
 const rateMap = new Map();
@@ -132,7 +144,7 @@ exports.handler = async function (event) {
 
   const h = event.headers || {};
   const origin = h.origin || h.Origin || '';
-  if (allowed.indexOf(origin) === -1) return reply(403, { error: 'origin_not_allowed' });
+  if (!requestAllowed(h, origin, allowed)) return reply(403, { error: 'origin_not_allowed' });
 
   if (event.httpMethod === 'OPTIONS') return { statusCode: 204, headers: Object.assign({}, headers, { 'Access-Control-Allow-Origin': origin, 'Vary': 'Origin', 'Access-Control-Allow-Methods': 'GET, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type' }), body: '' };
   if (event.httpMethod !== 'GET') return reply(405, { error: 'method_not_allowed' }, origin);
@@ -157,4 +169,4 @@ exports.handler = async function (event) {
   }, origin);
 };
 
-exports._test = { parseRSS, normaliseItems, safeUrl, checkRateLimit, QUERIES };
+exports._test = { requestAllowed, parseRSS, normaliseItems, safeUrl, checkRateLimit, QUERIES };
