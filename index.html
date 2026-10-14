@@ -592,6 +592,7 @@ textarea{resize:vertical;min-height:75px;}
     <button class="tab" onclick="switchTab('prospect',this)">Prospect Builder</button>
     <button class="tab" onclick="switchTab('outreach',this)">AI Outreach</button>
     <button class="tab" onclick="switchTab('pipeline',this)">Pipeline</button>
+    <button class="tab" onclick="switchTab('results',this)">&#128200; Results</button>
     <button class="tab" onclick="switchTab('script',this)">Call Script</button>
     <button class="tab" onclick="switchTab('import',this)">Apollo Import</button>
     <button class="tab" onclick="switchTab('company',this)">Company Intel</button>
@@ -685,6 +686,7 @@ textarea{resize:vertical;min-height:75px;}
           <select id="p-source">
             <option value="linkedin">LinkedIn</option><option value="referral">Referral</option>
             <option value="event">Event / Conference</option><option value="cold">Cold outreach</option>
+            <option value="perimeter">Perimeter Radar (new arrival)</option><option value="hotel">Hotel concierge</option>
           </select>
         </div>
       </div>
@@ -1613,6 +1615,13 @@ textarea{resize:vertical;min-height:75px;}
   </div>
 
   <!-- TAB 10: GATEKEEPER FINDER -->
+  <div class="panel" id="panel-results">
+    <div class="sec-tag">What is actually working</div>
+    <div class="sec-h">Results by Channel</div>
+    <div class="sec-d">Built from the Source you pick when adding a prospect, plus each prospect's current stage and response. It shows where replies and clients really come from, so you can put your time there. Counts are current stages, not history.</div>
+    <div id="results-body"></div>
+  </div>
+
   <div class="panel" id="panel-radar">
     <div class="sec-tag">Perimeter Center &middot; Dunwoody &middot; Sandy Springs &middot; Brookhaven</div>
     <div class="sec-h">Perimeter Radar</div>
@@ -2171,7 +2180,7 @@ var SIG_SCORES={'sig-hired':3,'sig-office':2,'sig-earnings':1,'sig-speaking':2,'
 var SIG_LABELS={'sig-hired':'Recently hired/promoted','sig-office':'Company opening ATL office','sig-earnings':'Upcoming earnings/board meeting','sig-speaking':'Speaking at ATL event','sig-reloc':'Relocating to Atlanta','sig-travel':'Increased travel activity'};
 var CHIP_IDS={'sig-hired':'chip-hired','sig-office':'chip-office','sig-earnings':'chip-earnings','sig-speaking':'chip-speaking','sig-reloc':'chip-reloc','sig-travel':'chip-travel'};
 
-function switchTab(n,el){document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});el.classList.add('active');document.getElementById('panel-'+n).classList.add('active');if(n==='pipeline'){renderPipeline();}if(n==='company'){buildCoMap();}if(n==='calendar'){initCalendar();updateKPIs();}if(n==='gatekeeper'){renderGatekeepers();}if(n==='radar'){renderRadar();}if(n==='today'){renderToday();}}
+function switchTab(n,el){document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});el.classList.add('active');document.getElementById('panel-'+n).classList.add('active');if(n==='pipeline'){renderPipeline();}if(n==='company'){buildCoMap();}if(n==='calendar'){initCalendar();updateKPIs();}if(n==='gatekeeper'){renderGatekeepers();}if(n==='radar'){renderRadar();}if(n==='today'){renderToday();}if(n==='results'){renderResults();}}
 
 function toggleSig(sid,cid){var cb=document.getElementById(sid);var chip=document.getElementById(cid);cb.checked=!cb.checked;if(cb.checked){chip.classList.add('on');}else{chip.classList.remove('on');}refreshBM();}
 function refreshBM(){var total=0;Object.keys(SIG_SCORES).forEach(function(id){var el=document.getElementById(id);if(el&&el.checked){total+=SIG_SCORES[id];}});total=Math.min(total,10);var num=document.getElementById('bm-num'),fill=document.getElementById('bm-fill'),desc=document.getElementById('bm-desc');num.textContent=total;fill.style.width=(total*10)+'%';var c,d;if(total===0){c='var(--muted)';d='No signals active';}else if(total<=3){c='#e67e22';d='Mild timing - monitor';}else if(total<=6){c='var(--yellow)';d='Good timing - reach out soon';}else if(total<=8){c='var(--green)';d='Strong timing - act this week';}else{c='var(--gold)';d='PEAK MOMENT - reach out today';}num.style.color=c;fill.style.background=c;desc.style.color=c;desc.textContent=d;return total;}
@@ -5194,6 +5203,61 @@ function renderToday(){
 async function todayScan(){await radarScan();renderToday();}
 
 renderToday();
+
+// ===== RESULTS BY CHANNEL =====
+var RESULT_CHANNELS={'linkedin':'LinkedIn','referral':'Referral','event':'Event / Conference','cold':'Cold outreach','perimeter':'Perimeter Radar (new arrival)','hotel':'Hotel concierge'};
+var RESULT_TRIAL_STAGES=['trial-sched','trial-done','active','recurring','corporate'];
+var RESULT_CLIENT_STAGES=['active','recurring','corporate'];
+var RESULT_MIN_SAMPLE=10;
+function resultStats(list){
+  var s={added:list.length,contacted:0,replied:0,positive:0,trial:0,clients:0,mrr:0};
+  list.forEach(function(p){
+    var touched=p.stage!=='identified'||!!p.lastContact||(p.responseStatus&&p.responseStatus!=='none');
+    if(touched){s.contacted++;}
+    if(p.responseStatus==='positive'||p.responseStatus==='negative'){s.replied++;}
+    if(p.responseStatus==='positive'){s.positive++;}
+    if(RESULT_TRIAL_STAGES.indexOf(p.stage)!==-1){s.trial++;}
+    if(RESULT_CLIENT_STAGES.indexOf(p.stage)!==-1){s.clients++;s.mrr+=(+p.monthlyValue||0);}
+  });
+  return s;
+}
+function resultPct(n,d){return d>0?Math.round(n/d*100)+'%':'—';}
+function resultRow(label,s){
+  var small=s.contacted<RESULT_MIN_SAMPLE;
+  return '<tr><td style="font-weight:600;">'+escapeHTML(label)+'</td><td>'+s.added+'</td><td>'+s.contacted+'</td><td>'+s.replied+'</td><td>'+resultPct(s.replied,s.contacted)+'</td><td>'+s.trial+'</td><td>'+s.clients+'</td><td>$'+s.mrr.toLocaleString()+'</td><td style="color:var(--muted);font-size:var(--fs-xs);">'+(small?'too few to judge':'')+'</td></tr>';
+}
+function resultTable(rowsHtml){
+  return '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:var(--fs-sm);min-width:560px;"><thead><tr style="text-align:left;color:var(--muted);font-size:var(--fs-xs);"><th>Channel</th><th>Added</th><th>Contacted</th><th>Replied</th><th>Reply rate</th><th>Trial+</th><th>Clients</th><th>MRR</th><th></th></tr></thead><tbody>'+rowsHtml+'</tbody></table></div>';
+}
+function renderResults(){
+  var el=document.getElementById('results-body');if(!el){return;}
+  if(!pipeline.length){el.innerHTML='<div class="card"><div style="font-size:var(--fs-sm);color:var(--muted);">No prospects yet. Add prospects in Prospect Builder and pick where each one came from. Results appear here.</div></div>';return;}
+  var groups={};
+  pipeline.forEach(function(p){var k=RESULT_CHANNELS[p.source]?p.source:'other';(groups[k]=groups[k]||[]).push(p);});
+  var keys=Object.keys(RESULT_CHANNELS).concat(['other']).filter(function(k){return groups[k];});
+  var rows='';
+  keys.forEach(function(k){rows+=resultRow(k==='other'?'Not recorded':RESULT_CHANNELS[k],resultStats(groups[k]));});
+  var all=resultStats(pipeline);
+  rows+='<tr style="border-top:1px solid var(--border);font-weight:700;"><td>All prospects</td><td>'+all.added+'</td><td>'+all.contacted+'</td><td>'+all.replied+'</td><td>'+resultPct(all.replied,all.contacted)+'</td><td>'+all.trial+'</td><td>'+all.clients+'</td><td>$'+all.mrr.toLocaleString()+'</td><td></td></tr>';
+  // verdict: only when at least two channels have a usable sample
+  var ranked=keys.filter(function(k){var s=resultStats(groups[k]);return s.contacted>=RESULT_MIN_SAMPLE;}).map(function(k){var s=resultStats(groups[k]);return {k:k,rate:s.replied/s.contacted,s:s};}).sort(function(a,b){return b.rate-a.rate;});
+  var verdict;
+  if(ranked.length>=2){
+    verdict='Best reply rate so far: <strong>'+escapeHTML(ranked[0].k==='other'?'Not recorded':RESULT_CHANNELS[ranked[0].k])+'</strong> ('+Math.round(ranked[0].rate*100)+'% of '+ranked[0].s.contacted+' contacted). Spend more of your week there, and re-check as numbers grow.';
+  }else{
+    verdict='Not enough data to pick a winner yet. Each channel needs at least '+RESULT_MIN_SAMPLE+' contacted prospects. Keep logging contacts and responses and this will fill in.';
+  }
+  // direct vs assistant route
+  var viaEA=pipeline.filter(function(p){return p.ea&&p.ea.active&&p.ea.name;});
+  var direct=pipeline.filter(function(p){return !(p.ea&&p.ea.active&&p.ea.name);});
+  var route=resultRow('Through an assistant',resultStats(viaEA))+resultRow('Direct to executive',resultStats(direct));
+  var funnel=[['Added',all.added],['Contacted',all.contacted],['Replied',all.replied],['Trial ride or beyond',all.trial],['Clients',all.clients]].map(function(f){return '<div style="flex:1;min-width:110px;text-align:center;"><div style="font-size:var(--fs-xl,24px);color:var(--gold);">'+f[1]+'</div><div style="font-size:var(--fs-xs);color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">'+f[0]+'</div></div>';}).join('');
+  el.innerHTML=
+    '<div class="card"><div class="sep-title"><span class="mini-badge mb-gold">Funnel</span></div><div style="display:flex;flex-wrap:wrap;gap:12px;">'+funnel+'</div></div>'+
+    '<div class="card"><div class="sep-title"><span class="mini-badge mb-green">By channel</span></div>'+resultTable(rows)+'<div style="font-size:var(--fs-sm);margin-top:12px;">'+verdict+'</div></div>'+
+    '<div class="card"><div class="sep-title"><span class="mini-badge mb-blue">Assistant route vs direct</span></div>'+resultTable(route)+'<div style="font-size:var(--fs-xs);color:var(--muted);margin-top:10px;">"Through an assistant" counts prospects where an assistant is recorded as active. Small samples can mislead.</div></div>'+
+    '<div class="card"><div style="font-size:var(--fs-xs);color:var(--muted);">Replied = positive or declined response recorded. Trial+ = trial scheduled, trial done, or any client stage. Prospects added before channels were tracked show as "Not recorded".</div></div>';
+}
 </script>
 </body>
 </html>
