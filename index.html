@@ -601,6 +601,7 @@ textarea{resize:vertical;min-height:75px;}
     <button class="tab" onclick="switchTab('pipeline',this)">Pipeline</button>
     <button class="tab" onclick="switchTab('results',this)">&#128200; Results</button>
     <button class="tab" onclick="switchTab('partners',this)">&#129309; Partners</button>
+    <button class="tab" onclick="switchTab('lookalike',this)">&#128269; Lookalikes</button>
     <button class="tab" onclick="switchTab('vendor',this)">&#128196; Vendor Packet</button>
     <button class="tab" onclick="switchTab('script',this)">Call Script</button>
     <button class="tab" onclick="switchTab('import',this)">Apollo Import</button>
@@ -1643,6 +1644,26 @@ textarea{resize:vertical;min-height:75px;}
       <div id="pt-body" style="overflow-wrap:anywhere;min-width:0;"></div></div>
   </div>
 
+  <div class="panel" id="panel-lookalike">
+    <div class="sec-tag">Find more clients like your best ones</div>
+    <div class="sec-h">Lookalike Finder</div>
+    <div class="sec-d">List the companies you already serve. The app finds what they have in common, then builds ready-to-click searches for similar companies, and for the assistants and office managers who book their travel. It does not name companies for you: you confirm each one, then send it to your Radar watchlist.</div>
+    <div class="card"><div class="sep-title"><span class="mini-badge mb-gold">Your best clients</span></div>
+      <div id="lk-clients"></div>
+      <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border);">
+        <div style="font-size:var(--fs-sm);font-weight:600;margin-bottom:8px;">Add a client</div>
+        <div class="g2"><div><label for="lk-name">Company</label><input type="text" id="lk-name" maxlength="100"></div>
+        <div><label for="lk-ind">Industry (your words)</label><input type="text" id="lk-ind" maxlength="60" list="lk-ind-list" placeholder="e.g. insurance brokerage"><datalist id="lk-ind-list"><option value="Insurance brokerage"><option value="Consumer goods"><option value="Media and communications"><option value="Financial services"><option value="Technology"><option value="Healthcare"><option value="Real estate"><option value="Professional services"><option value="Manufacturing and logistics"></datalist></div></div>
+        <div class="g2"><div><label for="lk-size">Size</label><select id="lk-size"><option value="">Not sure</option><option value="smb">About 50-200 employees</option><option value="mid">About 200-1,000 employees</option><option value="large">1,000+ employees</option></select></div>
+        <div><label for="lk-area">Where their Atlanta office is</label><select id="lk-area"><option value="">Not sure</option><option value="perimeter">Perimeter</option><option value="alpharetta">Alpharetta / North Fulton</option><option value="cobb">Cobb</option><option value="gwinnett">Gwinnett</option></select></div></div>
+        <div class="g2"><div><label for="lk-books">Who books their travel</label><select id="lk-books"><option value="">Not sure</option><option value="assistant">Executive assistant</option><option value="office">Office manager</option><option value="travel">Travel coordinator</option><option value="exec">The executive books it</option><option value="other">Other</option></select></div>
+        <div><label for="lk-note">Note (optional)</label><input type="text" id="lk-note" maxlength="200" onkeydown="if(event.key==='Enter')lkAdd()"></div></div>
+        <div class="btns" style="margin-top:10px;"><button class="btn btn-gold" onclick="lkAdd()">Add client</button></div>
+      </div></div>
+    <div class="card"><div class="sep-title"><span class="mini-badge mb-green">What they have in common</span></div><div id="lk-pattern"></div></div>
+    <div id="lk-body"></div>
+  </div>
+
   <div class="panel" id="panel-vendor">
     <div class="sec-tag">Get approved as a vendor</div>
     <div class="sec-h">Vendor Packet &amp; Proposal</div>
@@ -1957,7 +1978,7 @@ function notify_safe(msg){
   // may not exist yet at the moment these utilities run — this wrapper is safe either way.
   try{ if(typeof notify==='function'){ notify(msg); } else { console.warn(msg); } }catch(e){ console.warn(msg); }
 }
-var APPROVED_BACKUP_KEYS=['ob-pipeline','ob-gatekeepers','ob-messages','ob-cal-progress','ob-event-mode','ob-radar','ob-vendor','ob-partners'];
+var APPROVED_BACKUP_KEYS=['ob-pipeline','ob-gatekeepers','ob-messages','ob-cal-progress','ob-event-mode','ob-radar','ob-vendor','ob-partners','ob-lookalike'];
 var pendingRestore=null; // holds validated backup.keys while previewed, before the operator commits
 
 function csvCell(v){
@@ -2241,7 +2262,7 @@ var SIG_SCORES={'sig-hired':3,'sig-office':2,'sig-earnings':1,'sig-speaking':2,'
 var SIG_LABELS={'sig-hired':'Recently hired/promoted','sig-office':'Company opening ATL office','sig-earnings':'Upcoming earnings/board meeting','sig-speaking':'Speaking at ATL event','sig-reloc':'Relocating to Atlanta','sig-travel':'Increased travel activity'};
 var CHIP_IDS={'sig-hired':'chip-hired','sig-office':'chip-office','sig-earnings':'chip-earnings','sig-speaking':'chip-speaking','sig-reloc':'chip-reloc','sig-travel':'chip-travel'};
 
-function switchTab(n,el){document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});el.classList.add('active');document.getElementById('panel-'+n).classList.add('active');if(n==='pipeline'){renderPipeline();}if(n==='company'){buildCoMap();}if(n==='calendar'){initCalendar();updateKPIs();}if(n==='gatekeeper'){renderGatekeepers();}if(n==='radar'){renderRadar();}if(n==='today'){renderToday();}if(n==='results'){renderResults();}if(n==='vendor'){renderVendor();}if(n==='partners'){renderPartners();}}
+function switchTab(n,el){document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});el.classList.add('active');document.getElementById('panel-'+n).classList.add('active');if(n==='pipeline'){renderPipeline();}if(n==='company'){buildCoMap();}if(n==='calendar'){initCalendar();updateKPIs();}if(n==='gatekeeper'){renderGatekeepers();}if(n==='radar'){renderRadar();}if(n==='today'){renderToday();}if(n==='results'){renderResults();}if(n==='vendor'){renderVendor();}if(n==='partners'){renderPartners();}if(n==='lookalike'){renderLookalike();}}
 
 function toggleSig(sid,cid){var cb=document.getElementById(sid);var chip=document.getElementById(cid);cb.checked=!cb.checked;if(cb.checked){chip.classList.add('on');}else{chip.classList.remove('on');}refreshBM();}
 function refreshBM(){var total=0;Object.keys(SIG_SCORES).forEach(function(id){var el=document.getElementById(id);if(el&&el.checked){total+=SIG_SCORES[id];}});total=Math.min(total,10);var num=document.getElementById('bm-num'),fill=document.getElementById('bm-fill'),desc=document.getElementById('bm-desc');num.textContent=total;fill.style.width=(total*10)+'%';var c,d;if(total===0){c='var(--muted)';d='No signals active';}else if(total<=3){c='#e67e22';d='Mild timing - monitor';}else if(total<=6){c='var(--yellow)';d='Good timing - reach out soon';}else if(total<=8){c='var(--green)';d='Strong timing - act this week';}else{c='var(--gold)';d='PEAK MOMENT - reach out today';}num.style.color=c;fill.style.background=c;desc.style.color=c;desc.textContent=d;return total;}
@@ -5163,7 +5184,7 @@ async function cloudResolve(key,choice){
     }else{renderCloud();}
   }catch(e){cloudSet('conflict','That did not save. Check your connection and try again.');}
 }
-function cloudKeyLabel(k){return {'ob-pipeline':'Pipeline','ob-gatekeepers':'Gatekeepers','ob-messages':'Messages','ob-cal-progress':'Calendar progress','ob-event-mode':'Event mode','ob-radar':'Market Radar','ob-vendor':'Vendor packet','ob-partners':'Partners'}[k]||k;}
+function cloudKeyLabel(k){return {'ob-pipeline':'Pipeline','ob-gatekeepers':'Gatekeepers','ob-messages':'Messages','ob-cal-progress':'Calendar progress','ob-event-mode':'Event mode','ob-radar':'Market Radar','ob-vendor':'Vendor packet','ob-partners':'Partners','ob-lookalike':'Lookalikes'}[k]||k;}
 function renderCloud(){
   var chip=document.getElementById('cloud-chip');
   var labels={off:'Cloud: off',checking:'Cloud: checking',syncing:'Cloud: syncing',synced:'Cloud: saved',error:'Cloud: not synced',conflict:'Cloud: choose data',newer:'Cloud: newer data'};
@@ -5588,6 +5609,105 @@ function renderPartners(){
       '<span style="color:var(--muted);">Last contact: '+escapeHTML(p.lastContact||'none')+'</span></div>'+
       (p.notes?'<div style="font-size:var(--fs-xs);margin-top:6px;">'+escapeHTML(p.notes)+'</div>':'')+
       '<div class="btns" style="margin-top:8px;">'+todayBtn('Log contact today','ptLog(\''+p.id+'\')',true)+todayBtn(ptConfirm===p.id?'Click again to delete':'Delete','ptDelete(\''+p.id+'\')')+'</div></div>';
+  }).join('');
+}
+
+// ===== LOOKALIKES (find companies like your best clients) =====
+var LK_SIZES=[['','Not sure'],['smb','About 50-200 employees'],['mid','About 200-1,000 employees'],['large','1,000+ employees']];
+var LK_APOLLO_SIZE={smb:'51-200',mid:'201-1000',large:'1001+'};
+var LK_BOOKS=[['','Not sure'],['assistant','Executive assistant'],['office','Office manager'],['travel','Travel coordinator'],['exec','The executive books it'],['other','Other']];
+var LK_TITLES={assistant:'executive assistant',office:'office manager',travel:'travel coordinator'};
+var LK_CITY={perimeter:'Perimeter Center Atlanta',alpharetta:'Alpharetta GA',cobb:'Cobb County GA',gwinnett:'Gwinnett County GA'};
+var LK_CLIENT_STAGES=['active','recurring','corporate'];
+var lkConfirm='';
+function lkOk(list,k){return list.some(function(x){return x[0]===k;});}
+function lkClean(raw){
+  var out={clients:[]};
+  if(!raw||typeof raw!=='object'||!Array.isArray(raw.clients)){return out;}
+  var seen={};
+  raw.clients.slice(0,100).forEach(function(r,i){
+    if(!r||typeof r!=='object'){return;}
+    var name=String(r.name||'').trim().slice(0,100);if(!name){return;}
+    var id=(typeof r.id==='string'&&/^lk-\d{6,}$/.test(r.id)&&!seen[r.id])?r.id:'lk-'+(Date.now()+i);
+    while(seen[id]){id=id+'1';}seen[id]=1;
+    out.clients.push({id:id,name:name,industry:String(r.industry||'').trim().slice(0,60),
+      size:lkOk(LK_SIZES,r.size)?r.size:'',
+      area:(RADAR_AREAS.some(function(a){return a[0]===r.area&&a[0]!=='all';})?r.area:''),
+      books:lkOk(LK_BOOKS,r.books)?r.books:'',note:String(r.note||'').slice(0,200)});
+  });
+  return out;
+}
+var lkState=lkClean(loadJSON('ob-lookalike',null));
+function lkSave(){saveJSON('ob-lookalike',lkState);}
+function lkAllClients(){
+  var have={};lkState.clients.forEach(function(c){have[c.name.toLowerCase()]=1;});
+  var auto=[];
+  (Array.isArray(pipeline)?pipeline:[]).forEach(function(p){
+    if(LK_CLIENT_STAGES.indexOf(p.stage)===-1||!p.company){return;}
+    var k=String(p.company).trim().toLowerCase();if(!k||have[k]){return;}have[k]=1;
+    auto.push({id:'',name:String(p.company).trim().slice(0,100),industry:String(p.industry||'').slice(0,60),size:'',area:'',books:(p.ea&&p.ea.active&&p.ea.name)?'assistant':'',note:'',auto:true});
+  });
+  return lkState.clients.concat(auto);
+}
+function lkAdd(){
+  var name=document.getElementById('lk-name').value.trim();
+  if(!name){notify('Enter the client company name first.');return;}
+  var c=lkClean({clients:[{id:'lk-'+Date.now(),name:name,industry:document.getElementById('lk-ind').value,size:document.getElementById('lk-size').value,area:document.getElementById('lk-area').value,books:document.getElementById('lk-books').value,note:document.getElementById('lk-note').value}]}).clients[0];
+  lkState.clients.push(c);lkSave();
+  ['lk-name','lk-ind','lk-note'].forEach(function(i){document.getElementById(i).value='';});renderLookalike();
+}
+function lkDelete(id){if(lkConfirm!==id){lkConfirm=id;renderLookalike();return;}lkConfirm='';lkState.clients=lkState.clients.filter(function(c){return c.id!==id;});lkSave();renderLookalike();}
+function lkSearchLinks(ind,cities,titles){
+  var enc=encodeURIComponent,links=[];
+  cities.forEach(function(city){
+    links.push(['Google: '+ind+' companies, '+city,'https://www.google.com/search?q='+enc(ind+' companies headquarters OR "regional office" '+city)]);
+  });
+  links.push(['Google News: '+ind+' moving or opening an office','https://www.google.com/search?tbm=nws&q='+enc(ind+' ("new office" OR relocating OR headquarters) '+cities[0])]);
+  links.push(['LinkedIn: companies','https://www.linkedin.com/search/results/companies/?keywords='+enc(ind+' '+cities[0])]);
+  links.push(['LinkedIn: people who book travel','https://www.linkedin.com/search/results/people/?keywords='+enc('('+titles.map(function(t){return '"'+t+'"';}).join(' OR ')+') '+ind+' '+cities[0])]);
+  return links;
+}
+function lkAddToRadar(i){
+  var name=document.getElementById('lk-co-'+i).value.trim();
+  if(!name){notify('Type the company you found first.');return;}
+  if(radarState.custom.length>=100){notify('Watchlist is full (100 custom companies)');return;}
+  var note=document.getElementById('lk-from-'+i).textContent.slice(0,200);
+  radarState.custom.push({id:'c-'+Date.now(),name:name.slice(0,100),area:radarCleanArea(document.getElementById('lk-ar-'+i).value),note:note});
+  radarSave();document.getElementById('lk-co-'+i).value='';notify(name+' added to your Radar watchlist');
+}
+function renderLookalike(){
+  var el=document.getElementById('lk-body');if(!el){return;}
+  var all=lkAllClients();
+  var rows=all.map(function(c){
+    var meta=[c.industry,(c.size?ptLabel(LK_SIZES,c.size):''),c.area?radarAreaLabel(c.area):'',c.books?'Books: '+ptLabel(LK_BOOKS,c.books):''].filter(Boolean).map(escapeHTML).join(' &middot; ');
+    return '<div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);"><div style="min-width:0;overflow-wrap:anywhere;"><div style="font-weight:600;font-size:var(--fs-sm);">'+escapeHTML(c.name)+(c.auto?' <span class="mini-badge mb-blue">From Pipeline</span>':'')+'</div><div style="font-size:var(--fs-xs);color:var(--muted);">'+(meta||'No details yet')+(c.note?' &middot; '+escapeHTML(c.note):'')+'</div></div>'+
+      (c.auto?'':todayBtn(lkConfirm===c.id?'Click again to remove':'Remove','lkDelete(\''+c.id+'\')'))+'</div>';
+  }).join('');
+  document.getElementById('lk-clients').innerHTML=rows||'<div style="font-size:var(--fs-sm);color:var(--muted);">No clients yet. Add the companies you already serve, such as Newell, Brown & Brown and Cox. Anything in your Pipeline at an active or client stage also appears here.</div>';
+  // pattern
+  var groups={},order=[];
+  all.forEach(function(c){var k=c.industry.trim().toLowerCase();if(!k){return;}if(!groups[k]){groups[k]={ind:c.industry.trim(),clients:[]};order.push(k);}groups[k].clients.push(c);});
+  order.sort(function(a,b){return groups[b].clients.length-groups[a].clients.length;});
+  var noInd=all.filter(function(c){return !c.industry.trim();}).length;
+  if(!all.length){document.getElementById('lk-pattern').innerHTML='';el.innerHTML='';return;}
+  var sizes={},areas={},books={};
+  all.forEach(function(c){if(c.size){sizes[c.size]=(sizes[c.size]||0)+1;}if(c.area){areas[c.area]=(areas[c.area]||0)+1;}if(c.books){books[c.books]=(books[c.books]||0)+1;}});
+  function top(m,labeler){var k=Object.keys(m).sort(function(a,b){return m[b]-m[a];});return k.length?labeler(k[0])+' ('+m[k[0]]+' of '+all.length+')':'not set yet';}
+  document.getElementById('lk-pattern').innerHTML='<div style="font-size:var(--fs-sm);line-height:1.6;">Most common industry: <strong>'+(order.length?escapeHTML(groups[order[0]].ind)+' ('+groups[order[0]].clients.length+' of '+all.length+')':'not set yet')+'</strong><br>Typical size: <strong>'+escapeHTML(top(sizes,function(k){return ptLabel(LK_SIZES,k);}))+'</strong><br>Most common area: <strong>'+escapeHTML(top(areas,radarAreaLabel))+'</strong><br>Who books the travel: <strong>'+escapeHTML(top(books,function(k){return ptLabel(LK_BOOKS,k);}))+'</strong></div>'+(noInd?'<div style="font-size:var(--fs-xs);color:var(--muted);margin-top:8px;">'+noInd+' client'+(noInd===1?' has':'s have')+' no industry yet. Add one to get searches for it.</div>':'');
+  if(!order.length){el.innerHTML='<div style="font-size:var(--fs-sm);color:var(--muted);">Add an industry to at least one client to see searches for companies like it.</div>';return;}
+  el.innerHTML=order.slice(0,6).map(function(k,i){
+    var g=groups[k],cities=[],titles=[],szs=[];
+    g.clients.forEach(function(c){var city=LK_CITY[c.area]||'Atlanta GA';if(cities.indexOf(city)===-1){cities.push(city);}if(LK_TITLES[c.books]&&titles.indexOf(LK_TITLES[c.books])===-1){titles.push(LK_TITLES[c.books]);}if(c.size&&szs.indexOf(LK_APOLLO_SIZE[c.size])===-1){szs.push(LK_APOLLO_SIZE[c.size]);}});
+    cities=cities.slice(0,3);if(!titles.length){titles=['executive assistant','office manager','travel coordinator'];}
+    var from='Similar to '+g.clients.map(function(c){return c.name;}).join(', ');
+    var links=lkSearchLinks(g.ind,cities,titles).map(function(l){return '<div style="margin:4px 0;font-size:var(--fs-sm);"><a href="'+l[1]+'" target="_blank" rel="noopener noreferrer" style="color:var(--gold);text-decoration:underline;">'+escapeHTML(l[0])+'</a></div>';}).join('');
+    var apollo='Industry: '+g.ind+' | Location: '+cities.join(' or ')+' | Employees: '+(szs.length?szs.join(', '):'set to match your clients')+' | Titles: '+titles.concat(['chief of staff']).join(', ');
+    return '<div class="card" style="margin-top:12px;"><div class="sep-title"><span class="mini-badge mb-green">'+escapeHTML(g.ind)+'</span></div>'+
+      '<div id="lk-from-'+i+'" style="font-size:var(--fs-xs);color:var(--muted);margin-bottom:8px;overflow-wrap:anywhere;">'+escapeHTML(from)+'</div>'+links+
+      '<div style="font-size:var(--fs-xs);margin-top:8px;overflow-wrap:anywhere;"><strong>Apollo filters to copy:</strong> '+escapeHTML(apollo)+'</div>'+
+      '<div class="g2" style="margin-top:10px;"><div><label for="lk-co-'+i+'">Company you found</label><input type="text" id="lk-co-'+i+'" maxlength="100"></div>'+
+      '<div><label for="lk-ar-'+i+'">Area</label><select id="lk-ar-'+i+'"><option value="perimeter">Perimeter</option><option value="alpharetta">Alpharetta / North Fulton</option><option value="cobb">Cobb</option><option value="gwinnett">Gwinnett</option></select></div></div>'+
+      '<div class="btns" style="margin-top:8px;"><button class="btn btn-gold" onclick="lkAddToRadar('+i+')">Add to Radar watchlist</button></div></div>';
   }).join('');
 }
 </script>
