@@ -602,6 +602,7 @@ textarea{resize:vertical;min-height:75px;}
     <button class="tab" onclick="switchTab('results',this)">&#128200; Results</button>
     <button class="tab" onclick="switchTab('partners',this)">&#129309; Partners</button>
     <button class="tab" onclick="switchTab('lookalike',this)">&#128269; Lookalikes</button>
+    <button class="tab" onclick="switchTab('quotes',this)">&#128181; Quote Builder</button>
     <button class="tab" onclick="switchTab('vendor',this)">&#128196; Vendor Packet</button>
     <button class="tab" onclick="switchTab('forecast',this)">&#128176; Forecast</button>
     <button class="tab" onclick="switchTab('script',this)">Call Script</button>
@@ -1675,6 +1676,37 @@ textarea{resize:vertical;min-height:75px;}
     <div id="fc-body"></div>
   </div>
 
+  <div class="panel" id="panel-quotes">
+    <div class="sec-tag">Price a trip in seconds</div>
+    <div class="sec-h">Quote Builder</div>
+    <div class="sec-d">Enter the pickup and drop-off. You get the Sedan and SUV price from your own distance rates, with the peak surcharge and the 45% Executive &amp; Service Rate included. Copy it into an email in one click. Treat the price as an estimate until you have compared it with your booking system (the check box below the prices does that).</div>
+    <div class="card"><div class="sep-title"><span class="mini-badge mb-gold">Trip</span></div>
+      <div class="g2"><div><label for="qt-pick">Pick a prospect (optional)</label><select id="qt-pick" onchange="qtPick(this.value)"></select></div>
+      <div><label for="qt-client">Client or company</label><input type="text" id="qt-client" maxlength="100" oninput="qtCompute()"></div></div>
+      <div class="g2"><div><label for="qt-from">Pickup address</label><input type="text" id="qt-from" maxlength="200" placeholder="Street, city, state" oninput="qtCompute()"></div>
+      <div><label for="qt-to">Drop-off address</label><input type="text" id="qt-to" maxlength="200" placeholder="Street, city, state" oninput="qtCompute()"></div></div>
+      <div class="g2"><div><label for="qt-miles">Miles</label><input type="text" id="qt-miles" inputmode="decimal" maxlength="7" placeholder="Filled in by Get distance, or type it" oninput="qtCompute()"></div>
+      <div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;"><button class="btn btn-gold" id="qt-lookup" onclick="qtLookup()">Get distance</button><a id="qt-maps" href="#" target="_blank" rel="noopener noreferrer" style="color:var(--gold);font-size:var(--fs-xs);text-decoration:underline;display:none;">Check in Google Maps</a></div></div>
+      <div id="qt-msg" style="font-size:var(--fs-xs);color:var(--muted);margin-bottom:10px;" aria-live="polite"></div>
+      <div class="g2"><div><label for="qt-date">Pickup date</label><input type="date" id="qt-date" oninput="qtCompute()" onchange="qtCompute()"></div>
+      <div><label for="qt-time">Pickup time</label><input type="time" id="qt-time" oninput="qtCompute()" onchange="qtCompute()"></div></div>
+      <div style="max-width:320px;"><label for="qt-peak">Peak pricing</label><select id="qt-peak" onchange="qtCompute()"><option value="auto">Automatic, from the date and time</option><option value="yes">Treat as peak</option><option value="no">Treat as off-peak</option></select></div>
+    </div>
+    <div class="card"><div class="sep-title"><span class="mini-badge mb-green">Price</span></div><div id="qt-result"></div></div>
+    <div class="card"><div class="sep-title"><span class="mini-badge mb-blue">Check against your booking system</span></div>
+      <div style="font-size:var(--fs-xs);color:var(--muted);margin-bottom:8px;">Enter the same trip on your booking site and type the prices it shows. Any difference means one of the rates or the peak rule below needs adjusting.</div>
+      <div class="g2"><div><label for="qt-chk-sedan">Booking site price, Sedan ($)</label><input type="text" id="qt-chk-sedan" inputmode="decimal" maxlength="9" oninput="qtCompute()"></div>
+      <div><label for="qt-chk-suv">Booking site price, SUV ($)</label><input type="text" id="qt-chk-suv" inputmode="decimal" maxlength="9" oninput="qtCompute()"></div></div>
+      <div id="qt-check-out" style="font-size:var(--fs-sm);"></div>
+    </div>
+    <div class="card"><div class="sep-title"><span class="mini-badge mb-gold">Quote log</span></div><div id="qt-log"></div></div>
+    <div class="card"><div class="sep-title"><span class="mini-badge mb-blue">Distance rates</span></div>
+      <div style="font-size:var(--fs-xs);color:var(--muted);margin-bottom:8px;line-height:1.5;">Entered from your booking-system rate screens. Compare each number with the booking system, especially which screen is the Sedan and which is the SUV, and whether the peak percentage applies to the whole fare, and whether the Executive &amp; Service Rate is charged on the fare after peak. Changes save here only; they do not change your booking site.</div>
+      <div id="qt-rates"></div>
+      <div class="btns" style="margin-top:10px;"><button class="btn btn-outline" onclick="qtResetRates()">Reset rates</button></div>
+    </div>
+  </div>
+
   <div class="panel" id="panel-vendor">
     <div class="sec-tag">Get approved as a vendor</div>
     <div class="sec-h">Vendor Packet &amp; Proposal</div>
@@ -1989,7 +2021,7 @@ function notify_safe(msg){
   // may not exist yet at the moment these utilities run — this wrapper is safe either way.
   try{ if(typeof notify==='function'){ notify(msg); } else { console.warn(msg); } }catch(e){ console.warn(msg); }
 }
-var APPROVED_BACKUP_KEYS=['ob-pipeline','ob-gatekeepers','ob-messages','ob-cal-progress','ob-event-mode','ob-radar','ob-vendor','ob-partners','ob-lookalike','ob-forecast'];
+var APPROVED_BACKUP_KEYS=['ob-pipeline','ob-gatekeepers','ob-messages','ob-cal-progress','ob-event-mode','ob-radar','ob-vendor','ob-partners','ob-lookalike','ob-forecast','ob-quotes'];
 var pendingRestore=null; // holds validated backup.keys while previewed, before the operator commits
 
 function csvCell(v){
@@ -2273,7 +2305,7 @@ var SIG_SCORES={'sig-hired':3,'sig-office':2,'sig-earnings':1,'sig-speaking':2,'
 var SIG_LABELS={'sig-hired':'Recently hired/promoted','sig-office':'Company opening ATL office','sig-earnings':'Upcoming earnings/board meeting','sig-speaking':'Speaking at ATL event','sig-reloc':'Relocating to Atlanta','sig-travel':'Increased travel activity'};
 var CHIP_IDS={'sig-hired':'chip-hired','sig-office':'chip-office','sig-earnings':'chip-earnings','sig-speaking':'chip-speaking','sig-reloc':'chip-reloc','sig-travel':'chip-travel'};
 
-function switchTab(n,el){document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});el.classList.add('active');document.getElementById('panel-'+n).classList.add('active');if(n==='pipeline'){renderPipeline();}if(n==='company'){buildCoMap();}if(n==='calendar'){initCalendar();updateKPIs();}if(n==='gatekeeper'){renderGatekeepers();}if(n==='radar'){renderRadar();}if(n==='today'){renderToday();}if(n==='results'){renderResults();}if(n==='vendor'){renderVendor();}if(n==='partners'){renderPartners();}if(n==='lookalike'){renderLookalike();}if(n==='forecast'){renderForecast();}}
+function switchTab(n,el){document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});el.classList.add('active');document.getElementById('panel-'+n).classList.add('active');if(n==='pipeline'){renderPipeline();}if(n==='company'){buildCoMap();}if(n==='calendar'){initCalendar();updateKPIs();}if(n==='gatekeeper'){renderGatekeepers();}if(n==='radar'){renderRadar();}if(n==='today'){renderToday();}if(n==='results'){renderResults();}if(n==='vendor'){renderVendor();}if(n==='partners'){renderPartners();}if(n==='lookalike'){renderLookalike();}if(n==='forecast'){renderForecast();}if(n==='quotes'){renderQuotes();}}
 
 function toggleSig(sid,cid){var cb=document.getElementById(sid);var chip=document.getElementById(cid);cb.checked=!cb.checked;if(cb.checked){chip.classList.add('on');}else{chip.classList.remove('on');}refreshBM();}
 function refreshBM(){var total=0;Object.keys(SIG_SCORES).forEach(function(id){var el=document.getElementById(id);if(el&&el.checked){total+=SIG_SCORES[id];}});total=Math.min(total,10);var num=document.getElementById('bm-num'),fill=document.getElementById('bm-fill'),desc=document.getElementById('bm-desc');num.textContent=total;fill.style.width=(total*10)+'%';var c,d;if(total===0){c='var(--muted)';d='No signals active';}else if(total<=3){c='#e67e22';d='Mild timing - monitor';}else if(total<=6){c='var(--yellow)';d='Good timing - reach out soon';}else if(total<=8){c='var(--green)';d='Strong timing - act this week';}else{c='var(--gold)';d='PEAK MOMENT - reach out today';}num.style.color=c;fill.style.background=c;desc.style.color=c;desc.textContent=d;return total;}
@@ -5195,7 +5227,7 @@ async function cloudResolve(key,choice){
     }else{renderCloud();}
   }catch(e){cloudSet('conflict','That did not save. Check your connection and try again.');}
 }
-function cloudKeyLabel(k){return {'ob-pipeline':'Pipeline','ob-gatekeepers':'Gatekeepers','ob-messages':'Messages','ob-cal-progress':'Calendar progress','ob-event-mode':'Event mode','ob-radar':'Market Radar','ob-vendor':'Vendor packet','ob-partners':'Partners','ob-lookalike':'Lookalikes','ob-forecast':'Forecast'}[k]||k;}
+function cloudKeyLabel(k){return {'ob-pipeline':'Pipeline','ob-gatekeepers':'Gatekeepers','ob-messages':'Messages','ob-cal-progress':'Calendar progress','ob-event-mode':'Event mode','ob-radar':'Market Radar','ob-vendor':'Vendor packet','ob-partners':'Partners','ob-lookalike':'Lookalikes','ob-forecast':'Forecast','ob-quotes':'Quotes'}[k]||k;}
 function renderCloud(){
   var chip=document.getElementById('cloud-chip');
   var labels={off:'Cloud: off',checking:'Cloud: checking',syncing:'Cloud: syncing',synced:'Cloud: saved',error:'Cloud: not synced',conflict:'Cloud: choose data',newer:'Cloud: newer data'};
@@ -5327,6 +5359,14 @@ function renderToday(){
     var d=todayDaysBetween(p.nextFollow,today);
     return todayItem(d>0?'high':'med',escapeHTML(p.name)+(p.org?' &middot; '+escapeHTML(p.org):'')+' &middot; '+escapeHTML(ptLabel(PT_TYPES,p.type)),d>0?'Follow-up overdue '+d+' day'+(d===1?'':'s'):'Follow-up due today',[todayBtn('Log contact','ptLog(\''+p.id+'\')',true),todayBtn('Open Partners','todayGoTab(\'partners\')')]);
   }).join('');
+  // 3c. Quotes
+  var qtList=(typeof qtState!=='undefined'&&qtState&&Array.isArray(qtState.log))?qtState.log:[];
+  var qtDue=qtList.filter(function(q){return q.status==='sent'&&q.follow&&q.follow<=today;}).sort(function(a,b){return a.follow<b.follow?-1:1;});
+  total+=qtDue.length;
+  var qtHtml=qtDue.slice(0,6).map(function(q){
+    var d=todayDaysBetween(q.follow,today);
+    return todayItem(d>0?'high':'med',escapeHTML(q.client||'Quote')+' &middot; '+(q.sedan!==null?'Sedan $'+q.sedan.toFixed(2):'')+(q.suv!==null?' SUV $'+q.suv.toFixed(2):''),d>0?'Quote follow-up overdue '+d+' day'+(d===1?'':'s'):'Quote follow-up due today',[todayBtn('Won','qtSet(\''+q.id+'\',\'status\',\'won\')',true),todayBtn('Lost','qtSet(\''+q.id+'\',\'status\',\'lost\')'),todayBtn('Snooze 3d','qtSnooze(\''+q.id+'\')'),todayBtn('Open','todayGoTab(\'quotes\')')]);
+  }).join('');
   // 4. Sprint
   var sh='';
   if(!radarState.sprintStart){
@@ -5344,6 +5384,7 @@ function renderToday(){
     todaySection('Gatekeepers','mb-blue',gkHtml,'No gatekeeper follow-ups are due.')+
     todaySection('Market Radar','mb-green',rh,'Nothing new from the Radar today.')+
     (ptList.length?todaySection('Partners','mb-blue',ptHtml,'No partner follow-ups are due.'):'')+
+    (qtList.length?todaySection('Quotes','mb-gold',qtHtml,'No quote follow-ups are due.'):'')+
     todaySection('Sprint','mb-gold',sh,'All of this week\'s sprint tasks are done.')+
     todaySection('Weekly digest','mb-blue',(typeof TODAY_INACTIVE_STAGES!=='undefined'?digestHTML():''),'');
   var sm=document.getElementById('today-summary');
@@ -5913,6 +5954,279 @@ function renderForecast(){
   var goal='<div class="card"><div class="sep-title"><span class="mini-badge mb-blue">Goal</span></div><label for="fc-target">Monthly revenue goal ($)</label><input type="text" id="fc-target" inputmode="decimal" maxlength="10" value="'+(fcState.target||'')+'" onchange="fcSetTarget(this.value)" style="max-width:200px;margin-bottom:10px;">'+gh+'</div>';
   el.innerHTML=tiles+table+goal;
 }
+
+// ===== QUOTE BUILDER =====
+// Distance pricing copied from the booking system's matrix: first tier, next tier, then a per-mile
+// rate for the remainder, plus a percentage added during peak windows. Everything is editable.
+var QT_DAYS=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+var QT_VEHICLES=['sedan','suv'];
+var QT_SVC_DEFAULT=45;
+var QT_DEFAULT={
+  sedan:{label:'Executive Sedan',first:{miles:1,rate:65},next:{miles:9,rate:0},rem:3.15,peak:15.25,days:[null,['14:00','18:59'],['14:00','19:59'],['14:00','19:59'],['14:00','19:59'],['14:00','23:59'],['00:00','05:59']]},
+  suv:{label:'Executive SUV',first:{miles:1,rate:75},next:{miles:9,rate:0},rem:3.79,peak:20.05,days:[['00:00','05:59'],['14:00','18:59'],['14:00','19:59'],['14:00','19:59'],['14:00','19:59'],['14:00','23:59'],['00:00','05:59']]}
+};
+function qtNum(v,min,max,dflt){var n=parseFloat(v);if(!isFinite(n)){return dflt;}return Math.max(min,Math.min(max,Math.round(n*100)/100));}
+function qtRate(v,min,max,dflt){var n=parseFloat(v);return (isFinite(n)&&n>=min&&n<=max)?Math.round(n*100)/100:dflt;}
+function qtTime(v,dflt){return (typeof v==='string'&&/^([01]\d|2[0-3]):[0-5]\d$/.test(v))?v:dflt;}
+function qtMoneyOrNull(v){var n=parseFloat(v);return (isFinite(n)&&n>=0&&n<=100000)?Math.round(n*100)/100:null;}
+function qtClean(raw){
+  var out={rates:JSON.parse(JSON.stringify(QT_DEFAULT)),svc:QT_SVC_DEFAULT,log:[]};
+  if(!raw||typeof raw!=='object'||Array.isArray(raw)){return out;}
+  out.svc=qtRate(raw.svc,0,200,QT_SVC_DEFAULT);
+  if(raw.rates&&typeof raw.rates==='object'){
+    QT_VEHICLES.forEach(function(v){
+      var r=raw.rates[v],d=QT_DEFAULT[v],o=out.rates[v];
+      if(!r||typeof r!=='object'){return;}
+      if(r.first&&typeof r.first==='object'){o.first.miles=qtRate(r.first.miles,0,100,d.first.miles);o.first.rate=qtRate(r.first.rate,0,9999,d.first.rate);}
+      if(r.next&&typeof r.next==='object'){o.next.miles=qtRate(r.next.miles,0,500,d.next.miles);o.next.rate=qtRate(r.next.rate,0,9999,d.next.rate);}
+      o.rem=qtRate(r.rem,0,999,d.rem);o.peak=qtRate(r.peak,0,500,d.peak);
+      if(Array.isArray(r.days)&&r.days.length===7){o.days=r.days.map(function(x,i){
+        if(!Array.isArray(x)||x.length!==2){return null;}
+        var a=qtTime(x[0],null),b=qtTime(x[1],null);return (a&&b)?[a,b]:null;});}
+    });
+  }
+  if(Array.isArray(raw.log)){
+    var seen={};
+    raw.log.slice(0,200).forEach(function(q,i){
+      if(!q||typeof q!=='object'){return;}
+      var id=(typeof q.id==='string'&&/^qt-\d{6,}$/.test(q.id)&&!seen[q.id])?q.id:'qt-'+(Date.now()+i);
+      while(seen[id]){id=id+'1';}
+      seen[id]=1;
+      out.log.push({id:id,client:String(q.client||'').slice(0,100),from:String(q.from||'').slice(0,200),to:String(q.to||'').slice(0,200),
+        miles:qtNum(q.miles,0,2000,0),date:ptDate(q.date),time:qtTime(q.time,''),peak:(q.peak==='yes'||q.peak==='no')?q.peak:'',
+        sedan:qtMoneyOrNull(q.sedan),suv:qtMoneyOrNull(q.suv),
+        status:(['sent','won','lost'].indexOf(q.status)!==-1)?q.status:'sent',follow:ptDate(q.follow),at:ptDate(q.at)});
+    });
+  }
+  return out;
+}
+var qtState=qtClean(loadJSON('ob-quotes',null));
+function qtSave(){saveJSON('ob-quotes',qtState);}
+function qtRound(n){return Math.round(n*100)/100;}
+function qtMoney(n){return '$'+Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function qtIsPeak(veh,dateStr,timeStr){
+  var r=qtState.rates[veh];if(!r||!/^\d{4}-\d{2}-\d{2}$/.test(dateStr||'')||!/^\d{2}:\d{2}$/.test(timeStr||'')){return null;}
+  var p=dateStr.split('-'),dow=new Date(+p[0],+p[1]-1,+p[2]).getDay();
+  var w=r.days[dow];if(!w){return false;}
+  var t=parseInt(timeStr.slice(0,2),10)*60+parseInt(timeStr.slice(3),10);
+  var a=parseInt(w[0].slice(0,2),10)*60+parseInt(w[0].slice(3),10),b=parseInt(w[1].slice(0,2),10)*60+parseInt(w[1].slice(3),10);
+  return a<=b?(t>=a&&t<=b):(t>=a||t<=b);
+}
+// peak: true, false, or null (unknown). Trips shorter than the first tier are charged the full first tier.
+function qtQuote(veh,miles,peak){
+  var r=qtState.rates[veh];if(!r||!(miles>0)){return null;}
+  var lines=[],base=0;
+  var a=r.first.miles*r.first.rate;base+=a;lines.push(['First '+r.first.miles+' mile'+(r.first.miles===1?'':'s'),a]);
+  var rest=Math.max(0,miles-r.first.miles);
+  var nm=Math.min(rest,r.next.miles);
+  if(r.next.miles>0){var b=nm*r.next.rate;base+=b;lines.push(['Next '+r.next.miles+' miles'+(r.next.rate===0?' (included)':''),b]);}
+  var rm=Math.max(0,rest-r.next.miles);
+  if(rm>0){var c=rm*r.rem;base+=c;lines.push([qtRound(rm)+' mile'+(qtRound(rm)===1?'':'s')+' at '+qtMoney(r.rem)+' per mile',c]);}
+  base=qtRound(base);
+  var pk=peak===true?qtRound(base*r.peak/100):0;
+  var sub=qtRound(base+pk),sv=qtRound(sub*qtState.svc/100);
+  var pkSub=qtRound(base+base*r.peak/100);
+  return {veh:veh,label:r.label,base:base,peakPct:r.peak,peakAmt:pk,peakApplied:peak===true,peakUnknown:peak===null,svcPct:qtState.svc,svcAmt:sv,total:qtRound(sub+sv),ifPeak:qtRound(pkSub+pkSub*qtState.svc/100),lines:lines};
+}
+function qtPeakFor(veh){
+  var o=document.getElementById('qt-peak').value;
+  if(o==='yes'){return true;}if(o==='no'){return false;}
+  return qtIsPeak(veh,document.getElementById('qt-date').value,document.getElementById('qt-time').value);
+}
+function qtInputs(){
+  return {client:document.getElementById('qt-client').value.trim(),from:document.getElementById('qt-from').value.trim(),to:document.getElementById('qt-to').value.trim(),
+    miles:parseFloat(document.getElementById('qt-miles').value),date:document.getElementById('qt-date').value,time:document.getElementById('qt-time').value};
+}
+var qtLast=null;
+function qtCompute(){
+  var el=document.getElementById('qt-result');if(!el){return;}
+  var inp=qtInputs();
+  var maps=document.getElementById('qt-maps');
+  if(inp.from.length>=5&&inp.to.length>=5){maps.href='https://www.google.com/maps/dir/?api=1&origin='+encodeURIComponent(inp.from)+'&destination='+encodeURIComponent(inp.to);maps.style.display='inline';}
+  else{maps.style.display='none';}
+  var chk=document.getElementById('qt-check-out');
+  if(!(inp.miles>0)){
+    qtLast=null;
+    el.innerHTML='<div style="font-size:var(--fs-sm);color:var(--muted);">Enter both addresses and press Get distance, or type the miles, to see the price.</div>';
+    chk.textContent='';return;
+  }
+  var qs=QT_VEHICLES.map(function(v){return qtQuote(v,inp.miles,qtPeakFor(v));});
+  qtLast={inp:inp,qs:qs};
+  var tiles=qs.map(function(q){
+    var detail=q.lines.map(function(l){return '<div style="display:flex;justify-content:space-between;gap:10px;"><span>'+escapeHTML(l[0])+'</span><span>'+qtMoney(l[1])+'</span></div>';}).join('')+
+      (q.peakApplied?'<div style="display:flex;justify-content:space-between;gap:10px;"><span>Peak pricing +'+q.peakPct+'%</span><span>'+qtMoney(q.peakAmt)+'</span></div>':'')+
+      (q.svcPct>0?'<div style="display:flex;justify-content:space-between;gap:10px;"><span>Executive &amp; Service Rate '+q.svcPct+'%</span><span>'+qtMoney(q.svcAmt)+'</span></div>':'');
+    return '<div style="flex:1;min-width:220px;border:1px solid var(--border);padding:14px;">'+
+      '<div style="font-size:var(--fs-xs);color:var(--muted);">'+escapeHTML(q.label)+'</div>'+
+      '<div style="font-size:28px;font-weight:700;margin:2px 0 8px;" data-qt-total="'+q.veh+'">'+qtMoney(q.total)+'</div>'+
+      '<div style="font-size:var(--fs-xs);color:var(--muted);line-height:1.6;">'+detail+'</div>'+
+      (q.peakUnknown?'<div style="font-size:var(--fs-xs);margin-top:8px;">During peak hours: <strong>'+qtMoney(q.ifPeak)+'</strong> (+'+q.peakPct+'%). Add the pickup date and time to price it exactly.</div>':'')+
+      (q.peakApplied?'':(q.peakUnknown?'':'<div style="font-size:var(--fs-xs);margin-top:8px;color:var(--muted);">Off-peak. Peak would be '+qtMoney(q.ifPeak)+'.</div>'))+'</div>';
+  }).join('');
+  var hourly=qtHourlyRows();
+  el.innerHTML='<div style="font-size:var(--fs-sm);margin-bottom:10px;">'+qtRound(inp.miles)+' miles'+(inp.date?' &middot; '+escapeHTML(inp.date):'')+(inp.time?' at '+escapeHTML(qtTime12(inp.time)):'')+'</div>'+
+    '<div style="display:flex;flex-wrap:wrap;gap:12px;">'+tiles+'</div>'+
+    (hourly?'<div style="font-size:var(--fs-xs);color:var(--muted);margin-top:12px;line-height:1.6;">By the hour instead: '+hourly+'</div>':'')+
+    '<div class="btns" style="margin-top:12px;"><button class="btn btn-gold" onclick="qtCopy()">Copy quote</button><button class="btn btn-outline" onclick="qtSaveQuote()">Save to quote log</button></div>';
+  var cs=parseFloat(document.getElementById('qt-chk-sedan').value),cv=parseFloat(document.getElementById('qt-chk-suv').value),parts=[];
+  [['Sedan',cs,qs[0]],['SUV',cv,qs[1]]].forEach(function(x){
+    if(!isFinite(x[1])){return;}
+    var d=qtRound(x[2].total-x[1]);
+    parts.push(x[0]+': '+(Math.abs(d)<0.005?'<strong>matches</strong> the booking site.':'this app says '+qtMoney(x[2].total)+', the booking site says '+qtMoney(x[1])+' (<strong>'+(d>0?'+':'-')+qtMoney(Math.abs(d))+'</strong>).'));
+  });
+  chk.innerHTML=parts.join('<br>');
+}
+function qtHourlyRows(){
+  var rows=[];
+  (vendorState&&Array.isArray(vendorState.rates)?vendorState.rates:[]).forEach(function(r){
+    if(['sedan','suv','sprinter'].indexOf(r.id)===-1){return;}
+    var rate=parseFloat(r.rate),min=parseFloat(r.min);
+    if(isFinite(rate)&&rate>0&&isFinite(min)&&min>0){rows.push(escapeHTML(r.label.replace('Executive ','').replace('Mercedes-Benz ',''))+' '+qtMoney(rate)+'/hr, '+min+'-hour minimum ('+qtMoney(rate*min)+')');}
+  });
+  return rows.join(' &middot; ');
+}
+function qtTime12(t){var h=parseInt(t.slice(0,2),10),m=t.slice(3);return ((h%12)||12)+':'+m+' '+(h<12?'AM':'PM');}
+function qtText(){
+  if(!qtLast){return '';}
+  var i=qtLast.inp,c=vendorState.co,L=[];
+  L.push((c.legal||'Odyssey Black, LLC')+' - Trip quote','');
+  if(i.client){L.push('For: '+i.client);}
+  if(i.from){L.push('Pickup: '+i.from);}
+  if(i.to){L.push('Drop-off: '+i.to);}
+  if(i.date||i.time){L.push('When: '+(i.date||'')+(i.time?' at '+qtTime12(i.time):''));}
+  L.push('Distance: about '+qtRound(i.miles)+' miles','');
+  var anyUnknown=false;
+  qtLast.qs.forEach(function(q){L.push(q.label+': '+qtMoney(q.total)+(q.peakApplied?' (includes peak pricing)':''));if(q.peakUnknown){anyUnknown=true;}});
+  L.push('');
+  if(anyUnknown){L.push('Pickups during peak hours carry a surcharge. Send the pickup time for an exact price.');}
+  if(qtState.svc>0){L.push('Prices include the '+qtState.svc+'% Executive & Service Rate.');}
+  L.push('This is an estimate based on driving distance. The final price is confirmed when you book.','');
+  var sig=[c.signer,c.phone,c.email,c.web].filter(function(x){return x;});
+  return L.join('\n')+sig.join('\n');
+}
+function qtCopy(){
+  var txt=qtText();if(!txt){return;}
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(function(){notify('Quote copied.');},function(){qtCopyFallback(txt);});}
+  else{qtCopyFallback(txt);}
+}
+function qtCopyFallback(txt){
+  var ta=document.createElement('textarea');ta.value=txt;ta.setAttribute('readonly','');ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();
+  var ok=false;try{ok=document.execCommand('copy');}catch(e){}
+  document.body.removeChild(ta);notify(ok?'Quote copied.':'Could not copy. Select the text on screen instead.');
+}
+function qtPick(v){
+  if(v===''){return;}
+  var p=pipeline.filter(function(x){return String(x.id)===String(v);})[0];
+  if(p){document.getElementById('qt-client').value=(p.company||p.name||'').slice(0,100);qtCompute();}
+}
+function qtFillPicker(){
+  var sel=document.getElementById('qt-pick');if(!sel){return;}
+  sel.innerHTML='<option value="">Choose...</option>'+(Array.isArray(pipeline)?pipeline:[]).filter(function(p){return p.company||p.name;}).slice(0,300).map(function(p){return '<option value="'+escapeHTML(String(p.id))+'">'+escapeHTML(p.company||p.name)+(p.company&&p.name?' ('+escapeHTML(p.name)+')':'')+'</option>';}).join('');
+}
+function qtMsg(t){var e=document.getElementById('qt-msg');if(e){e.textContent=t;}}
+async function qtLookup(){
+  var inp=qtInputs();
+  if(inp.from.length<5||inp.to.length<5){qtMsg('Enter both addresses first.');return;}
+  var btn=document.getElementById('qt-lookup');btn.disabled=true;qtMsg('Looking up the distance...');
+  try{
+    var res=await fetch('/.netlify/functions/distance?from='+encodeURIComponent(inp.from)+'&to='+encodeURIComponent(inp.to));
+    var data={};try{data=await res.json();}catch(e){}
+    if(res.ok&&data.status==='OK'&&typeof data.miles==='number'){
+      document.getElementById('qt-miles').value=String(data.miles);
+      qtMsg('About '+data.miles+' miles'+(data.minutes?', about '+data.minutes+' minutes of driving':'')+'. You can change the miles if the route is different.');
+      qtCompute();
+    }else{
+      var m={routes_not_enabled:'The distance service is not switched on yet for your Google key (it needs the Routes API). Type the miles, or use the Google Maps link.',
+        server_not_configured:'The distance service is not set up on the server yet. Type the miles, or use the Google Maps link.',
+        invalid_input:'Check the addresses. Use letters, numbers and commas only.',no_route:'No driving route found between those addresses. Check them, or type the miles.',
+        rate_limited:'Too many lookups. Wait a minute, or type the miles.',timeout:'The lookup timed out. Try again, or type the miles.'};
+      qtMsg(m[data.error]||'The distance lookup did not work. Type the miles, or use the Google Maps link.');
+    }
+  }catch(e){qtMsg('The distance lookup did not work. Type the miles, or use the Google Maps link.');}
+  btn.disabled=false;
+}
+function qtSaveQuote(){
+  if(!qtLast){return;}
+  var i=qtLast.inp,pk='';
+  if(qtLast.qs[0].peakApplied){pk='yes';}else if(!qtLast.qs[0].peakUnknown){pk='no';}
+  var q=qtClean({log:[{id:'qt-'+Date.now(),client:i.client,from:i.from,to:i.to,miles:i.miles,date:i.date,time:i.time,peak:pk,sedan:qtLast.qs[0].total,suv:qtLast.qs[1].total,status:'sent',follow:todayAddDays(3),at:atlDateStr()}]}).log[0];
+  qtState.log.unshift(q);if(qtState.log.length>200){qtState.log.length=200;}
+  qtSave();notify('Quote saved. Follow-up set for '+q.follow+'.');renderQuoteLog();
+  if(document.getElementById('today-body')){renderToday();}
+}
+function qtFind(id){return qtState.log.filter(function(x){return x.id===id;})[0];}
+function qtSet(id,field,val){
+  var q=qtFind(id);if(!q){return;}
+  if(field==='status'&&['sent','won','lost'].indexOf(val)!==-1){q.status=val;}
+  if(field==='follow'){q.follow=ptDate(val);}
+  qtSave();renderQuoteLog();if(document.getElementById('today-body')){renderToday();}
+}
+function qtSnooze(id){var q=qtFind(id);if(!q){return;}q.follow=todayAddDays(3);qtSave();notify('Snoozed to '+q.follow);renderQuoteLog();renderToday();}
+var qtConfirm='';
+function qtDelete(id){
+  if(qtConfirm!==id){qtConfirm=id;renderQuoteLog();return;}
+  qtState.log=qtState.log.filter(function(x){return x.id!==id;});qtConfirm='';qtSave();renderQuoteLog();
+}
+function renderQuoteLog(){
+  var el=document.getElementById('qt-log');if(!el){return;}
+  var L=qtState.log,today=atlDateStr();
+  if(!L.length){el.innerHTML='<div style="font-size:var(--fs-sm);color:var(--muted);">No saved quotes yet. Price a trip above and press Save to quote log. Saved quotes show up on Today when their follow-up is due.</div>';return;}
+  var won=L.filter(function(q){return q.status==='won';}).length,lost=L.filter(function(q){return q.status==='lost';}).length,sent=L.length-won-lost;
+  var h='<div style="font-size:var(--fs-sm);margin-bottom:8px;"><strong>'+L.length+'</strong> quote'+(L.length===1?'':'s')+' &middot; <strong>'+sent+'</strong> waiting &middot; <strong>'+won+'</strong> won &middot; <strong>'+lost+'</strong> lost &middot; '+resultPct(won,won+lost)+' of decided quotes won</div>';
+  h+=L.slice(0,50).map(function(q){
+    var overdue=q.status==='sent'&&q.follow&&q.follow<today;
+    var opts=[['sent','Waiting'],['won','Won'],['lost','Lost']].map(function(s){return '<option value="'+s[0]+'"'+(q.status===s[0]?' selected':'')+'>'+s[1]+'</option>';}).join('');
+    return '<div style="padding:10px 0;border-bottom:1px solid var(--border);">'+
+      '<div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;"><div style="font-weight:600;font-size:var(--fs-sm);">'+escapeHTML(q.client||'No name')+'</div><div style="font-size:var(--fs-xs);color:var(--muted);">'+escapeHTML(q.at||'')+'</div></div>'+
+      '<div style="font-size:var(--fs-xs);color:var(--muted);margin-top:2px;overflow-wrap:anywhere;">'+escapeHTML(q.from)+(q.to?' to '+escapeHTML(q.to):'')+' &middot; '+q.miles+' mi'+(q.date?' &middot; '+escapeHTML(q.date):'')+'</div>'+
+      '<div style="font-size:var(--fs-sm);margin-top:4px;">Sedan '+(q.sedan===null?'-':qtMoney(q.sedan))+' &middot; SUV '+(q.suv===null?'-':qtMoney(q.suv))+(q.peak==='yes'?' <span style="color:var(--muted);">(peak)</span>':'')+'</div>'+
+      '<div class="g2" style="margin-top:8px;"><div><label>Status</label><select onchange="qtSet(\''+q.id+'\',\'status\',this.value)">'+opts+'</select></div>'+
+      '<div><label>Follow-up'+(overdue?' (overdue)':'')+'</label><input type="date" value="'+escapeHTML(q.follow)+'" onchange="qtSet(\''+q.id+'\',\'follow\',this.value)"></div></div>'+
+      '<div class="btns" style="margin-top:6px;">'+todayBtn(qtConfirm===q.id?'Click again to delete':'Delete','qtDelete(\''+q.id+'\')')+'</div></div>';
+  }).join('');
+  if(L.length>50){h+='<div style="font-size:var(--fs-xs);color:var(--muted);padding-top:8px;">Showing the newest 50 of '+L.length+'.</div>';}
+  el.innerHTML=h;
+}
+function qtSetRate(veh,field,val){
+  var r=qtState.rates[veh];if(!r){return;}
+  var d=QT_DEFAULT[veh];
+  if(field==='first.miles'){r.first.miles=qtRate(val,0,100,d.first.miles);}
+  else if(field==='first.rate'){r.first.rate=qtRate(val,0,9999,d.first.rate);}
+  else if(field==='next.miles'){r.next.miles=qtRate(val,0,500,d.next.miles);}
+  else if(field==='next.rate'){r.next.rate=qtRate(val,0,9999,d.next.rate);}
+  else if(field==='rem'){r.rem=qtRate(val,0,999,d.rem);}
+  else if(field==='peak'){r.peak=qtRate(val,0,500,d.peak);}
+  else{return;}
+  qtSave();renderQuoteRates();qtCompute();
+}
+function qtSetSvc(val){qtState.svc=qtRate(val,0,200,QT_SVC_DEFAULT);qtSave();renderQuoteRates();qtCompute();}
+function qtSetDay(veh,dow,kind,val){
+  var r=qtState.rates[veh];if(!r||!(dow>=0&&dow<=6)){return;}
+  if(kind==='on'){r.days[dow]=val?(r.days[dow]||['14:00','19:59']):null;}
+  else if(r.days[dow]){var t=qtTime(val,null);if(!t){renderQuoteRates();return;}r.days[dow][kind==='s'?0:1]=t;}
+  qtSave();renderQuoteRates();qtCompute();
+}
+function qtResetRates(){
+  if(!confirm('Reset the Sedan and SUV rates, peak hours and Executive & Service Rate to the values entered from the booking system?')){return;}
+  qtState.rates=JSON.parse(JSON.stringify(QT_DEFAULT));qtState.svc=QT_SVC_DEFAULT;qtSave();renderQuoteRates();qtCompute();
+}
+function renderQuoteRates(){
+  var el=document.getElementById('qt-rates');if(!el){return;}
+  var svcRow='<div style="margin-bottom:12px;"><label for="qt-svc">Executive &amp; Service Rate (%), added to every fare</label><input type="text" id="qt-svc" inputmode="decimal" style="width:90px;" value="'+qtState.svc+'" onchange="qtSetSvc(this.value)"></div>';
+  function num(v,field,veh,label,w){return '<div><label>'+label+'</label><input type="text" inputmode="decimal" style="width:'+(w||90)+'px;" value="'+v+'" aria-label="'+escapeHTML(QT_DEFAULT[veh].label)+' '+label+'" onchange="qtSetRate(\''+veh+'\',\''+field+'\',this.value)"></div>';}
+  el.innerHTML=svcRow+QT_VEHICLES.map(function(v){
+    var r=qtState.rates[v];
+    var days=QT_DAYS.map(function(n,i){var w=r.days[i];
+      return '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:4px 0;font-size:var(--fs-xs);"><label style="display:flex;gap:6px;align-items:center;min-width:110px;margin:0;"><input type="checkbox"'+(w?' checked':'')+' aria-label="'+escapeHTML(r.label)+' peak on '+n+'" onchange="qtSetDay(\''+v+'\','+i+',\'on\',this.checked)"> '+n+'</label>'+
+        '<input type="time" value="'+(w?w[0]:'')+'"'+(w?'':' disabled')+' aria-label="'+escapeHTML(r.label)+' '+n+' peak start" onchange="qtSetDay(\''+v+'\','+i+',\'s\',this.value)"> to '+
+        '<input type="time" value="'+(w?w[1]:'')+'"'+(w?'':' disabled')+' aria-label="'+escapeHTML(r.label)+' '+n+' peak end" onchange="qtSetDay(\''+v+'\','+i+',\'e\',this.value)"></div>';}).join('');
+    return '<details style="margin-bottom:10px;"><summary style="cursor:pointer;font-weight:600;font-size:var(--fs-sm);">'+escapeHTML(r.label)+': '+qtMoney(r.first.miles*r.first.rate+r.next.miles*r.next.rate)+' covers the first '+(r.first.miles+r.next.miles)+' miles, then '+qtMoney(r.rem)+' per mile, peak +'+r.peak+'%</summary>'+
+      '<div style="display:flex;flex-wrap:wrap;gap:12px;margin:10px 0;">'+num(r.first.miles,'first.miles',v,'First tier miles')+num(r.first.rate,'first.rate',v,'First tier $ per mile')+num(r.next.miles,'next.miles',v,'Next tier miles')+num(r.next.rate,'next.rate',v,'Next tier $ per mile')+num(r.rem,'rem',v,'Remaining $ per mile')+num(r.peak,'peak',v,'Peak increase %')+'</div>'+
+      '<div style="font-size:var(--fs-xs);color:var(--muted);margin-bottom:4px;">Peak windows (pickup time)</div>'+days+'</details>';
+  }).join('');
+}
+function renderQuotes(){qtFillPicker();renderQuoteRates();renderQuoteLog();qtCompute();}
+if(document.getElementById('today-body')){renderToday();}
 </script>
 </body>
 </html>
