@@ -600,6 +600,7 @@ textarea{resize:vertical;min-height:75px;}
     <button class="tab" onclick="switchTab('outreach',this)">AI Outreach</button>
     <button class="tab" onclick="switchTab('pipeline',this)">Pipeline</button>
     <button class="tab" onclick="switchTab('results',this)">&#128200; Results</button>
+    <button class="tab" onclick="switchTab('partners',this)">&#129309; Partners</button>
     <button class="tab" onclick="switchTab('vendor',this)">&#128196; Vendor Packet</button>
     <button class="tab" onclick="switchTab('script',this)">Call Script</button>
     <button class="tab" onclick="switchTab('import',this)">Apollo Import</button>
@@ -1623,6 +1624,25 @@ textarea{resize:vertical;min-height:75px;}
   </div>
 
   <!-- TAB 10: GATEKEEPER FINDER -->
+  <div class="panel" id="panel-partners">
+    <div class="sec-tag">People who send you riders</div>
+    <div class="sec-h">Referral &amp; Hotel Partners</div>
+    <div class="sec-d">Hotel concierges, event planners, executive assistants and happy clients can send you a steady stream of travelers. Track who they are, when to follow up, and how many referrals turn into clients. Follow-ups that come due also show on the Today screen.</div>
+    <div class="card"><div class="sep-title"><span class="mini-badge mb-gold">Add a partner</span></div>
+      <div class="g2"><div><label for="pt-name">Name</label><input type="text" id="pt-name" maxlength="100" placeholder="Person or organization"></div>
+      <div><label for="pt-org">Organization (optional)</label><input type="text" id="pt-org" maxlength="100"></div></div>
+      <div class="g2"><div><label for="pt-type">Type</label><select id="pt-type"><option value="hotel">Hotel concierge</option><option value="planner">Event / meeting planner</option><option value="assistant">Executive assistant</option><option value="client">Existing client</option><option value="other">Other</option></select></div>
+      <div><label for="pt-area">Area (optional)</label><select id="pt-area"><option value="">Not set</option><option value="perimeter">Perimeter</option><option value="alpharetta">Alpharetta / North Fulton</option><option value="cobb">Cobb</option><option value="gwinnett">Gwinnett</option></select></div></div>
+      <label for="pt-contact">How to reach them (optional)</label><input type="text" id="pt-contact" maxlength="200" placeholder="Phone, email or where you met">
+      <label for="pt-notes">Notes (optional)</label><input type="text" id="pt-notes" maxlength="500" onkeydown="if(event.key==='Enter')ptAdd()">
+      <div class="btns" style="margin-top:10px;"><button class="btn btn-gold" onclick="ptAdd()">Add partner</button><button class="btn btn-outline" onclick="ptImportHotels()">Import hotels from Market Radar</button></div>
+    </div>
+    <div class="card"><div class="sep-title"><span class="mini-badge mb-green">Your partners</span></div>
+      <div id="pt-summary" style="font-size:var(--fs-sm);margin-bottom:10px;"></div>
+      <div id="pt-chips" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;"></div>
+      <div id="pt-body" style="overflow-wrap:anywhere;min-width:0;"></div></div>
+  </div>
+
   <div class="panel" id="panel-vendor">
     <div class="sec-tag">Get approved as a vendor</div>
     <div class="sec-h">Vendor Packet &amp; Proposal</div>
@@ -1937,7 +1957,7 @@ function notify_safe(msg){
   // may not exist yet at the moment these utilities run — this wrapper is safe either way.
   try{ if(typeof notify==='function'){ notify(msg); } else { console.warn(msg); } }catch(e){ console.warn(msg); }
 }
-var APPROVED_BACKUP_KEYS=['ob-pipeline','ob-gatekeepers','ob-messages','ob-cal-progress','ob-event-mode','ob-radar','ob-vendor'];
+var APPROVED_BACKUP_KEYS=['ob-pipeline','ob-gatekeepers','ob-messages','ob-cal-progress','ob-event-mode','ob-radar','ob-vendor','ob-partners'];
 var pendingRestore=null; // holds validated backup.keys while previewed, before the operator commits
 
 function csvCell(v){
@@ -2221,7 +2241,7 @@ var SIG_SCORES={'sig-hired':3,'sig-office':2,'sig-earnings':1,'sig-speaking':2,'
 var SIG_LABELS={'sig-hired':'Recently hired/promoted','sig-office':'Company opening ATL office','sig-earnings':'Upcoming earnings/board meeting','sig-speaking':'Speaking at ATL event','sig-reloc':'Relocating to Atlanta','sig-travel':'Increased travel activity'};
 var CHIP_IDS={'sig-hired':'chip-hired','sig-office':'chip-office','sig-earnings':'chip-earnings','sig-speaking':'chip-speaking','sig-reloc':'chip-reloc','sig-travel':'chip-travel'};
 
-function switchTab(n,el){document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});el.classList.add('active');document.getElementById('panel-'+n).classList.add('active');if(n==='pipeline'){renderPipeline();}if(n==='company'){buildCoMap();}if(n==='calendar'){initCalendar();updateKPIs();}if(n==='gatekeeper'){renderGatekeepers();}if(n==='radar'){renderRadar();}if(n==='today'){renderToday();}if(n==='results'){renderResults();}if(n==='vendor'){renderVendor();}}
+function switchTab(n,el){document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});el.classList.add('active');document.getElementById('panel-'+n).classList.add('active');if(n==='pipeline'){renderPipeline();}if(n==='company'){buildCoMap();}if(n==='calendar'){initCalendar();updateKPIs();}if(n==='gatekeeper'){renderGatekeepers();}if(n==='radar'){renderRadar();}if(n==='today'){renderToday();}if(n==='results'){renderResults();}if(n==='vendor'){renderVendor();}if(n==='partners'){renderPartners();}}
 
 function toggleSig(sid,cid){var cb=document.getElementById(sid);var chip=document.getElementById(cid);cb.checked=!cb.checked;if(cb.checked){chip.classList.add('on');}else{chip.classList.remove('on');}refreshBM();}
 function refreshBM(){var total=0;Object.keys(SIG_SCORES).forEach(function(id){var el=document.getElementById(id);if(el&&el.checked){total+=SIG_SCORES[id];}});total=Math.min(total,10);var num=document.getElementById('bm-num'),fill=document.getElementById('bm-fill'),desc=document.getElementById('bm-desc');num.textContent=total;fill.style.width=(total*10)+'%';var c,d;if(total===0){c='var(--muted)';d='No signals active';}else if(total<=3){c='#e67e22';d='Mild timing - monitor';}else if(total<=6){c='var(--yellow)';d='Good timing - reach out soon';}else if(total<=8){c='var(--green)';d='Strong timing - act this week';}else{c='var(--gold)';d='PEAK MOMENT - reach out today';}num.style.color=c;fill.style.background=c;desc.style.color=c;desc.textContent=d;return total;}
@@ -5143,7 +5163,7 @@ async function cloudResolve(key,choice){
     }else{renderCloud();}
   }catch(e){cloudSet('conflict','That did not save. Check your connection and try again.');}
 }
-function cloudKeyLabel(k){return {'ob-pipeline':'Pipeline','ob-gatekeepers':'Gatekeepers','ob-messages':'Messages','ob-cal-progress':'Calendar progress','ob-event-mode':'Event mode','ob-radar':'Market Radar','ob-vendor':'Vendor packet'}[k]||k;}
+function cloudKeyLabel(k){return {'ob-pipeline':'Pipeline','ob-gatekeepers':'Gatekeepers','ob-messages':'Messages','ob-cal-progress':'Calendar progress','ob-event-mode':'Event mode','ob-radar':'Market Radar','ob-vendor':'Vendor packet','ob-partners':'Partners'}[k]||k;}
 function renderCloud(){
   var chip=document.getElementById('cloud-chip');
   var labels={off:'Cloud: off',checking:'Cloud: checking',syncing:'Cloud: syncing',synced:'Cloud: saved',error:'Cloud: not synced',conflict:'Cloud: choose data',newer:'Cloud: newer data'};
@@ -5267,6 +5287,14 @@ function renderToday(){
     total++;
     rh+=todayItem('med','Research '+escapeHTML(c.name),escapeHTML(c.signal)+' &middot; unverified',[todayBtn('Find gatekeepers','radarFindGatekeepers('+c._i+')',true)]);
   });
+  // 3b. Partners
+  var ptList=(typeof partners!=='undefined'&&Array.isArray(partners))?partners:[];
+  var ptDue=ptList.filter(function(p){return p.status!=='dormant'&&p.nextFollow&&p.nextFollow<=today;}).sort(function(a,b){return a.nextFollow<b.nextFollow?-1:1;});
+  total+=ptDue.length;
+  var ptHtml=ptDue.slice(0,6).map(function(p){
+    var d=todayDaysBetween(p.nextFollow,today);
+    return todayItem(d>0?'high':'med',escapeHTML(p.name)+(p.org?' &middot; '+escapeHTML(p.org):'')+' &middot; '+escapeHTML(ptLabel(PT_TYPES,p.type)),d>0?'Follow-up overdue '+d+' day'+(d===1?'':'s'):'Follow-up due today',[todayBtn('Log contact','ptLog(\''+p.id+'\')',true),todayBtn('Open Partners','todayGoTab(\'partners\')')]);
+  }).join('');
   // 4. Sprint
   var sh='';
   if(!radarState.sprintStart){
@@ -5283,6 +5311,7 @@ function renderToday(){
     todaySection('Pipeline','mb-gold',pipeHtml,'No pipeline follow-ups are due. Add prospects or set follow-up dates in Pipeline.')+
     todaySection('Gatekeepers','mb-blue',gkHtml,'No gatekeeper follow-ups are due.')+
     todaySection('Market Radar','mb-green',rh,'Nothing new from the Radar today.')+
+    (ptList.length?todaySection('Partners','mb-blue',ptHtml,'No partner follow-ups are due.'):'')+
     todaySection('Sprint','mb-gold',sh,'All of this week\'s sprint tasks are done.');
   var sm=document.getElementById('today-summary');
   if(sm){sm.textContent=total?(total+' thing'+(total===1?'':'s')+' need'+(total===1?'s':'')+' you today. Start at the top.'):'You are all caught up. Add prospects, or run a Radar scan.';}
@@ -5474,6 +5503,92 @@ function vpPrint(){
   root.innerHTML=r.html;
   if(r.blanks&&!confirm(r.blanks+' detail(s) are still blank and will print as lines. Print anyway?')){return;}
   window.print();
+}
+
+// ===== PARTNERS (referral sources and hotel partners) =====
+var PT_TYPES=[['hotel','Hotel concierge'],['planner','Event / meeting planner'],['assistant','Executive assistant'],['client','Existing client'],['other','Other']];
+var PT_STATUS=[['identified','Identified'],['contacted','Contacted'],['meeting','Meeting held'],['active','Sending referrals'],['dormant','Dormant']];
+var ptFilter='all';var ptConfirm='';
+function ptLabel(list,k){var f=list.filter(function(x){return x[0]===k;})[0];return f?f[1]:'';}
+function ptDate(v){return (typeof v==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(v))?v:'';}
+function ptInt(v){v=parseInt(v,10);return (isFinite(v)&&v>0)?Math.min(v,9999):0;}
+function ptClean(raw){
+  if(!Array.isArray(raw)){return [];}
+  var out=[],seen={};
+  raw.slice(0,300).forEach(function(r,i){
+    if(!r||typeof r!=='object'){return;}
+    var name=String(r.name||'').trim().slice(0,100);if(!name){return;}
+    var id=(typeof r.id==='string'&&/^pt-\d{6,}$/.test(r.id)&&!seen[r.id])?r.id:'pt-'+(Date.now()+i);
+    while(seen[id]){id=id+'1';}
+    seen[id]=1;
+    out.push({id:id,name:name,org:String(r.org||'').slice(0,100),
+      type:ptLabel(PT_TYPES,r.type)?r.type:'other',
+      area:(RADAR_AREAS.some(function(a){return a[0]===r.area&&a[0]!=='all';})?r.area:''),
+      contact:String(r.contact||'').slice(0,200),
+      status:ptLabel(PT_STATUS,r.status)?r.status:'identified',
+      lastContact:ptDate(r.lastContact),nextFollow:ptDate(r.nextFollow),
+      sent:ptInt(r.sent),won:Math.min(ptInt(r.won),ptInt(r.sent)),notes:String(r.notes||'').slice(0,500)});
+  });
+  return out;
+}
+var partners=ptClean(loadJSON('ob-partners',[]));
+function ptSave(){saveJSON('ob-partners',partners);}
+function ptFind(id){return partners.filter(function(x){return x.id===id;})[0];}
+function ptAdd(){
+  var name=document.getElementById('pt-name').value.trim();
+  if(!name){notify('Enter a name or organization first.');return;}
+  partners.unshift(ptClean([{id:'pt-'+Date.now(),name:name,org:document.getElementById('pt-org').value,type:document.getElementById('pt-type').value,area:document.getElementById('pt-area').value,contact:document.getElementById('pt-contact').value,status:'identified',notes:document.getElementById('pt-notes').value}])[0]);
+  ptSave();['pt-name','pt-org','pt-contact','pt-notes'].forEach(function(i){document.getElementById(i).value='';});
+  renderPartners();
+}
+function ptImportHotels(){
+  var have={};partners.forEach(function(p){have[(p.name+'|'+p.org).toLowerCase()]=1;have[p.name.toLowerCase()]=1;});
+  var n=0;
+  RADAR_HOTELS.forEach(function(h,i){
+    if(have[h.name.toLowerCase()]){return;}
+    partners.push(ptClean([{id:'pt-'+(Date.now()+i),name:h.name,org:'',type:'hotel',area:h.area||'perimeter',status:'identified',notes:'Concierge or sales contact not yet found. Source: Market Radar hotel list.'}])[0]);n++;
+  });
+  ptSave();notify(n?(n+' hotel'+(n===1?'':'s')+' added from the Radar list.'):'All Radar hotels are already here.');renderPartners();
+}
+function ptSet(id,field,val){
+  var p=ptFind(id);if(!p){return;}
+  if(field==='status'&&ptLabel(PT_STATUS,val)){p.status=val;}
+  else if(field==='nextFollow'){p.nextFollow=ptDate(val);}
+  else if(field==='notes'){p.notes=String(val).slice(0,500);}
+  else{return;}
+  ptSave();renderPartners();
+}
+function ptLog(id){var p=ptFind(id);if(!p){return;}p.lastContact=atlDateStr();p.nextFollow=todayAddDays(14);if(p.status==='identified'){p.status='contacted';}ptSave();notify('Logged. Next follow-up '+p.nextFollow);renderPartners();if(document.getElementById('today-body')){renderToday();}}
+function ptCount(id,field,d){var p=ptFind(id);if(!p||(field!=='sent'&&field!=='won')){return;}p[field]=Math.max(0,Math.min(9999,p[field]+d));if(field==='sent'&&p.won>p.sent){p.won=p.sent;}if(field==='won'&&p.won>p.sent){p.sent=p.won;}if(d>0&&field==='sent'&&p.status!=='active'){p.status='active';}ptSave();renderPartners();}
+function ptDelete(id){if(ptConfirm!==id){ptConfirm=id;renderPartners();return;}ptConfirm='';partners=partners.filter(function(x){return x.id!==id;});ptSave();renderPartners();}
+function ptSetFilter(f){if(f!=='all'&&!ptLabel(PT_TYPES,f)){return;}ptFilter=f;renderPartners();}
+renderToday();
+function renderPartners(){
+  var el=document.getElementById('pt-body');if(!el){return;}
+  var today=atlDateStr();
+  var chips=[['all','All']].concat(PT_TYPES).map(function(t){return '<button class="btn '+(ptFilter===t[0]?'btn-gold':'btn-outline')+'" style="padding:5px 12px;font-size:var(--fs-xs);" onclick="ptSetFilter(\''+t[0]+'\')">'+escapeHTML(t[1])+'</button>';}).join(' ');
+  document.getElementById('pt-chips').innerHTML=chips;
+  var sent=0,won=0,act=0,due=0;
+  partners.forEach(function(p){sent+=p.sent;won+=p.won;if(p.status==='active'){act++;}if(p.status!=='dormant'&&p.nextFollow&&p.nextFollow<=today){due++;}});
+  document.getElementById('pt-summary').innerHTML='<strong>'+partners.length+'</strong> partner'+(partners.length===1?'':'s')+' &middot; <strong>'+act+'</strong> sending referrals &middot; <strong>'+sent+'</strong> referrals sent &middot; <strong>'+won+'</strong> became clients ('+resultPct(won,sent)+') &middot; <strong>'+due+'</strong> follow-up'+(due===1?'':'s')+' due';
+  var list=partners.filter(function(p){return ptFilter==='all'||p.type===ptFilter;});
+  if(!list.length){el.innerHTML='<div style="font-size:var(--fs-sm);color:var(--muted);">'+(partners.length?'No partners of this type yet.':'No partners yet. Add the hotel concierges, planners and assistants who can send you riders, or import the hotels from Market Radar.')+'</div>';return;}
+  el.innerHTML=list.map(function(p){
+    var overdue=p.status!=='dormant'&&p.nextFollow&&p.nextFollow<today;
+    var opts=PT_STATUS.map(function(s){return '<option value="'+s[0]+'"'+(p.status===s[0]?' selected':'')+'>'+escapeHTML(s[1])+'</option>';}).join('');
+    return '<div style="padding:12px 0;border-bottom:1px solid var(--border);">'+
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between;"><div style="font-weight:600;font-size:var(--fs-sm);">'+escapeHTML(p.name)+(p.org?' &middot; '+escapeHTML(p.org):'')+'</div>'+
+      '<div><span class="mini-badge mb-blue">'+escapeHTML(ptLabel(PT_TYPES,p.type))+'</span>'+(p.area?' <span class="mini-badge mb-green">'+escapeHTML(radarAreaLabel(p.area))+'</span>':'')+'</div></div>'+
+      (p.contact?'<div style="font-size:var(--fs-xs);color:var(--muted);margin-top:2px;">'+escapeHTML(p.contact)+'</div>':'')+
+      '<div class="g2" style="margin-top:8px;"><div><label>Status</label><select onchange="ptSet(\''+p.id+'\',\'status\',this.value)">'+opts+'</select></div>'+
+      '<div><label>Next follow-up'+(overdue?' (overdue)':'')+'</label><input type="date" value="'+escapeHTML(p.nextFollow)+'" onchange="ptSet(\''+p.id+'\',\'nextFollow\',this.value)"></div></div>'+
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px;font-size:var(--fs-xs);">'+
+      '<span>Referrals sent: <strong>'+p.sent+'</strong></span>'+todayBtn('+1','ptCount(\''+p.id+'\',\'sent\',1)')+todayBtn('-1','ptCount(\''+p.id+'\',\'sent\',-1)')+
+      '<span>Became clients: <strong>'+p.won+'</strong></span>'+todayBtn('+1','ptCount(\''+p.id+'\',\'won\',1)')+todayBtn('-1','ptCount(\''+p.id+'\',\'won\',-1)')+
+      '<span style="color:var(--muted);">Last contact: '+escapeHTML(p.lastContact||'none')+'</span></div>'+
+      (p.notes?'<div style="font-size:var(--fs-xs);margin-top:6px;">'+escapeHTML(p.notes)+'</div>':'')+
+      '<div class="btns" style="margin-top:8px;">'+todayBtn('Log contact today','ptLog(\''+p.id+'\')',true)+todayBtn(ptConfirm===p.id?'Click again to delete':'Delete','ptDelete(\''+p.id+'\')')+'</div></div>';
+  }).join('');
 }
 </script>
 </body>
