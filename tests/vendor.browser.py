@@ -20,6 +20,7 @@ with sync_playwright() as p:
         t(f'[{w}] sprinter overtime note shown','$220/hour' in pv)
         t(f'[{w}] insurance is NOT prefilled (blank highlighted)',pg.locator('#vp-preview .vp-blank').count()>=3 and 'still blank' in pg.inner_text('#vp-status'))
         t(f'[{w}] driving record line prefilled without license/DOB/address','0 points' in pv and '025141272' not in pg.content() and '1968' not in pg.content())
+        t(f'[{w}] contact details from the website are prefilled','678-481-1421' in pv and 'concierge@odysseyblack.com' in pv and 'Up to 13 passengers' in pg.inner_text('#vp-preview'))
         pg.click('#vp-btn-full')
         pf=pg.inner_text('#vp-preview')
         t(f'[{w}] full version adds terms and acceptance','Acceptance' in pf and 'Cancellation policy' in pf and 'Insurance details' in pf)
