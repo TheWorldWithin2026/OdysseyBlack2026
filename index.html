@@ -544,6 +544,7 @@ textarea{resize:vertical;min-height:75px;}
 <!-- COMMAND CENTER -->
 <div class="command-center" id="command-center">
   <button class="btn btn-outline" style="padding:6px 12px;font-size:var(--fs-xs);margin-right:14px;" onclick="openBackupModal()">&#128190; Data &amp; Backup</button>
+  <button class="btn btn-outline" id="cloud-chip" style="padding:6px 12px;font-size:var(--fs-xs);margin-right:14px;" onclick="openBackupModal()">&#9729; Cloud: off</button>
   <div class="cc-stat">
     <div class="cc-num" id="cc-mrr" style="color:var(--gold);">$0</div>
     <div class="cc-label">Current MRR</div>
@@ -1726,6 +1727,20 @@ textarea{resize:vertical;min-height:75px;}
       <button class="modal-x" onclick="closeBackupModal()">&times;</button>
     </div>
     <div class="modal-bd">
+      <div class="sep-title"><span class="mini-badge mb-green">Cloud Sync</span></div>
+      <div id="cloud-signed-out" style="margin-bottom:12px;">
+        <div class="sec-d" style="margin-bottom:10px;">Sign in to keep a copy of your data in the cloud so it survives a cleared browser or a new device. The app still works without it.</div>
+        <label for="cloud-email">Email</label><input type="email" id="cloud-email" autocomplete="username" style="margin-bottom:8px;">
+        <label for="cloud-pass">Password</label><input type="password" id="cloud-pass" autocomplete="current-password" onkeydown="if(event.key==='Enter')cloudSignIn()" style="margin-bottom:8px;">
+        <div class="btns"><button class="btn btn-gold" onclick="cloudSignIn()">Sign In</button></div>
+      </div>
+      <div id="cloud-signed-in" style="display:none;margin-bottom:12px;">
+        <div id="cloud-who" style="font-size:var(--fs-sm);margin-bottom:6px;"></div>
+        <div class="btns"><button class="btn btn-outline" onclick="cloudReconcile({startup:false})">Sync Now</button><button class="btn btn-ghost" onclick="cloudSignOut()">Sign Out</button></div>
+      </div>
+      <div id="cloud-msg" role="status" style="font-size:var(--fs-xs);color:var(--muted);margin-bottom:6px;"></div>
+      <div id="cloud-conflicts"></div>
+      <div style="height:12px;"></div>
       <div class="sep-title"><span class="mini-badge mb-gold">Export</span></div>
       <div class="btns" style="margin-bottom:16px;flex-wrap:wrap;">
         <button class="btn btn-gold" onclick="exportFullBackup()">Export Full Backup</button>
@@ -1851,6 +1866,7 @@ function loadJSON(key,fallback){
 function saveJSON(key,value){
   try{
     localStorage.setItem(key,JSON.stringify(value));
+    if(typeof cloudQueuePush==='function'&&APPROVED_BACKUP_KEYS.indexOf(key)!==-1){cloudQueuePush();}
     return true;
   }catch(e){
     notify_safe('Could not save '+key+' — storage may be full. Export a backup and clear old data.');
@@ -4873,6 +4889,184 @@ function radarSprintReset(){
   if(!window.confirm('Restart the sprint? Checked tasks will be cleared. Watchlist statuses are kept.')){return;}
   radarState.sprintStart=null;radarState.sprintDone={};radarSave();renderRadarSprint();
 }
+
+// ===== CLOUD SYNC (Supabase) =====
+// Optional. The app always works from this device's storage first; signing in adds a cloud copy.
+// Only the publishable key lives here (safe by design); row-level security restricts rows to the signed-in owner.
+var CLOUD_URL='https://cicghvjkunvozriicykw.supabase.co';
+var CLOUD_KEY='sb_publishable_TuJJvWydTF5TmnsupabKMg_vNNxDKyL';
+var CLOUD_KEYS=APPROVED_BACKUP_KEYS.slice();
+var cloudSession=loadJSON('ob-cloud-session',null);
+var cloudMeta=loadJSON('ob-cloud-meta',{});
+if(!cloudMeta||typeof cloudMeta!=='object'||Array.isArray(cloudMeta)){cloudMeta={};}
+var cloudState={status:cloudSession?'checking':'off',msg:'',conflicts:[],remote:{},lastSync:null};
+var cloudTimer=null,cloudBusy=false,cloudAgain=false;
+
+function cloudCanon(v){
+  if(Array.isArray(v)){return '['+v.map(cloudCanon).join(',')+']';}
+  if(v&&typeof v==='object'){return '{'+Object.keys(v).sort().map(function(k){return JSON.stringify(k)+':'+cloudCanon(v[k]);}).join(',')+'}';}
+  return JSON.stringify(v);
+}
+function cloudHash(v){
+  var s=cloudCanon(v),h=5381;
+  for(var i=0;i<s.length;i++){h=((h<<5)+h+s.charCodeAt(i))|0;}
+  return (h>>>0).toString(16)+':'+s.length;
+}
+function cloudCount(v){return Array.isArray(v)?v.length:(v&&typeof v==='object'?Object.keys(v).length:(v?1:0));}
+function cloudIsEmpty(v){return v===null||v===undefined||cloudCount(v)===0;}
+function cloudSaveMeta(){saveJSON('ob-cloud-meta',cloudMeta);}
+function cloudSet(status,msg){cloudState.status=status;cloudState.msg=msg||'';renderCloud();}
+
+async function cloudHttp(path,opts,auth){
+  opts=opts||{};
+  var headers=Object.assign({'apikey':CLOUD_KEY,'Content-Type':'application/json'},opts.headers||{});
+  if(auth){headers['Authorization']='Bearer '+(await cloudToken());}
+  var ctrl=new AbortController();var t=setTimeout(function(){ctrl.abort();},12000);
+  try{return await fetch(CLOUD_URL+path,{method:opts.method||'GET',headers:headers,body:opts.body,signal:ctrl.signal});}
+  finally{clearTimeout(t);}
+}
+function cloudStoreSession(d){
+  cloudSession={access_token:d.access_token,refresh_token:d.refresh_token,expires_at:d.expires_at||(Math.floor(Date.now()/1000)+(d.expires_in||3600)),id:(d.user&&d.user.id)||(cloudSession&&cloudSession.id),email:(d.user&&d.user.email)||(cloudSession&&cloudSession.email)};
+  saveJSON('ob-cloud-session',cloudSession);
+}
+async function cloudToken(){
+  if(!cloudSession){throw new Error('no_session');}
+  if(cloudSession.expires_at*1000-Date.now()>60000){return cloudSession.access_token;}
+  var res=await cloudHttp('/auth/v1/token?grant_type=refresh_token',{method:'POST',body:JSON.stringify({refresh_token:cloudSession.refresh_token})},false);
+  if(res.status===400||res.status===401){
+    cloudSession=null;try{localStorage.removeItem('ob-cloud-session');}catch(e){}
+    var err=new Error('session_expired');err.authFailed=true;throw err;
+  }
+  if(!res.ok){throw new Error('refresh_failed');}
+  cloudStoreSession(await res.json());
+  return cloudSession.access_token;
+}
+async function cloudSignIn(){
+  var em=document.getElementById('cloud-email').value.trim();var pw=document.getElementById('cloud-pass').value;
+  if(!em||!pw){cloudSet('off','Enter your email and password');return;}
+  cloudSet('off','Signing in…');
+  try{
+    var res=await cloudHttp('/auth/v1/token?grant_type=password',{method:'POST',body:JSON.stringify({email:em,password:pw})},false);
+    document.getElementById('cloud-pass').value='';
+    if(!res.ok){cloudSet('off','Sign-in failed. Check your email and password.');return;}
+    cloudStoreSession(await res.json());
+    cloudReconcile({startup:true});
+  }catch(e){cloudSet('off','Could not reach the cloud. Check your connection.');}
+}
+function cloudSignOut(){
+  cloudSession=null;try{localStorage.removeItem('ob-cloud-session');}catch(e){}
+  cloudState.conflicts=[];cloudState.remote={};
+  cloudSet('off','Signed out. Your data stays on this device.');
+}
+async function cloudRemoteAll(){
+  var res=await cloudHttp('/rest/v1/ob_store?select=key,value,updated_at',{},true);
+  if(!res.ok){throw new Error('read_'+res.status);}
+  var rows=await res.json();var map={};
+  (Array.isArray(rows)?rows:[]).forEach(function(r){if(CLOUD_KEYS.indexOf(r.key)!==-1){map[r.key]=r;}});
+  return map;
+}
+async function cloudPushKey(k){
+  var raw=localStorage.getItem(k);if(raw===null){return;}
+  var value=JSON.parse(raw);
+  var res=await cloudHttp('/rest/v1/ob_store?on_conflict=user_id,key',{method:'POST',headers:{'Prefer':'resolution=merge-duplicates,return=representation'},body:JSON.stringify([{user_id:cloudSession.id,key:k,value:value}])},true);
+  if(!res.ok){throw new Error('write_'+res.status);}
+  var rows=await res.json();
+  cloudMeta[k]={h:cloudHash(value),t:(rows[0]&&rows[0].updated_at)||new Date().toISOString()};
+}
+async function cloudReconcile(opts){
+  opts=opts||{};
+  if(!cloudSession){return;}
+  if(cloudBusy){cloudAgain=true;return;}
+  if(cloudState.status==='conflict'&&!opts.startup){return;}
+  cloudBusy=true;
+  if(opts.startup||cloudState.status==='off'||cloudState.status==='checking'){cloudSet('syncing','Syncing…');}
+  try{
+    var remote=await cloudRemoteAll();
+    var conflicts=[],pulled=false,newer=false,snapped=false;
+    for(var i=0;i<CLOUD_KEYS.length;i++){
+      var k=CLOUD_KEYS[i];var raw=null;
+      try{raw=localStorage.getItem(k);}catch(e){}
+      var local=null;
+      if(raw!==null){try{local=JSON.parse(raw);}catch(e){continue;}}
+      var localEmpty=cloudIsEmpty(local);var r=remote[k];
+      if(!r){if(!localEmpty){await cloudPushKey(k);}continue;}
+      var rh=cloudHash(r.value),lh=local===null?null:cloudHash(local),m=cloudMeta[k];
+      if(lh===rh){cloudMeta[k]={h:rh,t:r.updated_at};continue;}
+      var wantPull=localEmpty||(m&&m.h===lh);
+      if(wantPull){
+        if(!opts.startup){newer=true;continue;}
+        if(!snapped){snapshotCurrentApprovedKeys();snapped=true;}
+        localStorage.setItem(k,JSON.stringify(r.value));cloudMeta[k]={h:rh,t:r.updated_at};pulled=true;continue;
+      }
+      if(m&&m.t===r.updated_at){await cloudPushKey(k);continue;}
+      conflicts.push({key:k,localCount:cloudCount(local),remoteCount:cloudCount(r.value),remoteAt:r.updated_at});
+    }
+    cloudSaveMeta();
+    cloudState.remote=remote;
+    if(pulled){cloudSet('synced','Loaded your cloud data. Reloading…');setTimeout(function(){location.reload();},700);cloudBusy=false;return;}
+    if(conflicts.length){cloudState.conflicts=conflicts;cloudSet('conflict','This device and the cloud have different data. Choose which to keep.');openBackupModal();}
+    else{cloudState.conflicts=[];cloudState.lastSync=new Date();cloudSet(newer?'newer':'synced',newer?'Newer data is in the cloud.':'');}
+  }catch(e){
+    if(e&&e.authFailed){cloudSet('off','Your session expired. Sign in again.');}
+    else{cloudSet('error','Not synced yet. Your data is safe on this device and will retry.');}
+  }
+  cloudBusy=false;
+  if(cloudAgain){cloudAgain=false;cloudQueuePush();}
+}
+function cloudQueuePush(){
+  if(!cloudSession||cloudState.status==='conflict'){return;}
+  if(cloudBusy){cloudAgain=true;return;}
+  clearTimeout(cloudTimer);
+  cloudTimer=setTimeout(function(){cloudReconcile({startup:false});},1500);
+}
+async function cloudResolve(key,choice){
+  if(CLOUD_KEYS.indexOf(key)===-1){return;}
+  try{
+    snapshotCurrentApprovedKeys();
+    var r=cloudState.remote[key];
+    if(choice==='cloud'&&r){
+      localStorage.setItem(key,JSON.stringify(r.value));cloudMeta[key]={h:cloudHash(r.value),t:r.updated_at};cloudState.needReload=true;
+    }else{
+      await cloudPushKey(key);
+    }
+    cloudSaveMeta();
+    cloudState.conflicts=cloudState.conflicts.filter(function(c){return c.key!==key;});
+    if(!cloudState.conflicts.length){
+      if(cloudState.needReload){cloudSet('synced','Loaded your choice. Reloading…');setTimeout(function(){location.reload();},700);return;}
+      cloudState.lastSync=new Date();cloudSet('synced','');
+    }else{renderCloud();}
+  }catch(e){cloudSet('conflict','That did not save. Check your connection and try again.');}
+}
+function cloudKeyLabel(k){return {'ob-pipeline':'Pipeline','ob-gatekeepers':'Gatekeepers','ob-messages':'Messages','ob-cal-progress':'Calendar progress','ob-event-mode':'Event mode','ob-radar':'Perimeter Radar'}[k]||k;}
+function renderCloud(){
+  var chip=document.getElementById('cloud-chip');
+  var labels={off:'Cloud: off',checking:'Cloud: checking',syncing:'Cloud: syncing',synced:'Cloud: saved',error:'Cloud: not synced',conflict:'Cloud: choose data',newer:'Cloud: newer data'};
+  if(chip){chip.textContent='☁ '+(labels[cloudState.status]||'Cloud');}
+  var out=document.getElementById('cloud-signed-out'),inn=document.getElementById('cloud-signed-in'),msg=document.getElementById('cloud-msg'),box=document.getElementById('cloud-conflicts');
+  if(!out||!inn||!msg||!box){return;}
+  out.style.display=cloudSession?'none':'block';inn.style.display=cloudSession?'block':'none';
+  var line=cloudState.msg;
+  if(cloudSession&&!line){line=cloudState.status==='synced'&&cloudState.lastSync?'All data saved to the cloud at '+cloudState.lastSync.toLocaleTimeString('en-US',{timeZone:'America/New_York',hour:'numeric',minute:'2-digit'})+' ET.':'';}
+  msg.textContent=line;
+  var who=document.getElementById('cloud-who');if(who){who.textContent=cloudSession?('Signed in as '+(cloudSession.email||'your account')):'';}
+  var h='';
+  cloudState.conflicts.forEach(function(c){
+    h+='<div class="card" style="padding:12px;margin:8px 0;background:rgba(255,255,255,0.02);"><div style="font-weight:600;font-size:var(--fs-sm);">'+escapeHTML(cloudKeyLabel(c.key))+'</div>'+
+      '<div style="font-size:var(--fs-xs);color:var(--muted);margin:4px 0 8px;">This device: '+escapeHTML(c.localCount)+' item(s) &middot; Cloud: '+escapeHTML(c.remoteCount)+' item(s)</div>'+
+      '<div class="btns" style="flex-wrap:wrap;"><button class="btn btn-gold" onclick="cloudResolve(\''+c.key+'\',\'device\')">Keep this device</button><button class="btn btn-outline" onclick="cloudResolve(\''+c.key+'\',\'cloud\')">Use cloud</button></div></div>';
+  });
+  if(cloudState.status==='newer'){h+='<div class="btns" style="margin-top:8px;"><button class="btn btn-outline" onclick="cloudLoadNewer()">Load newer cloud data</button></div>';}
+  box.innerHTML=h;
+}
+function cloudLoadNewer(){
+  if(!window.confirm('Load the newer cloud data? The page will reload. A recovery snapshot of this device is saved first.')){return;}
+  cloudReconcile({startup:true});
+}
+window.addEventListener('online',function(){cloudQueuePush();});
+document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible'){cloudQueuePush();}});
+setInterval(function(){cloudQueuePush();},120000);
+renderCloud();
+if(cloudSession){cloudReconcile({startup:true});}
 </script>
 </body>
 </html>
