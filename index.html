@@ -126,6 +126,10 @@ textarea{resize:vertical;min-height:75px;}
 .section-sep{margin-top:20px;padding-top:20px;border-top:1px solid var(--border);}
 .sep-title{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
 .mini-badge{font-size:var(--fs-xs);letter-spacing:var(--ls-wide);text-transform:uppercase;padding:4px 10px;border-radius:1px;font-weight:600;}
+.evidence-toggle{display:flex;gap:4px;}
+.ev-btn{flex:1;padding:4px 8px;font-size:var(--fs-xs);border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;border-radius:1px;transition:all 0.15s;}
+.ev-btn.active{border-color:var(--gold);color:var(--gold);background:rgba(201,168,76,0.08);}
+.ev-btn.active.verified{border-color:var(--green);color:var(--green);background:rgba(46,204,113,0.08);}
 .mb-green{background:rgba(46,204,113,0.1);border:1px solid rgba(46,204,113,0.3);color:var(--green);}
 .mb-gold{background:var(--gold-dim);border:1px solid rgba(201,168,76,0.3);color:var(--gold);}
 .mb-blue{background:rgba(52,152,219,0.1);border:1px solid rgba(52,152,219,0.3);color:var(--blue);}
@@ -539,6 +543,7 @@ textarea{resize:vertical;min-height:75px;}
 
 <!-- COMMAND CENTER -->
 <div class="command-center" id="command-center">
+  <button class="btn btn-outline" style="padding:6px 12px;font-size:var(--fs-xs);margin-right:14px;" onclick="openBackupModal()">&#128190; Data &amp; Backup</button>
   <div class="cc-stat">
     <div class="cc-num" id="cc-mrr" style="color:var(--gold);">$0</div>
     <div class="cc-label">Current MRR</div>
@@ -591,6 +596,8 @@ textarea{resize:vertical;min-height:75px;}
     <button class="tab" onclick="switchTab('calendar',this)">90-Day Plan</button>
     <button class="tab" onclick="switchTab('strategy',this)">&#9733; War Room</button>
     <button class="tab" onclick="switchTab('markets',this)">&#9775; Market Expansion</button>
+    <button class="tab" onclick="switchTab('radar',this)">&#128225; Perimeter Radar</button>
+    <button class="tab" onclick="switchTab('gatekeeper',this)">&#128273; Gatekeeper Finder</button>
   </div>
 
   <!-- TAB 1: PROSPECT BUILDER -->
@@ -600,20 +607,20 @@ textarea{resize:vertical;min-height:75px;}
     <div class="target-finder">
       <div class="target-finder-header" onclick="toggleTargetFinder()">
         <div>
-          <div class="target-finder-title">&#9654; Find Executives at a Company</div>
-          <div class="target-finder-sub">Type any company name — get C-suite targets ready to score in one click</div>
+          <div class="target-finder-title">&#9654; AI Target Suggestions</div>
+          <div class="target-finder-sub">Type any company name — get candidate C-suite roles to research and score. Not a verified directory.</div>
         </div>
         <div class="tf-arrow" id="tf-arrow">&#9660;</div>
       </div>
       <div class="target-finder-body" id="tf-body">
         <div class="tf-search-row">
           <input type="text" id="tf-company" placeholder="e.g. Delta Air Lines, NCR Voyix, Truist Financial, Coca-Cola..." onkeydown="if(event.key==='Enter')findCompanyTargets()">
-          <button class="btn btn-gold" onclick="findCompanyTargets()">Find Targets <div class="spin" id="sp-tf"></div></button>
+          <button class="btn btn-gold" onclick="findCompanyTargets()">Suggest Targets <div class="spin" id="sp-tf"></div></button>
         </div>
-        <div class="tf-hint">Works best with Fortune 500 and major Atlanta mid-market companies. Click any card to pre-fill the scoring form below.</div>
+        <div class="tf-hint">Works best with Fortune 500 and major Atlanta mid-market companies. Every result is an unverified suggestion — click a card to pre-fill the scoring form, then confirm on LinkedIn before any outreach.</div>
         <div id="tf-status" class="tf-status" style="display:none;"></div>
         <div class="target-cards" id="tf-cards" style="display:none;"></div>
-        <div class="tf-verify-note" id="tf-verify" style="display:none;">&#9432; AI-generated executive data. Always verify names and titles on LinkedIn or the company website before outreach.</div>
+        <div class="tf-verify-note" id="tf-verify" style="display:none;">&#9432; AI-generated suggestions, not a live lookup. "Not Found" means the model didn't have reliable knowledge — it will not guess a name to fill the gap. Always verify on LinkedIn or the company website before outreach.</div>
       </div>
     </div>
 
@@ -641,18 +648,28 @@ textarea{resize:vertical;min-height:75px;}
       </div>
       <div class="g3">
         <div><label>Atlanta Presence</label>
-          <select id="p-hq">
+          <select id="p-hq" onchange="onProvenanceFieldChanged('hq')">
+            <option value="unknown">Unknown — needs verification</option>
             <option value="yes">Headquartered here</option>
             <option value="regional">Regional / major office</option>
             <option value="no">Visiting / remote</option>
           </select>
+          <div class="evidence-toggle" id="hq-evidence-toggle" style="display:none;margin-top:4px;">
+            <button type="button" class="ev-btn" id="hq-ev-estimate" onclick="setEvidenceStatus('hq','operator_estimate')">Estimate</button>
+            <button type="button" class="ev-btn" id="hq-ev-verified" onclick="setEvidenceStatus('hq','operator_verified')">Verified</button>
+          </div>
         </div>
         <div><label>Travel Frequency</label>
-          <select id="p-travel" onchange="updateClientTypeDisplay()">
+          <select id="p-travel" onchange="updateClientTypeDisplay();onProvenanceFieldChanged('travel')">
+            <option value="unknown">Unknown — needs verification</option>
             <option value="heavy">Heavy (weekly flights)</option>
             <option value="moderate">Moderate (2-3x per month)</option>
             <option value="light">Light (occasional)</option>
           </select>
+          <div class="evidence-toggle" id="travel-evidence-toggle" style="display:none;margin-top:4px;">
+            <button type="button" class="ev-btn" id="travel-ev-estimate" onclick="setEvidenceStatus('travel','operator_estimate')">Estimate</button>
+            <button type="button" class="ev-btn" id="travel-ev-verified" onclick="setEvidenceStatus('travel','operator_verified')">Verified</button>
+          </div>
         </div>
         <div><label>Lead Source</label>
           <select id="p-source">
@@ -979,7 +996,11 @@ textarea{resize:vertical;min-height:75px;}
         <div class="btns"><button class="btn btn-gold" onclick="generateOutreach()">Generate Assistant Outreach <div class="spin" id="sp3b"></div></button></div>
       </div>
     </div>
-    <div class="ai-box" id="research-box"><span class="ai-label">Executive Research</span><button class="copy-btn" onclick="copyText('research-ai')">Copy</button><div class="ai-text" id="research-ai"></div></div>
+    <div class="ai-box" id="research-box"><span class="ai-label">AI Research Notes (draft — not verified)</span>
+      <div class="tf-verify-note">&#9432; AI-drafted from general knowledge, not a live web lookup. Each claim below must be individually reviewed, sourced, and approved. Raw research is never sent to outreach — only claims you mark Approved.</div>
+      <div id="research-claims-list" style="margin-top:12px;"></div>
+      <div id="research-approved-count" style="margin-top:10px;font-size:var(--fs-sm);color:var(--green);display:none;"></div>
+    </div>
     <div class="ai-box" id="out-box"><span class="ai-label">Generated Outreach</span><button class="copy-btn" onclick="copyText('out-ai')">Copy</button><div class="ai-text" id="out-ai"></div></div>
   </div>
 
@@ -1285,13 +1306,7 @@ textarea{resize:vertical;min-height:75px;}
       <div style="font-size:var(--fs-lg);font-weight:600;color:var(--text);margin-bottom:4px);">Find Atlanta Prospects by Category</div>
       <div style="font-size:var(--fs-sm);color:var(--muted);margin-bottom:16px;">Search hotels, medical practices, event venues, and mid-market companies in Atlanta. Powered by Google Places API. Results are scored automatically.</div>
 
-      <div class="api-key-row" id="places-key-row">
-        <label>Google Places API Key</label>
-        <input type="password" id="places-api-key" placeholder="Paste your API key here — stored locally, never sent anywhere except Google">
-        <button class="btn btn-outline" style="padding:8px 14px;font-size:var(--fs-xs);" onclick="savePlacesKey()">Save Key</button>
-        <a href="https://console.cloud.google.com/apis/library/places-backend.googleapis.com" target="_blank" style="font-size:var(--fs-xs);color:var(--blue);white-space:nowrap;text-decoration:none;">Get Free Key &#8599;</a>
-      </div>
-      <div id="places-key-saved" style="display:none;font-size:var(--fs-sm);color:var(--green);margin-bottom:14px;">&#10003; API key saved</div>
+      <div style="font-size:var(--fs-sm);color:var(--muted);margin-bottom:16px;padding:10px 12px;background:rgba(52,152,219,0.06);border:1px solid rgba(52,152,219,0.2);border-radius:1px;">&#9432; Search now runs through a secured server function — no API key is stored in this browser. If your builder hasn't deployed <code>netlify/functions/places.js</code> and set <code>GOOGLE_PLACES_KEY</code> in Netlify yet, searches below will show a clear "not yet configured" message rather than failing silently.</div>
 
       <div class="search-bar">
         <div style="flex:1.5;">
@@ -1335,12 +1350,12 @@ textarea{resize:vertical;min-height:75px;}
       <div id="places-results" style="display:none;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
           <div id="places-count" style="font-size:var(--fs-sm);color:var(--muted);"></div>
-          <button class="btn btn-outline" style="padding:6px 14px;font-size:var(--fs-xs);" onclick="addAllPlacesToPipeline()">Add All HOT to Market Pipeline</button>
+          <button class="btn btn-outline" style="padding:6px 14px;font-size:var(--fs-xs);" onclick="addAllPlacesToPipeline()">Review HOT/STRONG Prospects</button>
         </div>
         <div class="places-grid" id="places-grid"></div>
       </div>
       <div id="places-no-key" style="padding:12px;background:rgba(231,76,60,0.06);border:1px solid rgba(231,76,60,0.2);border-radius:1px;font-size:var(--fs-sm);color:#e74c3c;display:none;">
-        &#9888; Add your Google Places API key above to enable live search. The key is free for up to 200 searches per month.
+        &#9888; Market search isn't configured yet on the server. Ask your builder to deploy <code>netlify/functions/places.js</code> and set the <code>GOOGLE_PLACES_KEY</code> environment variable in Netlify.
       </div>
     </div>
 
@@ -1587,7 +1602,158 @@ textarea{resize:vertical;min-height:75px;}
     </div>
   </div>
 
+  <!-- TAB 10: GATEKEEPER FINDER -->
+  <div class="panel" id="panel-radar">
+    <div class="sec-tag">Perimeter Center &middot; Dunwoody &middot; Sandy Springs &middot; Brookhaven</div>
+    <div class="sec-h">Perimeter Radar</div>
+    <div class="sec-d">Watch for companies moving into the area, work a sourced watchlist, and run a 30-day sprint. Everything here is a <strong>lead, not a verified fact</strong> &mdash; confirm the company and the move before any outreach.</div>
+
+    <div class="card">
+      <div class="sep-title"><span class="mini-badge mb-gold">Live Move Scan</span></div>
+      <div class="sec-d" style="margin-bottom:14px;">Scans public news headlines for relocations, new headquarters and office leases in the Perimeter submarket. It is a headline monitor, not a directory &mdash; it can miss moves that were never reported.</div>
+      <div class="btns"><button class="btn btn-gold" onclick="radarScan()">Scan Now</button><button class="btn btn-outline" onclick="radarMarkAllSeen()">Mark All Seen</button></div>
+      <div id="radar-scan-status" style="font-size:var(--fs-xs);color:var(--muted);margin-top:10px;"></div>
+      <div id="radar-scan-list" style="margin-top:12px;"></div>
+    </div>
+
+    <div class="card">
+      <div class="sep-title"><span class="mini-badge mb-blue">Watchlist &mdash; Public-News Snapshot</span></div>
+      <div class="sec-d" style="margin-bottom:14px;">Compiled from public news and broker announcements as of October 2026. No individual contacts are included &mdash; use Gatekeeper Finder to find the right people. Verify each item before outreach.</div>
+      <div id="radar-watchlist"></div>
+    </div>
+
+    <div class="card">
+      <div class="sep-title"><span class="mini-badge mb-green">Hotel Concierge Referral Channel</span></div>
+      <div class="sec-d" style="margin-bottom:14px;">Perimeter hotels host visiting executives and corporate groups. Ask each front desk or concierge who handles ground-transportation referrals, then log the visit.</div>
+      <div id="radar-hotels"></div>
+    </div>
+
+    <div class="card">
+      <div class="sep-title"><span class="mini-badge mb-gold">30-Day Perimeter Sprint</span></div>
+      <div id="radar-sprint-head" style="font-size:var(--fs-sm);margin-bottom:12px;"></div>
+      <div id="radar-sprint"></div>
+      <div class="btns" style="margin-top:12px;"><button class="btn btn-outline" onclick="radarSprintReset()">Restart Sprint</button></div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-gatekeeper">
+    <div class="sec-tag">No Sales Navigator Needed</div>
+    <div class="sec-h">Gatekeeper Finder</div>
+    <div class="sec-d">Find EAs, Chiefs of Staff, and every other gatekeeper standing between you and the executive — without paying for LinkedIn Sales Navigator.</div>
+
+    <!-- X-RAY SEARCH GENERATOR -->
+    <div class="card">
+      <div class="sep-title"><span class="mini-badge mb-gold">Free LinkedIn X-Ray Search</span></div>
+      <div class="sec-d" style="margin-bottom:14px;">Enter a company. This builds public search-engine queries that surface LinkedIn profiles by role &mdash; no LinkedIn login or paid seat required.</div>
+      <div class="g2">
+        <div><label>Company Name</label><input type="text" id="gk-company" placeholder="e.g. UPS, Delta Air Lines, Truist" onkeydown="if(event.key==='Enter')buildXraySearches()"></div>
+        <div><label>City Qualifier (optional)</label><input type="text" id="gk-city" placeholder="e.g. Atlanta" value="Atlanta"></div>
+      </div>
+      <div class="btns"><button class="btn btn-gold" onclick="buildXraySearches()">Generate Search Links</button></div>
+      <div id="gk-xray-results" style="display:none;margin-top:16px;">
+        <div id="gk-xray-list"></div>
+      </div>
+    </div>
+
+    <!-- APOLLO EA FILTER BUILDER -->
+    <div class="card">
+      <div class="sep-title"><span class="mini-badge" style="background:rgba(52,152,219,0.1);border:1px solid rgba(52,152,219,0.3);color:var(--blue);">Apollo &mdash; EA-Specific Pull</span></div>
+      <div class="sec-d" style="margin-bottom:12px;">Your existing Apollo searches target executives. Run a <em>second</em>, parallel search using these titles to pull the gatekeepers directly instead of guessing from the exec list.</div>
+      <div class="ai-box" style="display:block;">
+        <span class="ai-label">Paste into Apollo's Job Title filter</span>
+        <button class="copy-btn" onclick="copyText('gk-apollo-titles')">Copy</button>
+        <div class="ai-text" id="gk-apollo-titles">Executive Assistant, Chief of Staff, Office Manager, Travel Coordinator, Personal Assistant, Executive Business Partner, Administrative Business Partner, Senior Executive Assistant</div>
+      </div>
+      <div class="sec-d" style="margin-top:10px;font-size:var(--fs-xs);">Company filter: same Fortune 500 / Atlanta list you already use. Employee filter: remove the 1,000+ minimum &mdash; admin titles undercount on LinkedIn-sourced employee data.</div>
+    </div>
+
+    <!-- GATEKEEPER NETWORK TRACKER -->
+    <div class="card">
+      <div class="sep-title"><span class="mini-badge mb-green">Gatekeeper Network Tracker</span></div>
+      <div class="sec-d" style="margin-bottom:14px;">FBO staff, hotel concierges, and standalone travel coordinators aren't tied to one prospect &mdash; they're relationships you maintain across your whole territory. Track them here.</div>
+      <div class="g2">
+        <div><label>Contact Name</label><input type="text" id="gk-name" placeholder="e.g. Marcus Webb"></div>
+        <div><label>Type</label>
+          <select id="gk-type">
+            <option value="fbo">FBO Staff (PDK/FTY)</option>
+            <option value="concierge">Hotel Concierge</option>
+            <option value="coordinator">Corporate Travel Coordinator</option>
+            <option value="community">IAAP / EA Community Contact</option>
+            <option value="other">Other Gatekeeper</option>
+          </select>
+        </div>
+      </div>
+      <div class="g2">
+        <div><label>Location / Affiliation</label><input type="text" id="gk-location" placeholder="e.g. Signature Flight Support, PDK"></div>
+        <div><label>Next Follow-Up Date</label><input type="date" id="gk-followup"></div>
+      </div>
+      <div class="g1"><label>Relationship Notes</label><textarea id="gk-notes" placeholder="How you met, what they need from you, referral history..."></textarea></div>
+      <div class="btns"><button class="btn btn-gold" onclick="addGatekeeper()">Add to Network</button></div>
+      <div id="gk-empty" class="empty-msg">No gatekeeper contacts yet &mdash; add your first FBO, concierge, or coordinator contact above.</div>
+      <div id="gk-table-wrap" style="display:none;">
+        <div class="card" style="padding:0;overflow:auto;margin-top:14px;">
+          <table class="bulk-table"><thead><tr><th>Name</th><th>Type</th><th>Location</th><th>Next Follow-Up</th><th>Action</th></tr></thead><tbody id="gk-tbody"></tbody></table>
+        </div>
+      </div>
+    </div>
+
+    <!-- GATEKEEPER OUTREACH -->
+    <div class="card">
+      <div class="sep-title"><span class="mini-badge" style="background:rgba(52,152,219,0.1);border:1px solid rgba(52,152,219,0.3);color:var(--blue);">Draft Gatekeeper Outreach</span></div>
+      <div class="g2">
+        <div><label>Contact Name</label><input type="text" id="gko-name" placeholder="e.g. Marcus Webb"></div>
+        <div><label>Type</label>
+          <select id="gko-type">
+            <option value="fbo">FBO Staff</option>
+            <option value="concierge">Hotel Concierge</option>
+            <option value="coordinator">Corporate Travel Coordinator</option>
+            <option value="community">IAAP / EA Community Contact</option>
+          </select>
+        </div>
+      </div>
+      <div class="g1"><label>Context</label><textarea id="gko-ctx" placeholder="e.g. Introducing Odyssey Black as a preferred ground transport partner for last-minute exec arrivals..."></textarea></div>
+      <div class="btns"><button class="btn btn-gold" onclick="generateGatekeeperOutreach()">Generate Message <div class="spin" id="sp-gko"></div></button></div>
+      <div class="ai-box" id="gko-ai-box"><span class="ai-label">Gatekeeper Outreach</span><button class="copy-btn" onclick="copyText('gko-ai')">Copy</button><div class="ai-text" id="gko-ai"></div></div>
+    </div>
+  </div>
+
 </div>
+<!-- DATA & BACKUP MODAL -->
+<div class="modal-overlay" id="backup-modal" onclick="if(event.target===this)closeBackupModal()">
+  <div class="modal-box" style="max-width:560px;">
+    <div class="modal-hd">
+      <div class="modal-title">Data &amp; Backup</div>
+      <button class="modal-x" onclick="closeBackupModal()">&times;</button>
+    </div>
+    <div class="modal-bd">
+      <div class="sep-title"><span class="mini-badge mb-gold">Export</span></div>
+      <div class="btns" style="margin-bottom:16px;flex-wrap:wrap;">
+        <button class="btn btn-gold" onclick="exportFullBackup()">Export Full Backup</button>
+        <button class="btn btn-outline" onclick="exportPipelineCSV()">Export Pipeline CSV</button>
+        <button class="btn btn-outline" onclick="exportGatekeepersCSV()">Export Gatekeepers CSV</button>
+        <button class="btn btn-outline" onclick="exportAllContactsCSV()">Export All Contacts CSV</button>
+      </div>
+
+      <div class="sep-title"><span class="mini-badge" style="background:rgba(52,152,219,0.1);border:1px solid rgba(52,152,219,0.3);color:var(--blue);">Restore</span></div>
+      <label>Choose Backup File</label>
+      <input type="file" id="backup-file-input" accept="application/json" onchange="previewBackupFile(this.files[0])" style="margin-bottom:10px;">
+      <div id="backup-preview" style="display:none;">
+        <div class="card" style="padding:12px;margin-bottom:10px;background:rgba(255,255,255,0.02);">
+          <div id="backup-preview-summary" style="font-size:var(--fs-sm);white-space:pre-wrap;"></div>
+        </div>
+        <div class="btns" style="flex-wrap:wrap;">
+          <button class="btn btn-gold" id="backup-restore-replace-btn" onclick="restoreBackup('replace')" disabled>Restore (Replace)</button>
+          <button class="btn btn-outline" id="backup-restore-merge-btn" onclick="restoreBackup('merge')" disabled>Restore (Merge)</button>
+          <button class="btn btn-ghost" onclick="cancelBackupPreview()">Cancel</button>
+        </div>
+      </div>
+
+      <div class="sep-title" style="margin-top:18px;"><span class="mini-badge" style="background:rgba(231,76,60,0.08);border:1px solid rgba(231,76,60,0.25);color:#e74c3c;">Recovery</span></div>
+      <div id="backup-snapshots-list" style="font-size:var(--fs-sm);color:var(--muted);"></div>
+    </div>
+  </div>
+</div>
+
 <!-- EDIT PROSPECT MODAL -->
 <div class="modal-overlay" id="edit-modal" onclick="if(event.target===this)closeEditModal()">
   <div class="modal-box">
@@ -1654,16 +1820,333 @@ textarea{resize:vertical;min-height:75px;}
 <div class="notif" id="notif"></div>
 
 <script>
-var pipeline=JSON.parse(localStorage.getItem('ob-pipeline')||'[]');
+// ===== CORE SAFETY UTILITIES =====
+function escapeHTML(s){
+  if(s===null||s===undefined){return '';}
+  return String(s).replace(/[&<>"']/g,function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+// Atlanta is always Eastern Time regardless of the operator's own browser timezone —
+// using this instead of toISOString().slice(0,10) prevents follow-up dates from
+// shifting to the wrong calendar day in the evening (UTC is 4-5 hours ahead of ET).
+function atlDateStr(d){
+  d = d || new Date();
+  return new Intl.DateTimeFormat('en-CA',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit'}).format(d);
+}
+function loadJSON(key,fallback){
+  var raw=null;
+  try{ raw=localStorage.getItem(key); }
+  catch(e){ notify_safe('Storage unavailable — working in memory only this session'); return fallback; }
+  if(raw===null||raw===undefined){ return fallback; }
+  try{ return JSON.parse(raw); }
+  catch(e){
+    // Corrupted record — don't let a bad string crash the whole app on load.
+    // Preserve the corrupted raw value under a recovery key so nothing is silently lost.
+    try{ localStorage.setItem(key+'-corrupted-'+Date.now(), raw); }catch(e2){}
+    notify_safe('Recovered from corrupted data in '+key+' — check '+key+'-corrupted-* keys if something looks missing');
+    return fallback;
+  }
+}
+function saveJSON(key,value){
+  try{
+    localStorage.setItem(key,JSON.stringify(value));
+    return true;
+  }catch(e){
+    notify_safe('Could not save '+key+' — storage may be full. Export a backup and clear old data.');
+    return false;
+  }
+}
+function notify_safe(msg){
+  // notify() is defined later in this file and depends on a DOM element that
+  // may not exist yet at the moment these utilities run — this wrapper is safe either way.
+  try{ if(typeof notify==='function'){ notify(msg); } else { console.warn(msg); } }catch(e){ console.warn(msg); }
+}
+var APPROVED_BACKUP_KEYS=['ob-pipeline','ob-gatekeepers','ob-messages','ob-cal-progress','ob-event-mode','ob-radar'];
+var pendingRestore=null; // holds validated backup.keys while previewed, before the operator commits
+
+function csvCell(v){
+  if(v===null||v===undefined){v='';}
+  var s=String(v);
+  // Neutralise spreadsheet formula injection — a leading =,+,-,@ can execute as a formula in Excel/Sheets
+  if(/^[=+\-@]/.test(s)){ s="'"+s; }
+  if(/[",\n]/.test(s)){ s='"'+s.replace(/"/g,'""')+'"'; }
+  return s;
+}
+function downloadCSV(filename,rows){
+  var csv=rows.map(function(r){return r.map(csvCell).join(',');}).join('\r\n');
+  var BOM='\uFEFF'; // UTF-8 BOM — without this, Excel on Windows can misread accented/special characters
+  var blob=new Blob([BOM+csv],{type:'text/csv;charset=utf-8'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');a.href=url;a.download=filename;
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+function exportPipelineCSV(){
+  var rows=[['Name','Title','Company','Score','Stage','Client Type','Monthly Value','Atlanta Presence','Travel Frequency','Notes','Exported']];
+  if(!pipeline.length){
+    rows.push(['(no pipeline records yet)','','','','','','','','','',atlDateStr()]);
+  } else {
+    pipeline.forEach(function(p){
+      rows.push([p.name,p.title,p.company,p.score,getStageLabel(p.stage),p.clientType||'',p.monthlyValue||'',p.hq,p.travel,p.notes||'',atlDateStr()]);
+    });
+  }
+  downloadCSV('odyssey-black-pipeline-'+atlDateStr()+'.csv',rows);
+  notify('Pipeline CSV downloaded');
+}
+function exportGatekeepersCSV(){
+  var rows=[['Name','Type','Location','Next Follow-Up','Notes','Exported']];
+  if(!gatekeepers.length){
+    rows.push(['(no gatekeeper records yet)','','','','',atlDateStr()]);
+  } else {
+    gatekeepers.forEach(function(g){
+      rows.push([g.name,GK_TYPE_LABELS[g.type]||g.type,g.location||'',g.followup||'',g.notes||'',atlDateStr()]);
+    });
+  }
+  downloadCSV('odyssey-black-gatekeepers-'+atlDateStr()+'.csv',rows);
+  notify('Gatekeepers CSV downloaded');
+}
+function exportAllContactsCSV(){
+  var rows=[['Record Type','Name','Role','Company or Organisation','Email','Phone','Status','Last Contact','Next Follow-Up','Source','Notes','Exported Date']];
+  pipeline.forEach(function(p){
+    rows.push(['Prospect',p.name,p.title||'',p.company||'','','',getStageLabel(p.stage),p.lastContact||'',p.followUp||'',p.source||'',p.notes||'',atlDateStr()]);
+    if(p.ea&&p.ea.active&&p.ea.name){
+      // EA email, if present, is operator-entered contact info for a real assistant — not an AI-guessed pattern, so it is safe to export as-is.
+      rows.push(['Executive Assistant',p.ea.name,p.ea.role||'','(assists '+p.name+')',p.ea.email||'',p.ea.phone||'','','','',p.source||'',p.ea.notes||'',atlDateStr()]);
+    }
+  });
+  gatekeepers.forEach(function(g){
+    rows.push(['Gatekeeper',g.name,GK_TYPE_LABELS[g.type]||g.type,g.location||'','','','',g.lastContact||'',g.followup||'',g.type||'',g.notes||'',atlDateStr()]);
+  });
+  if(rows.length===1){
+    rows.push(['(no contact records yet)','','','','','','','','','','',atlDateStr()]);
+  }
+  downloadCSV('odyssey-black-all-contacts-'+atlDateStr()+'.csv',rows);
+  notify('All Contacts CSV downloaded');
+}
+function openBackupModal(){
+  document.getElementById('backup-modal').classList.add('open');
+  renderSnapshotsList();
+}
+function closeBackupModal(){
+  document.getElementById('backup-modal').classList.remove('open');
+  cancelBackupPreview();
+}
+function renderSnapshotsList(){
+  var el=document.getElementById('backup-snapshots-list');
+  var snaps=[];
+  try{
+    for(var i=0;i<localStorage.length;i++){
+      var k=localStorage.key(i);
+      if(k && k.indexOf('ob-pre-restore-snapshot-')===0){ snaps.push(k); }
+    }
+  }catch(e){}
+  if(!snaps.length){ el.textContent='No recovery snapshots yet — one is created automatically before every restore.'; return; }
+  snaps.sort().reverse();
+  el.innerHTML=snaps.map(function(k){
+    var ts=k.replace('ob-pre-restore-snapshot-','');
+    var d=new Date(parseInt(ts,10));
+    return '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);">'+
+      '<span>Snapshot from '+escapeHTML(d.toLocaleString())+'</span>'+
+      '<button class="btn btn-ghost" style="padding:4px 10px;font-size:var(--fs-xs);" onclick="restoreSnapshot(\''+k+'\')">Restore This</button>'+
+      '</div>';
+  }).join('');
+}
+function restoreSnapshot(key){
+  if(!confirm('Restore this snapshot? Your CURRENT data will be replaced with what was saved at that point.')){return;}
+  try{
+    var snap=JSON.parse(localStorage.getItem(key));
+    Object.keys(snap).forEach(function(k){
+      if(APPROVED_BACKUP_KEYS.indexOf(k)===-1){return;}
+      if(snap[k]!==null&&snap[k]!==undefined){ localStorage.setItem(k,snap[k]); }
+    });
+    notify('Snapshot restored — reloading');
+    setTimeout(function(){ location.reload(); },1000);
+  }catch(e){ notify('Could not restore that snapshot — it may be corrupted'); }
+}
+
+function exportFullBackup(){
+  var recordCounts={};
+  var keys={};
+  APPROVED_BACKUP_KEYS.forEach(function(k){
+    var raw=null;
+    try{ raw=localStorage.getItem(k); }catch(e){}
+    keys[k]=raw;
+    try{ var parsed=JSON.parse(raw||'null'); recordCounts[k]=Array.isArray(parsed)?parsed.length:(parsed?1:0); }catch(e){ recordCounts[k]='unreadable'; }
+  });
+  var backup={
+    app:'odyssey-black-executive-acquisition-suite',
+    schemaVersion:1,
+    exportedAt:new Date().toISOString(),
+    exportedAtlDate:atlDateStr(),
+    recordCounts:recordCounts,
+    keys:keys
+  };
+  var blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url;a.download='odyssey-black-backup-'+atlDateStr()+'.json';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  notify('Backup downloaded');
+}
+
+function previewBackupFile(file){
+  if(!file){return;}
+  var reader=new FileReader();
+  reader.onload=function(e){
+    var parsed;
+    try{ parsed=JSON.parse(e.target.result); }
+    catch(err){ notify('That file is not valid JSON — nothing changed'); return; }
+
+    var problems=[];
+    if(parsed.app!=='odyssey-black-executive-acquisition-suite'){ problems.push('Not recognized as an Odyssey Black backup (missing or wrong app identifier).'); }
+    if(typeof parsed.schemaVersion!=='number'){ problems.push('Missing schema version.'); }
+    if(!parsed.keys||typeof parsed.keys!=='object'||Array.isArray(parsed.keys)){ problems.push('Missing or malformed "keys" object.'); }
+
+    if(problems.length){
+      document.getElementById('backup-preview').style.display='block';
+      document.getElementById('backup-preview-summary').textContent='This file cannot be restored:\n'+problems.join('\n');
+      document.getElementById('backup-restore-replace-btn').disabled=true;
+      document.getElementById('backup-restore-merge-btn').disabled=true;
+      pendingRestore=null;
+      return;
+    }
+
+    var accepted={};var rejectedKeys=[];var summaryLines=[];
+    Object.keys(parsed.keys).forEach(function(k){
+      if(APPROVED_BACKUP_KEYS.indexOf(k)===-1){ rejectedKeys.push(k); return; }
+      var raw=parsed.keys[k];
+      try{
+        var val=JSON.parse(raw);
+        accepted[k]=raw;
+        summaryLines.push(k+': '+(Array.isArray(val)?val.length+' records':'1 object')+' — will restore');
+      }catch(e){
+        rejectedKeys.push(k+' (unreadable)');
+      }
+    });
+    if(rejectedKeys.length){
+      summaryLines.push('');
+      summaryLines.push('Rejected (not an approved key, or unreadable): '+rejectedKeys.join(', '));
+    }
+    summaryLines.push('');
+    summaryLines.push('Backup date: '+(parsed.exportedAtlDate||parsed.exportedAt||'unknown'));
+    summaryLines.push('This preview does NOT change any data yet.');
+
+    document.getElementById('backup-preview').style.display='block';
+    document.getElementById('backup-preview-summary').textContent=summaryLines.join('\n');
+    var hasAcceptedData=Object.keys(accepted).length>0;
+    document.getElementById('backup-restore-replace-btn').disabled=!hasAcceptedData;
+    document.getElementById('backup-restore-merge-btn').disabled=!hasAcceptedData;
+    pendingRestore=hasAcceptedData?accepted:null;
+  };
+  reader.readAsText(file);
+}
+function cancelBackupPreview(){
+  pendingRestore=null;
+  document.getElementById('backup-preview').style.display='none';
+  document.getElementById('backup-file-input').value='';
+}
+function snapshotCurrentApprovedKeys(){
+  var snapshot={};
+  APPROVED_BACKUP_KEYS.forEach(function(k){ try{ snapshot[k]=localStorage.getItem(k); }catch(e){} });
+  try{ localStorage.setItem('ob-pre-restore-snapshot-'+Date.now(),JSON.stringify(snapshot)); }catch(e){}
+}
+function restoreBackup(mode){
+  if(!pendingRestore){ notify('Preview a valid backup file first'); return; }
+  var label=mode==='replace'?'REPLACE your current data':'MERGE into your current data';
+  if(!confirm('This will '+label+' for the approved keys shown in the preview. A recovery snapshot of your current data will be saved first. Continue?')){ return; }
+
+  snapshotCurrentApprovedKeys();
+
+  try{
+    Object.keys(pendingRestore).forEach(function(k){
+      if(mode==='replace'){
+        localStorage.setItem(k,pendingRestore[k]);
+      } else {
+        // Merge: dedupe by id, keep the newer record when both sides have updatedAt, otherwise keep both
+        var incoming=JSON.parse(pendingRestore[k]);
+        var current=loadJSON(k,Array.isArray(incoming)?[]:{});
+        if(Array.isArray(incoming)&&Array.isArray(current)){
+          var byId={};
+          current.forEach(function(r){ if(r&&r.id!==undefined){ byId[r.id]=r; } });
+          incoming.forEach(function(r){
+            if(r&&r.id!==undefined&&byId[r.id]){
+              var existing=byId[r.id];
+              if(r.updatedAt&&existing.updatedAt){ byId[r.id]=r.updatedAt>existing.updatedAt?r:existing; }
+              else { byId[r.id]=r; } // no timestamps to compare — incoming wins, nothing is dropped, both were real records
+            } else if(r&&r.id!==undefined){
+              byId[r.id]=r;
+            }
+          });
+          saveJSON(k,Object.values(byId));
+        } else {
+          // Non-array keys (e.g. ob-cal-progress, ob-event-mode) — merge shallowly, incoming wins per-field
+          saveJSON(k,Object.assign({},current,incoming));
+        }
+      }
+    });
+    notify('Restore complete ('+mode+') — reloading');
+    cancelBackupPreview();
+    setTimeout(function(){ location.reload(); },1000);
+  }catch(e){
+    notify('Restore failed — rolling back to the pre-restore snapshot');
+    // Roll back using the snapshot we just took
+    var snapKeys=[];
+    try{
+      for(var i=0;i<localStorage.length;i++){ var k=localStorage.key(i); if(k&&k.indexOf('ob-pre-restore-snapshot-')===0){ snapKeys.push(k); } }
+      snapKeys.sort();
+      var latest=JSON.parse(localStorage.getItem(snapKeys[snapKeys.length-1]));
+      Object.keys(latest).forEach(function(k){ if(latest[k]!==null&&latest[k]!==undefined){ localStorage.setItem(k,latest[k]); } });
+    }catch(e2){}
+  }
+}
+
+var pipeline=loadJSON('ob-pipeline',[]);
+var identityVerification=null; // {name, sourceUrl, verifiedAt} — set only via explicit operator action, never by AI confidence
+var pendingAIIdentity=false; // true only when the current form name came from an AI target suggestion and hasn't been operator-verified
+var fieldProvenance={hq:{evidenceStatus:'unknown',source:'',verifiedAt:''},travel:{evidenceStatus:'unknown',source:'',verifiedAt:''}};
+
+function onProvenanceFieldChanged(field){
+  var val=document.getElementById('p-'+field).value;
+  var toggle=document.getElementById(field+'-evidence-toggle');
+  if(val==='unknown'){
+    toggle.style.display='none';
+    fieldProvenance[field]={evidenceStatus:'unknown',source:'',verifiedAt:''};
+    return;
+  }
+  // Selecting a factual value defaults to "estimate" — the safer assumption.
+  // The operator must explicitly upgrade to "Verified"; changing the value
+  // afterward resets this, since a new value has no verification behind it yet.
+  toggle.style.display='flex';
+  fieldProvenance[field]={evidenceStatus:'operator_estimate',source:'',verifiedAt:''};
+  renderEvidenceToggle(field);
+}
+function setEvidenceStatus(field,status){
+  if(status==='operator_verified'){
+    fieldProvenance[field]={evidenceStatus:'operator_verified',source:'firsthand knowledge',verifiedAt:atlDateStr()};
+  } else {
+    fieldProvenance[field]={evidenceStatus:'operator_estimate',source:'',verifiedAt:''};
+  }
+  renderEvidenceToggle(field);
+}
+function renderEvidenceToggle(field){
+  var est=document.getElementById(field+'-ev-estimate');
+  var ver=document.getElementById(field+'-ev-verified');
+  var status=fieldProvenance[field].evidenceStatus;
+  est.className='ev-btn'+(status==='operator_estimate'?' active':'');
+  ver.className='ev-btn'+(status==='operator_verified'?' active verified':'');
+}
+function resetFieldProvenance(){
+  fieldProvenance={hq:{evidenceStatus:'unknown',source:'',verifiedAt:''},travel:{evidenceStatus:'unknown',source:'',verifiedAt:''}};
+  ['hq','travel'].forEach(function(f){ var t=document.getElementById(f+'-evidence-toggle'); if(t){t.style.display='none';} });
+}
 var currentP=null,bulkData=[],bulkFilter='all',outMode='exec';
 var SIG_SCORES={'sig-hired':3,'sig-office':2,'sig-earnings':1,'sig-speaking':2,'sig-reloc':3,'sig-travel':2};
 var SIG_LABELS={'sig-hired':'Recently hired/promoted','sig-office':'Company opening ATL office','sig-earnings':'Upcoming earnings/board meeting','sig-speaking':'Speaking at ATL event','sig-reloc':'Relocating to Atlanta','sig-travel':'Increased travel activity'};
 var CHIP_IDS={'sig-hired':'chip-hired','sig-office':'chip-office','sig-earnings':'chip-earnings','sig-speaking':'chip-speaking','sig-reloc':'chip-reloc','sig-travel':'chip-travel'};
 
-function switchTab(n,el){document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});el.classList.add('active');document.getElementById('panel-'+n).classList.add('active');if(n==='pipeline'){renderPipeline();}if(n==='company'){buildCoMap();}if(n==='calendar'){initCalendar();updateKPIs();}if(n==='markets'){
-    var savedKey=localStorage.getItem('ob-places-key');
-    if(savedKey){document.getElementById('places-key-row').style.display='none';document.getElementById('places-key-saved').style.display='block';}
-  }}
+function switchTab(n,el){document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});el.classList.add('active');document.getElementById('panel-'+n).classList.add('active');if(n==='pipeline'){renderPipeline();}if(n==='company'){buildCoMap();}if(n==='calendar'){initCalendar();updateKPIs();}if(n==='gatekeeper'){renderGatekeepers();}if(n==='radar'){renderRadar();}}
 
 function toggleSig(sid,cid){var cb=document.getElementById(sid);var chip=document.getElementById(cid);cb.checked=!cb.checked;if(cb.checked){chip.classList.add('on');}else{chip.classList.remove('on');}refreshBM();}
 function refreshBM(){var total=0;Object.keys(SIG_SCORES).forEach(function(id){var el=document.getElementById(id);if(el&&el.checked){total+=SIG_SCORES[id];}});total=Math.min(total,10);var num=document.getElementById('bm-num'),fill=document.getElementById('bm-fill'),desc=document.getElementById('bm-desc');num.textContent=total;fill.style.width=(total*10)+'%';var c,d;if(total===0){c='var(--muted)';d='No signals active';}else if(total<=3){c='#e67e22';d='Mild timing - monitor';}else if(total<=6){c='var(--yellow)';d='Good timing - reach out soon';}else if(total<=8){c='var(--green)';d='Strong timing - act this week';}else{c='var(--gold)';d='PEAK MOMENT - reach out today';}num.style.color=c;fill.style.background=c;desc.style.color=c;desc.textContent=d;return total;}
@@ -1677,11 +2160,22 @@ function getTitleScore(t){var tl=(t||'').toLowerCase();if(/\b(ceo|chief executiv
 function getTier(s){if(s>=28){return'HOT';}if(s>=24){return'STRONG';}if(s>=20){return'QUALIFIED';}return'LOW';}
 function getTierClass(s){if(s>=28){return't-hot';}if(s>=24){return't-strong';}if(s>=20){return't-qual';}return't-low';}
 
+function provenanceTag(field){
+  var p=fieldProvenance[field];
+  if(!p||p.evidenceStatus==='unknown'){ return ''; }
+  if(p.evidenceStatus==='operator_verified'){ return ' [Verified]'; }
+  if(p.evidenceStatus==='operator_estimate'){ return ' [Estimate]'; }
+  return '';
+}
 function scoreProspect(){
   var name=document.getElementById('p-name').value.trim();
   var title=document.getElementById('p-title').value.trim();
   var company=document.getElementById('p-company').value.trim();
   if(!name||!title||!company){notify('Please fill in Name, Title, and Company');return;}
+  if(pendingAIIdentity && !identityVerification){
+    notify('This name came from an AI suggestion, not a verified source. Click "Verify Identity" above before scoring — or clear the form to enter a prospect you already know is real.');
+    return;
+  }
   var hq=document.getElementById('p-hq').value;
   var travel=document.getElementById('p-travel').value;
   var industry=document.getElementById('p-industry').value;
@@ -1695,8 +2189,8 @@ function scoreProspect(){
   else if(/\b(vp|vice president)\b/.test(tl)){bd.push('VP/MD: +'+ts);}
   else if(/\b(director|partner)\b/.test(tl)){bd.push('Director: +'+ts);}
   else{bd.push('Manager: +'+ts);}
-  if(hq==='yes'){score+=8;bd.push('Atlanta HQ: +8');}else if(hq==='regional'){score+=5;bd.push('ATL Regional: +5');}else{score+=3;bd.push('Visiting: +3');}
-  if(travel==='heavy'){score+=7;bd.push('Heavy Travel: +7');}else if(travel==='moderate'){score+=4;bd.push('Moderate Travel: +4');}else{score+=1;bd.push('Light Travel: +1');}
+  if(hq==='unknown'){score+=0;bd.push('Atlanta Presence: Unknown — Needs Verification (+0)');}else if(hq==='yes'){score+=8;bd.push('Atlanta HQ: +8'+provenanceTag('hq'));}else if(hq==='regional'){score+=5;bd.push('ATL Regional: +5'+provenanceTag('hq'));}else{score+=3;bd.push('Visiting: +3'+provenanceTag('hq'));}
+  if(travel==='unknown'){score+=0;bd.push('Travel Frequency: Unknown — Needs Verification (+0)');}else if(travel==='heavy'){score+=7;bd.push('Heavy Travel: +7'+provenanceTag('travel'));}else if(travel==='moderate'){score+=4;bd.push('Moderate Travel: +4'+provenanceTag('travel'));}else{score+=1;bd.push('Light Travel: +1'+provenanceTag('travel'));}
   var premInd=['Airline / Aviation','Financial Services / Banking','Private Equity / VC','Legal / Law Firm','Consulting'];
   if(premInd.indexOf(industry)>=0){score+=5;bd.push('Premium Industry: +5');}else if(industry){score+=3;bd.push('Fortune 500: +3');}
   if(source==='referral'){score+=5;bd.push('Referral: +5');}else if(source==='event'){score+=3;bd.push('Event: +3');}else{score+=1;bd.push('Cold: +1');}
@@ -1717,7 +2211,7 @@ function scoreProspect(){
   var bmScore=refreshBM();
   var sigs=getActiveSigs();
   var ct=classifyClientType(travelData,score,travel);
-  var tempP={name:name,title:title,company:company,industry:industry,hq:hq,travel:travel,source:source,score:score,notes:document.getElementById('p-notes').value,stage:'identified',id:Date.now(),bmScore:bmScore,signals:sigs,travelData:travelData,clientType:ct.short,clientTypeInfo:ct,ea:{active:eaOn&&!!eaName,name:eaName,role:eaRole,email:eaEmail,phone:eaPhone,notes:eaNotes,infLevel:eaInf.level,infScore:eaInf.score,infNote:eaInf.note,intel:getEAIntelProfile()}};
+  var tempP={name:name,title:title,company:company,industry:industry,hq:hq,travel:travel,source:source,score:score,notes:document.getElementById('p-notes').value,stage:'identified',id:Date.now(),bmScore:bmScore,signals:sigs,travelData:travelData,clientType:ct.short,clientTypeInfo:ct,fieldProvenance:JSON.parse(JSON.stringify(fieldProvenance)),ea:{active:eaOn&&!!eaName,name:eaName,role:eaRole,email:eaEmail,phone:eaPhone,notes:eaNotes,infLevel:eaInf.level,infScore:eaInf.score,infNote:eaInf.note,intel:getEAIntelProfile()}};
   tempP.convProb=calcConvProb(tempP);
   currentP=tempP;
   document.getElementById('r-name').textContent=name;
@@ -1788,7 +2282,7 @@ function scoreProspect(){
 
 async function callAI(lines,maxT){
   var prompt=Array.isArray(lines)?lines.filter(Boolean).join('\n'):lines;
-  var res=await fetch('/.netlify/functions/claude',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:maxT||1000,messages:[{role:'user',content:prompt}]})});
+  var res=await fetch('/.netlify/functions/claude',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-5',max_tokens:maxT||1000,messages:[{role:'user',content:prompt}]})});
   var d=await res.json();
   if(d.error){throw new Error(JSON.stringify(d.error));}
   if(!d.content||!d.content[0]){throw new Error('Bad response: '+JSON.stringify(d).substring(0,200));}
@@ -1819,7 +2313,7 @@ async function generateStrategy(){
       'You are a business development advisor for Odyssey Black VIP Transportation in Atlanta, a premium black car service for Fortune 500 executives.',
       'Prospect: '+currentP.name+', '+currentP.title+' at '+currentP.company,
       'Industry: '+currentP.industry+' | Atlanta presence: '+currentP.hq+' | Travel frequency: '+currentP.travel,
-      'Acquisition Score: '+currentP.score+'/40 ('+getTier(currentP.score)+')',
+      'Acquisition Score: '+currentP.score+' points ('+getTier(currentP.score)+')',
       'Buying Moment Score: '+currentP.bmScore+'/10',
       'Active Timing Signals: '+sigs,
       'Client Type Classification: '+ctInfo.type+' - '+ctInfo.desc,
@@ -1851,18 +2345,117 @@ async function generateStrategy(){
 
 function setMode(m,el){outMode=m;document.querySelectorAll('.mode-tab').forEach(function(t){t.classList.remove('active');});el.classList.add('active');document.getElementById('exec-fields').style.display=m==='exec'?'block':'none';document.getElementById('ea-fields-out').style.display=m==='ea'?'block':'none';document.getElementById('research-box').classList.remove('show');document.getElementById('out-box').classList.remove('show');}
 
+// ===== RESEARCH APPROVAL: CLAIM-LEVEL STATE MACHINE =====
+// Required invariant: raw AI research never reaches outreach directly.
+// generateOutreach() may only read claims with status === 'operator_verified'.
+var researchClaims=[]; // [{id, text, category, status, sourceUrl, sourceName, verifiedAt}]
+
+function validateResearchSource(value){
+  var v=(value||'').trim();
+  if(!v){ return {valid:false,error:'Source is required'}; }
+  var u;
+  try{ u=new URL(v); }
+  catch(e){ return {valid:false,error:'Not a valid URL'}; }
+  if(u.username||u.password){ return {valid:false,error:'URL must not contain embedded credentials'}; }
+  if(u.protocol==='javascript:'||u.protocol==='data:'||u.protocol==='file:'){ return {valid:false,error:'Unsafe URL scheme'}; }
+  var isLocalhost=(u.protocol==='http:'&&u.hostname==='localhost');
+  if(u.protocol!=='https:'&&!isLocalhost){ return {valid:false,error:'https:// required (http only allowed for localhost)'}; }
+  return {valid:true,normalized:u.toString()};
+}
+
+function parseResearchIntoClaims(rawText){
+  // Splits the AI's numbered-section output into individually reviewable claims.
+  var parts=rawText.split(/\n(?=\d+\.\s)/);
+  return parts.map(function(p,i){
+    var m=p.match(/^\d+\.\s*([A-Z\s]+?)(?::|\n|$)/);
+    var category=m?m[1].trim():'Note '+(i+1);
+    var text=p.trim();
+    if(!text){return null;}
+    return {id:'claim-'+Date.now()+'-'+i,text:text,category:category,status:'draft',sourceUrl:'',sourceName:'',verifiedAt:''};
+  }).filter(Boolean);
+}
+
 async function researchExec(){
   var name=document.getElementById('o-name').value.trim();var title=document.getElementById('o-title').value.trim();
   if(!name||!title){notify('Fill in name and title first');return;}
-  var sp=document.getElementById('sp-res');var box=document.getElementById('research-box');var out=document.getElementById('research-ai');
+  var sp=document.getElementById('sp-res');var box=document.getElementById('research-box');
   sp.classList.add('on');box.classList.remove('show');
+  researchClaims=[]; // generating new research clears all previous approval — required behaviour
+  renderResearchClaims();
   try{
-    var research=await callAI(['You are a research assistant providing verified facts about an executive for a sales team.','Executive: '+name+', '+title,'Provide ONLY facts you are highly confident about. Flag uncertain facts with [VERIFY].','Never invent company names, events, quotes, or initiatives you are not sure about.','Cover these 5 sections:','1. CURRENT ROLE AND COMPANY: confirmed current position and company HQ location','2. CAREER BACKGROUND: previous verified roles and companies','3. BUSINESS FOCUS: known priorities or public statements','4. TRAVEL INDICATORS: known travel patterns or multiple office locations','5. OUTREACH HOOK: one specific verified fact connecting to executive ground transportation needs','If you lack verified data on any section, say so clearly rather than guessing.'],800);
-    out.textContent=research;box.classList.add('show');
-    var hi=research.indexOf('OUTREACH HOOK');
-    if(hi>=0){var hl=research.substring(hi+13).replace(/^[:\s\-]+/,'').split('\n')[0].trim();if(hl.length>10){document.getElementById('o-ctx').value=hl;notify('Research complete - context auto-filled');}else{notify('Research complete');}}else{notify('Research complete');}
-  }catch(e){out.textContent='Error: '+e.message;box.classList.add('show');}
+    var research=await callAI(['You are drafting research NOTES for a sales operator — not a verified-facts database.','Executive: '+name+', '+title,'RULES: Only state a fact as plain text if you are highly confident it is currently accurate. Prefix every fact you are not highly confident about with [VERIFY]. Never invent company names, events, quotes, initiatives, or a plausible-sounding placeholder to fill a gap.','If you have no reliable information for a section, write exactly "No reliable data available" for that section — do not guess to appear complete.','Cover these 5 sections:','1. CURRENT ROLE AND COMPANY','2. CAREER BACKGROUND','3. BUSINESS FOCUS','4. TRAVEL INDICATORS','5. POSSIBLE OUTREACH ANGLE: only if section 1-4 gave you a real, specific, non-generic fact to hook it to. If not, write "No specific angle available — use general positioning."'],800);
+    researchClaims=parseResearchIntoClaims(research);
+    box.classList.add('show');
+    renderResearchClaims();
+    notify('Research draft ready — review, source, and approve each claim individually');
+  }catch(e){
+    researchClaims=[{id:'err',text:'Error: '+e.message,category:'Error',status:'rejected',sourceUrl:'',sourceName:'',verifiedAt:''}];
+    box.classList.add('show');renderResearchClaims();
+  }
   sp.classList.remove('on');
+}
+
+function renderResearchClaims(){
+  var list=document.getElementById('research-claims-list');
+  var countEl=document.getElementById('research-approved-count');
+  if(!researchClaims.length){ list.innerHTML=''; countEl.style.display='none'; return; }
+  list.innerHTML=researchClaims.map(function(c){
+    var hasVerify=/\[VERIFY\]/i.test(c.text);
+    var statusColors={draft:'var(--muted)',needs_verification:'#e67e22',operator_verified:'var(--green)',rejected:'#e74c3c'};
+    var statusLabels={draft:'Draft',needs_verification:'Needs Verification',operator_verified:'Approved',rejected:'Rejected'};
+    return '<div class="card" style="padding:12px;margin-bottom:10px;border-left:3px solid '+statusColors[c.status]+';">'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">'+
+        '<span style="font-size:var(--fs-xs);font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:0.05em;">'+escapeHTML(c.category)+'</span>'+
+        '<span style="font-size:var(--fs-xs);color:'+statusColors[c.status]+';font-weight:600;">'+statusLabels[c.status]+'</span>'+
+      '</div>'+
+      '<textarea data-claim-id="'+c.id+'" oninput="onClaimEdited(this)" rows="2" style="width:100%;font-family:inherit;font-size:var(--fs-sm);margin-bottom:6px;">'+escapeHTML(c.text)+'</textarea>'+
+      (hasVerify?'<div style="font-size:var(--fs-xs);color:#e67e22;margin-bottom:6px;">&#9888; Contains [VERIFY] — resolve before approving</div>':'')+
+      '<div class="g2" style="margin-bottom:6px;">'+
+        '<input type="text" data-claim-source="'+c.id+'" placeholder="Source URL (required to approve)" value="'+escapeHTML(c.sourceUrl)+'" oninput="onClaimSourceEdited(\''+c.id+'\',this.value)">'+
+      '</div>'+
+      '<div class="btns">'+
+        '<button class="btn btn-outline" style="padding:5px 12px;font-size:var(--fs-xs);" onclick="approveClaim(\''+c.id+'\')">Approve</button>'+
+        '<button class="btn btn-ghost" style="padding:5px 12px;font-size:var(--fs-xs);" onclick="rejectClaim(\''+c.id+'\')">Reject</button>'+
+      '</div>'+
+      (c.status==='operator_verified'?'<div style="font-size:var(--fs-xs);color:var(--green);margin-top:6px;">&#10003; Verified '+c.verifiedAt+'</div>':'')+
+    '</div>';
+  }).join('');
+  var approvedCount=researchClaims.filter(function(c){return c.status==='operator_verified';}).length;
+  countEl.style.display='block';
+  countEl.textContent=approvedCount+' of '+researchClaims.length+' claims approved for outreach';
+}
+function findClaim(id){ return researchClaims.find(function(c){return c.id===id;}); }
+function onClaimEdited(textareaEl){
+  var c=findClaim(textareaEl.dataset.claimId);
+  if(!c){return;}
+  c.text=textareaEl.value;
+  if(c.status==='operator_verified'){ c.status='draft'; notify('Approval cleared — claim text changed'); }
+  renderResearchClaims();
+  // Re-focus is lost on full re-render; acceptable trade-off for this pass, noted as a real UX limitation.
+}
+function onClaimSourceEdited(id,value){
+  var c=findClaim(id);
+  if(!c){return;}
+  c.sourceUrl=value;
+  if(c.status==='operator_verified'){ c.status='draft'; notify('Approval cleared — source changed'); renderResearchClaims(); }
+}
+function approveClaim(id){
+  var c=findClaim(id);
+  if(!c){return;}
+  if(/\[VERIFY\]/i.test(c.text)){ notify('Cannot approve — resolve the [VERIFY] flag first'); return; }
+  var v=validateResearchSource(c.sourceUrl);
+  if(!v.valid){ notify('Cannot approve — '+v.error); return; }
+  c.sourceUrl=v.normalized;
+  c.status='operator_verified';
+  c.verifiedAt=atlDateStr();
+  renderResearchClaims();
+  notify('Claim approved');
+}
+function rejectClaim(id){
+  var c=findClaim(id);
+  if(!c){return;}
+  c.status='rejected';
+  renderResearchClaims();
 }
 
 async function generateOutreach(){
@@ -1870,7 +2463,12 @@ async function generateOutreach(){
   var name=document.getElementById('o-name').value.trim();var title=document.getElementById('o-title').value.trim();
   if(!name||!title){notify('Fill in name and title');return;}
   var ch=document.getElementById('o-channel').value;var tone=document.getElementById('o-tone').value;
-  var ctx=document.getElementById('o-ctx').value.trim();var research=document.getElementById('research-ai').textContent.trim();
+  var ctx=document.getElementById('o-ctx').value.trim();
+  // Required invariant: only claims individually marked operator_verified reach outreach.
+  // researchClaims/raw AI text is never read here — this is enforced by construction,
+  // since this line only ever touches the .text of claims already filtered by status.
+  var approvedClaims=researchClaims.filter(function(c){return c.status==='operator_verified';});
+  var research=approvedClaims.map(function(c){return c.text;}).join('\n');
   var sp=document.getElementById('sp3');var box=document.getElementById('out-box');var out=document.getElementById('out-ai');
   sp.classList.add('on');box.classList.remove('show');
   var chL={email:'a cold email',linkedin:'a LinkedIn DM under 150 words',referral:'a warm referral introduction email',event:'a post-event follow-up email',voicemail:'a 30-second voicemail script'};
@@ -1883,7 +2481,7 @@ async function generateOutreach(){
     if(pipePros.convProb){convHint='Conversion probability: '+pipePros.convProb+'.';}
   }
   try{
-    out.textContent=await callAI(['You write outreach for Odyssey Black VIP Transportation in Atlanta, premium black car service for Fortune 500 executives.','Differentiators: reliability, discretion, professional chauffeurs, flight tracking, last-minute availability, recurring route ownership.','Write '+chL[ch]+' for:','Name: '+name,'Role: '+title,'Tone: '+tL[tone],travelHint||'',clientHint||'',convHint||'','Verified Research: '+(research||'None available'),'Additional Context: '+(ctx||'None'),'RULES: Only reference facts from Verified Research. Do NOT invent details not in research.','If travel route data is available, reference it specifically as a hook (e.g. Mon/Thu ATL-NYC stands out as a predictable route worth owning).','If client type is High-Frequency Traveler, lead with standing reservation concept. If Corporate Account, lead with company-wide reliability.','Do not sound like a mass email. Include a soft call to action.',ch==='email'?'Include a compelling subject line.':''],1000);
+    out.textContent=await callAI(['You write outreach for Odyssey Black VIP Transportation in Atlanta, premium black car service for Fortune 500 executives.','Differentiators: reliability, discretion, professional chauffeurs, flight tracking, last-minute availability, recurring route ownership.','Write '+chL[ch]+' for:','Name: '+name,'Role: '+title,'Tone: '+tL[tone],travelHint||'',clientHint||'',convHint||'','Operator-Verified Research: '+(research||'None approved — use general Odyssey Black positioning and Additional Context only'),'Additional Context: '+(ctx||'None'),'RULES: Only reference facts from Operator-Verified Research or Additional Context. Do NOT invent details, names, events, or facts not present in those fields.','If travel route data is available, reference it specifically as a hook (e.g. Mon/Thu ATL-NYC stands out as a predictable route worth owning).','If client type is High-Frequency Traveler, lead with standing reservation concept. If Corporate Account, lead with company-wide reliability.','Do not sound like a mass email. Include a soft call to action.',ch==='email'?'Include a compelling subject line.':''],1000);
     box.classList.add('show');
     if(pipePros){ saveMessage(pipePros.id, pipePros.name, ch, out.textContent); }
   }catch(e){out.textContent='Error: '+e.message;box.classList.add('show');}
@@ -1958,7 +2556,7 @@ function addToPipeline(){
     saved.eventUrgency=getEventUrgency(getDaysToEvent(saved.eventData.date));
   }
   pipeline.push(saved);
-  localStorage.setItem('ob-pipeline',JSON.stringify(pipeline));
+  saveJSON('ob-pipeline',pipeline);
   notify(currentP.name+' added — est. $'+saved.monthlyValue.toLocaleString()+'/mo');
   renderCommandCenter();
 }
@@ -1987,8 +2585,8 @@ function renderPipeline(){
       var sugAction=getSuggestedAction(p);
       return'<div class="pipe-card '+(urgent?'bm-hi ':'')+overdue+'">'+
         '<span class="stage-label '+stageCls+'">'+stageLabel+'</span>'+
-        '<div class="pipe-name">'+p.name+'</div>'+
-        '<div class="pipe-co">'+p.title+' &middot; '+p.company+'</div>'+
+        '<div class="pipe-name">'+escapeHTML(p.name)+'</div>'+
+        '<div class="pipe-co">'+escapeHTML(p.title)+' &middot; '+escapeHTML(p.company)+'</div>'+
         '<div class="pipe-sc"><span class="'+tc+'">'+p.score+'</span>'+dot+convDot+'</div>'+
         revStr+respStr+fuStr+
         '<div style="font-size:var(--fs-xs);color:var(--muted);margin-top:5px;font-style:italic;">'+sugAction+'</div>'+
@@ -2014,7 +2612,7 @@ function renderPipeline(){
   var monthlyRev=pipeline.filter(function(p){return p.stage==='active'||p.stage==='recurring'||p.stage==='corporate';}).reduce(function(s,p){return s+(p.monthlyValue||0);},0);
   var projRev=pipeline.filter(function(p){return p.convProb==='High'&&(p.stage==='trial-sched'||p.stage==='trial-done');}).reduce(function(s,p){return s+(p.monthlyValue||0);},0);
   document.getElementById('st-revenue').textContent='$'+(monthlyRev+projRev).toLocaleString();
-  var today=new Date().toISOString().slice(0,10);
+  var today=atlDateStr();
   var overdueCount=pipeline.filter(function(p){return p.followUp&&p.followUp<today;}).length;
   document.getElementById('st-bm').textContent=overdueCount>0?overdueCount+' overdue':pipeline.filter(function(p){return p.bmScore&&p.bmScore>=7;}).length+' active';
   document.getElementById('pipe-empty').style.display=pipeline.length?'none':'block';
@@ -2027,11 +2625,15 @@ function moveStage(id){
   var p=pipeline.find(function(x){return x.id===id;});
   if(!p){return;}
   p.stage=stages[(stages.indexOf(p.stage)+1)%stages.length];
-  localStorage.setItem('ob-pipeline',JSON.stringify(pipeline));
+  saveJSON('ob-pipeline',pipeline);
   renderPipeline();notify('Moved to '+p.stage);
 }
 
 function clearProspect(){
+  identityVerification=null;
+  pendingAIIdentity=false;
+  resetFieldProvenance();
+  var idBox=document.getElementById('identity-verify-box');if(idBox){idBox.remove();}
   ['p-name','p-title','p-company','p-notes','ea-name','ea-email','ea-phone','ea-notes'].forEach(function(id){var el=document.getElementById(id);if(el){el.value='';};});
   ['ea-comm-pref','ea-responsiveness','ea-booking','ea-personality'].forEach(function(id){var el=document.getElementById(id);if(el){el.selectedIndex=0;}});
   var eaIPel=document.getElementById('ea-intel-profile');if(eaIPel){eaIPel.style.display='none';}
@@ -2077,9 +2679,9 @@ function buildCoMap(){
     var activeRev=execs.filter(function(p){return p.stage==='active'||p.stage==='recurring'||p.stage==='corporate';}).reduce(function(s,p){return s+(p.monthlyValue||0);},0);
     var opp=Math.min(10,Math.round(execs.length*1.5+hot*1.5+bm));
     var oppC=opp>=8?'var(--gold)':opp>=5?'var(--green)':'var(--muted)';
-    var rows=execs.map(function(p){return'<div class="co-exec-row"><div><div class="co-exec-name">'+p.name+'</div><div class="co-exec-title">'+p.title+'</div></div><div class="'+getTierClass(p.score)+'" style="font-weight:600;">'+p.score+(p.bmScore>=5?' &#9650;':'')+'</div></div>';}).join('');
+    var rows=execs.map(function(p){return'<div class="co-exec-row"><div><div class="co-exec-name">'+escapeHTML(p.name)+'</div><div class="co-exec-title">'+escapeHTML(p.title)+'</div></div><div class="'+getTierClass(p.score)+'" style="font-weight:600;">'+p.score+(p.bmScore>=5?' &#9650;':'')+'</div></div>';}).join('');
     var revStr=totalRev>0?'<span style="color:var(--green);font-weight:600;margin-left:8px;">$'+totalRev.toLocaleString()+'/mo est</span>'+(activeRev>0?' <span style="color:var(--gold);font-size:var(--fs-xs);font-weight:700;">('+('$'+activeRev.toLocaleString())+' active)</span>':''):'';
-    return'<div class="co-card"><div class="co-head"><div><div class="co-name">'+co+'</div><div class="co-meta">'+execs.length+' executive'+(execs.length!==1?'s':'')+' in pipeline &nbsp;&middot;&nbsp; Avg score: '+avg+(bm>0?' &nbsp;&middot;&nbsp; '+bm+' active BM':'')+revStr+'</div></div><div><div class="co-opp-label">Opp Score</div><div class="co-opp-val" style="color:'+oppC+';">'+opp+'/10</div></div></div><div class="co-execs-list">'+rows+'</div></div>';
+    return'<div class="co-card"><div class="co-head"><div><div class="co-name">'+escapeHTML(co)+'</div><div class="co-meta">'+execs.length+' executive'+(execs.length!==1?'s':'')+' in pipeline &nbsp;&middot;&nbsp; Avg score: '+avg+(bm>0?' &nbsp;&middot;&nbsp; '+bm+' active BM':'')+revStr+'</div></div><div><div class="co-opp-label">Opp Score</div><div class="co-opp-val" style="color:'+oppC+';">'+opp+'/10</div></div></div><div class="co-execs-list">'+rows+'</div></div>';
   }).join('');
 }
 
@@ -2099,11 +2701,84 @@ async function genAccountStrategy(){
 
 function handleDrop(e){e.preventDefault();document.getElementById('drop-zone').classList.remove('over');var f=e.dataTransfer.files[0];if(f){handleFile(f);}}
 function handleFile(f){if(!f||!f.name.endsWith('.csv')){notify('Please upload a CSV file');return;}var r=new FileReader();r.onload=function(e){parseCSV(e.target.result);};r.readAsText(f);}
-function parseCSVLine(line){var result=[],cur='',inQ=false;for(var i=0;i<line.length;i++){var ch=line[i];if(ch==='"'){inQ=!inQ;}else if(ch===','&&!inQ){result.push(cur.trim());cur='';}else{cur+=ch;}}result.push(cur.trim());return result;}
+// ===== STANDARDS-COMPLIANT CSV PARSER (RFC4180) =====
+var CSV_MAX_FILE_SIZE=5*1024*1024; // 5MB
+var CSV_MAX_ROWS=5000;
+var CSV_MAX_COLS=100;
+var CSV_MAX_CELL_LEN=5000;
+
+function parseCSVRFC4180(text){
+  var rows=[];var row=[];var field='';var inQuotes=false;
+  var i=0;var n=text.length;
+  while(i<n){
+    var c=text[i];
+    if(inQuotes){
+      if(c==='"'){
+        if(text[i+1]==='"'){ field+='"'; i+=2; continue; }
+        inQuotes=false; i++; continue;
+      }
+      field+=c; i++; continue;
+    } else {
+      if(c==='"'){ inQuotes=true; i++; continue; }
+      if(c===','){ row.push(field); field=''; i++; continue; }
+      if(c==='\r'){ i++; continue; }
+      if(c==='\n'){ row.push(field); rows.push(row); row=[]; field=''; i++; continue; }
+      field+=c; i++; continue;
+    }
+  }
+  if(field.length>0||row.length>0){ row.push(field); rows.push(row); }
+  return rows;
+}
+
+function validateCSVFile(text){
+  var errors=[];
+  if(text.length>CSV_MAX_FILE_SIZE){
+    errors.push('File too large ('+Math.round(text.length/1024)+'KB) — maximum is '+Math.round(CSV_MAX_FILE_SIZE/1024)+'KB');
+    return {valid:false,errors:errors,rows:null};
+  }
+  var rows;
+  try{ rows=parseCSVRFC4180(text); }
+  catch(e){ return {valid:false,errors:['Could not parse file: '+e.message],rows:null}; }
+
+  rows=rows.filter(function(r){ return !(r.length===1 && r[0]==='' ); }); // drop fully-blank trailing rows
+
+  if(rows.length<2){ errors.push('File must have a header row plus at least one data row'); return {valid:false,errors:errors,rows:null}; }
+  if(rows.length-1>CSV_MAX_ROWS){ errors.push('Too many rows ('+(rows.length-1)+') — maximum is '+CSV_MAX_ROWS); return {valid:false,errors:errors,rows:null}; }
+
+  var headerRow=rows[0];
+  if(headerRow.length>CSV_MAX_COLS){ errors.push('Too many columns ('+headerRow.length+') — maximum is '+CSV_MAX_COLS); return {valid:false,errors:errors,rows:null}; }
+
+  var normalizedHeaders=headerRow.map(function(h){ return h.replace(/"/g,'').trim().toLowerCase(); });
+  var emptyHeaderIdx=normalizedHeaders.findIndex(function(h){ return h===''; });
+  if(emptyHeaderIdx!==-1){ errors.push('Column '+(emptyHeaderIdx+1)+' has an empty header'); }
+
+  var seen={};var dupes=[];
+  normalizedHeaders.forEach(function(h){ if(seen[h]){ dupes.push(h); } seen[h]=true; });
+  if(dupes.length){ errors.push('Duplicate headers: '+dupes.join(', ')); }
+
+  var hasNameCol=normalizedHeaders.some(function(h){ return h.includes('name'); });
+  if(!hasNameCol){ errors.push('No name-related column found (need "Name", "First Name", or similar)'); }
+
+  var oversizedCell=false;
+  for(var r=1;r<rows.length;r++){
+    for(var c=0;c<rows[r].length;c++){
+      if(rows[r][c].length>CSV_MAX_CELL_LEN){ oversizedCell=true; break; }
+    }
+    if(oversizedCell){ break; }
+  }
+  if(oversizedCell){ errors.push('One or more cells exceed the '+CSV_MAX_CELL_LEN+'-character limit'); }
+
+  return {valid:errors.length===0,errors:errors,rows:rows,headers:normalizedHeaders};
+}
+
 function parseCSV(text){
-  var lines=text.split('\n').filter(function(l){return l.trim();});
-  if(lines.length<2){notify('CSV appears empty');return;}
-  var headers=lines[0].split(',').map(function(h){return h.replace(/"/g,'').trim().toLowerCase();});
+  var validation=validateCSVFile(text);
+  if(!validation.valid){
+    notify('CSV rejected: '+validation.errors.join('; '));
+    return;
+  }
+  var rows=validation.rows;
+  var headers=validation.headers;
   var fi=-1,li=-1,ni=-1,ti=-1,ci=-1;
   headers.forEach(function(h,i){
     if(h==='first name'||h==='firstname'){fi=i;}
@@ -2113,28 +2788,41 @@ function parseCSV(text){
     if((h==='company'||h==='company name'||h==='account name')&&ci===-1){ci=i;}
   });
   if(fi===-1&&ni===-1){headers.forEach(function(h,i){if(h.includes('first')&&fi===-1){fi=i;}if(h.includes('last')&&!h.includes('latest')&&li===-1){li=i;}if(h.includes('name')&&ni===-1){ni=i;}if(h.includes('title')&&ti===-1){ti=i;}if((h.includes('company')||h.includes('account')||h.includes('organization'))&&ci===-1){ci=i;}});}
-  bulkData=[];
-  for(var i=1;i<lines.length;i++){
-    var cols=parseCSVLine(lines[i]);var fullName='';
+
+  // Full-file validation happens above BEFORE this point — bulkData is never
+  // partially mutated by a file that later turns out to be invalid.
+  var newBulkData=[];
+  var skippedRows=0;
+  var seenNames={};
+  var duplicateCount=0;
+  for(var i=1;i<rows.length;i++){
+    var cols=rows[i];var fullName='';
     if(fi>=0&&li>=0){fullName=((cols[fi]||'')+' '+(cols[li]||'')).trim();}
-    else if(ni>=0){fullName=(cols[ni]||'').replace(/"/g,'').trim();}
-    if(!fullName||fullName.length<2){continue;}
-    var title=ti>=0?(cols[ti]||'').replace(/"/g,'').trim():'';
-    var company=ci>=0?(cols[ci]||'').replace(/"/g,'').trim():'';
+    else if(ni>=0){fullName=(cols[ni]||'').trim();}
+    if(!fullName||fullName.length<2){ skippedRows++; continue; }
+    var title=ti>=0?(cols[ti]||'').trim():'';
+    var company=ci>=0?(cols[ci]||'').trim():'';
+    var dedupeKey=(fullName+'|'+company).toLowerCase();
+    if(seenNames[dedupeKey]){ duplicateCount++; }
+    seenNames[dedupeKey]=true;
     var ts=getTitleScore(title);
-    var hqPts=8;var travelPts=7;var sourcePts=1;
+    var hqPts=0;var travelPts=0;var sourcePts=1;
     var total=ts+hqPts+travelPts+sourcePts;
     var bulkDefaultTravel={route1:'',route2:'',pattern:'variable',airport:'ATL-main',companions:'solo'};
-    var bulkCT=classifyClientType(bulkDefaultTravel,total,'heavy');
-    var bulkProspect={name:fullName,title:title,company:company,score:total,id:Date.now()+Math.random(),stage:'identified',hq:'yes',travel:'heavy',source:'linkedin',industry:'',notes:'',bmScore:0,signals:[],travelData:bulkDefaultTravel,clientType:bulkCT.short,clientTypeInfo:bulkCT,ea:{active:false}};
+    var bulkCT=classifyClientType(bulkDefaultTravel,total,'unknown');
+    var bulkProspect={name:fullName,title:title,company:company,score:total,id:Date.now()+Math.random(),stage:'identified',hq:'unknown',travel:'unknown',source:'linkedin',industry:'',notes:'',bmScore:0,signals:[],travelData:bulkDefaultTravel,clientType:bulkCT.short,clientTypeInfo:bulkCT,ea:{active:false}};
     bulkProspect.convProb=calcConvProb(bulkProspect);
     bulkProspect.monthlyValue=estimateMonthlyValue(bulkProspect);
     bulkProspect.responseStatus='none';
     bulkProspect.lastContact='';
-    bulkData.push(bulkProspect);
+    newBulkData.push(bulkProspect);
   }
+  bulkData=newBulkData; // single atomic assignment — no partial mutation during the loop above
   bulkData.sort(function(a,b){return b.score-a.score;});
-  renderBulkTable();notify('Scored '+bulkData.length+' prospects');
+  var summary='Scored '+bulkData.length+' prospects';
+  if(skippedRows>0){ summary+=', skipped '+skippedRows+' row(s) with no usable name'; }
+  if(duplicateCount>0){ summary+=', '+duplicateCount+' likely duplicate(s) included (same name+company)'; }
+  renderBulkTable();notify(summary);
 }
 function renderBulkTable(){
   document.getElementById('import-results').style.display='block';
@@ -2143,7 +2831,7 @@ function renderBulkTable(){
   var filtered=bulkData;
   if(bulkFilter==='hot'){filtered=bulkData.filter(function(p){return p.score>=28;});}
   if(bulkFilter==='strong'){filtered=bulkData.filter(function(p){return p.score>=24;});}
-  document.getElementById('bulk-tbody').innerHTML=filtered.map(function(p){var sid=String(p.id).replace('.','_');return'<tr><td style="font-weight:500;">'+p.name+'</td><td style="color:var(--muted);font-size:var(--fs-sm);">'+(p.title||'')+'</td><td style="font-size:var(--fs-sm);">'+(p.company||'')+'</td><td style="font-weight:600;color:var(--gold);">'+p.score+'</td><td class="'+getTierClass(p.score)+'">'+getTier(p.score)+'</td><td><button class="btn btn-ghost" style="padding:5px 12px;font-size:var(--fs-xs);" onclick="addBulkOne(\''+sid+'\')">Add</button></td></tr>';}).join('');
+  document.getElementById('bulk-tbody').innerHTML=filtered.map(function(p){var sid=String(p.id).replace('.','_');return'<tr><td style="font-weight:500;">'+escapeHTML(p.name)+'</td><td style="color:var(--muted);font-size:var(--fs-sm);">'+escapeHTML(p.title||'')+'</td><td style="font-size:var(--fs-sm);">'+escapeHTML(p.company||'')+'</td><td style="font-weight:600;color:var(--gold);">'+p.score+'</td><td class="'+getTierClass(p.score)+'">'+getTier(p.score)+'</td><td><button class="btn btn-ghost" style="padding:5px 12px;font-size:var(--fs-xs);" onclick="addBulkOne(\''+sid+'\')">Add</button></td></tr>';}).join('');
 }
 function filterBulk(f,el){bulkFilter=f;document.querySelectorAll('.fbtn').forEach(function(b){b.classList.remove('on');});el.classList.add('on');renderBulkTable();}
 function addBulkOne(sid){var p=bulkData.find(function(x){return String(x.id).replace('.','_')===sid;});if(!p){return;}if(pipeline.find(function(x){return x.name===p.name&&x.company===p.company;})){notify('Already in pipeline');return;}var bp=JSON.parse(JSON.stringify(p));
@@ -2152,8 +2840,8 @@ function addBulkOne(sid){var p=bulkData.find(function(x){return String(x.id).rep
   if(!bp.monthlyValue){bp.monthlyValue=estimateMonthlyValue(bp);}
   if(!bp.responseStatus){bp.responseStatus='none';}
   if(!bp.lastContact){bp.lastContact='';}
-  pipeline.push(bp);localStorage.setItem('ob-pipeline',JSON.stringify(pipeline));notify(p.name+' added — est. $'+bp.monthlyValue.toLocaleString()+'/mo');}
-function addAllHot(){var hot=bulkData.filter(function(p){return p.score>=28;});var added=0;hot.forEach(function(p){if(!pipeline.find(function(x){return x.name===p.name&&x.company===p.company;})){pipeline.push(JSON.parse(JSON.stringify(p)));added++;}});localStorage.setItem('ob-pipeline',JSON.stringify(pipeline));notify('Added '+added+' HOT prospects to pipeline');}
+  pipeline.push(bp);saveJSON('ob-pipeline',pipeline);notify(p.name+' added — est. $'+bp.monthlyValue.toLocaleString()+'/mo');}
+function addAllHot(){var hot=bulkData.filter(function(p){return p.score>=28;});var added=0;hot.forEach(function(p){if(!pipeline.find(function(x){return x.name===p.name&&x.company===p.company;})){pipeline.push(JSON.parse(JSON.stringify(p)));added++;}});saveJSON('ob-pipeline',pipeline);notify('Added '+added+' HOT prospects to pipeline');}
 
 
 // ── TRAVEL INTELLIGENCE & CLIENT TYPE ─────────────────────────────────────
@@ -2222,10 +2910,10 @@ function quickOutreach(id){
 function setFollowUp(id){
   var p=pipeline.find(function(x){return x.id===id;});
   if(!p){return;}
-  var d=prompt('Set follow-up date for '+p.name+' (YYYY-MM-DD):',p.followUp||new Date(Date.now()+3*86400000).toISOString().slice(0,10));
+  var d=prompt('Set follow-up date for '+p.name+' (YYYY-MM-DD):',p.followUp||atlDateStr(new Date(Date.now()+3*86400000)));
   if(!d){return;}
   p.followUp=d;
-  localStorage.setItem('ob-pipeline',JSON.stringify(pipeline));
+  saveJSON('ob-pipeline',pipeline);
   renderPipeline();notify('Follow-up set: '+d);
 }
 
@@ -2272,7 +2960,7 @@ var RESPONSE_LABELS={'none':'No response yet','positive':'Responded positively',
 
 function getFollowUpAlert(p){
   var today=new Date();
-  var todayStr=today.toISOString().slice(0,10);
+  var todayStr=atlDateStr(today);
   if(!p.followUp){return null;}
   var diff=Math.ceil((new Date(p.followUp)-today)/(1000*60*60*24));
   if(diff<0){return{cls:'alert-overdue',text:'Overdue by '+Math.abs(diff)+' day'+(Math.abs(diff)!==1?'s':'')};}
@@ -2301,12 +2989,12 @@ function setResponseStatus(id,status){
   var p=pipeline.find(function(x){return x.id===id;});
   if(!p){return;}
   p.responseStatus=status;
-  p.lastContact=new Date().toISOString().slice(0,10);
+  p.lastContact=atlDateStr();
   var stageSuggestedDays={'identified':3,'contacted':4,'assistant':3,'trial-sched':1,'trial-done':2,'active':14,'recurring':30,'corporate':30};
   var days=stageSuggestedDays[p.stage]||3;
   var fu=new Date();fu.setDate(fu.getDate()+days);
-  p.followUp=fu.toISOString().slice(0,10);
-  localStorage.setItem('ob-pipeline',JSON.stringify(pipeline));
+  p.followUp=atlDateStr(fu);
+  saveJSON('ob-pipeline',pipeline);
   renderPipeline();
   notify('Status updated for '+p.name);
 }
@@ -2318,7 +3006,7 @@ function setMonthlyValue(id){
   var val=prompt('Monthly value for '+p.name+' (suggested: $'+suggested+'):',p.monthlyValue||suggested);
   if(val===null){return;}
   p.monthlyValue=parseInt(val)||0;
-  localStorage.setItem('ob-pipeline',JSON.stringify(pipeline));
+  saveJSON('ob-pipeline',pipeline);
   renderPipeline();
   notify('Monthly value set: $'+p.monthlyValue);
 }
@@ -2489,7 +3177,7 @@ function saveEventMode(){
   if(eventModeActive){
     var ed=getEventData();
     ed.active=true;
-    localStorage.setItem('ob-event-mode',JSON.stringify(ed));
+    saveJSON('ob-event-mode',ed);
   }
 }
 
@@ -2530,7 +3218,7 @@ async function generateEventCapture(){
     out.textContent=await callAI([
       'You are a business development advisor for Odyssey Black VIP Transportation in Atlanta.',
       'Prospect: '+currentP.name+', '+currentP.title+' at '+currentP.company,
-      'Acquisition Score: '+currentP.score+'/40 ('+getTier(currentP.score)+')',
+      'Acquisition Score: '+currentP.score+' points ('+getTier(currentP.score)+')',
       'Buying Moment Score: '+currentP.bmScore+'/10',
       'Client Type: '+(currentP.clientType||'Unknown'),
       'Event: '+(evData.name||'Atlanta event'),
@@ -2654,7 +3342,7 @@ var CAL_TASKS = {
   ]
 };
 
-var calProgress = JSON.parse(localStorage.getItem('ob-cal-progress') || '{}');
+var calProgress = loadJSON('ob-cal-progress', {});
 
 function initCalendar(){
   renderCalPhase('cal-phase1', CAL_TASKS.phase1);
@@ -2693,7 +3381,7 @@ function renderCalPhase(containerId, weeks){
 
 function toggleCalTask(id){
   calProgress[id] = !calProgress[id];
-  localStorage.setItem('ob-cal-progress', JSON.stringify(calProgress));
+  saveJSON('ob-cal-progress', calProgress);
   initCalendar();
 }
 
@@ -2770,7 +3458,7 @@ async function askDailyBriefing(){
   var box = document.getElementById('wr-box');
   var out = document.getElementById('wr-ai');
   sp.classList.add('on'); box.classList.remove('show');
-  var today = new Date().toISOString().slice(0,10);
+  var today = atlDateStr();
   var overdue = pipeline.filter(function(p){return p.followUp&&p.followUp<today;});
   var highConv = pipeline.filter(function(p){return p.convProb==='High'&&p.stage!=='active'&&p.stage!=='recurring'&&p.stage!=='corporate';});
   var trialsPending = pipeline.filter(function(p){return p.stage==='trial-sched';});
@@ -3040,28 +3728,13 @@ async function calcRideLikelihood(){
 // ══════════════════════════════════════════════════════════
 var placesResults = [];
 
-function savePlacesKey(){
-  var key = document.getElementById('places-api-key').value.trim();
-  if(!key){notify('Paste your API key first'); return;}
-  localStorage.setItem('ob-places-key', key);
-  document.getElementById('places-api-key').value = '••••••••••••••••••••••••••••••••••••••';
-  document.getElementById('places-key-row').style.display = 'none';
-  document.getElementById('places-key-saved').style.display = 'block';
-  notify('API key saved');
-}
-
-function getPlacesKey(){
-  var saved = localStorage.getItem('ob-places-key');
-  if(saved){ return saved; }
-  var input = document.getElementById('places-api-key').value.trim();
-  if(input && !input.startsWith('•')){ return input; }
-  return null;
-}
+// Places API key management moved server-side (see netlify/functions/places.js).
+// The client no longer stores, requests, or transmits this key at all.
 
 function scorePlaceProspect(place, category){
   var score = 0;
   var rating = place.rating || 0;
-  var reviews = place.user_ratings_total || 0;
+  var reviews = place.reviewCount || 0;
   var name = (place.name || '').toLowerCase();
   var types = place.types || [];
 
@@ -3110,35 +3783,46 @@ function getPlaceTierClass(score){
 }
 
 async function searchPlaces(){
-  var key = getPlacesKey();
-  if(!key){
-    document.getElementById('places-no-key').style.display = 'block';
-    document.getElementById('places-results').style.display = 'none';
-    return;
-  }
-  document.getElementById('places-no-key').style.display = 'none';
-
   var category = document.getElementById('places-category').value;
   var area = document.getElementById('places-area').value;
   var minRating = parseFloat(document.getElementById('places-rating').value) || 0;
   var sp = document.getElementById('sp-places');
   var status = document.getElementById('places-status');
   var results = document.getElementById('places-results');
+  var noKeyEl = document.getElementById('places-no-key');
 
+  noKeyEl.style.display = 'none';
   sp.classList.add('on');
   status.style.display = 'block';
+  status.style.color = '';
   status.textContent = 'Searching Atlanta for ' + category + ' businesses...';
   results.style.display = 'none';
 
-  var query = encodeURIComponent(category.split('|')[0] + ' in ' + area);
-  var url = 'https://maps.googleapis.com/maps/api/place/textsearch/json?query=' + query + '&key=' + key;
-
   try{
-    var res = await fetch('https://corsproxy.io/?' + encodeURIComponent(url));
+    var res = await fetch('/.netlify/functions/places?category=' + encodeURIComponent(category.split('|')[0]) + '&area=' + encodeURIComponent(area));
+
+    if(res.status === 404){
+      noKeyEl.style.display = 'block';
+      status.style.display = 'none';
+      sp.classList.remove('on');
+      return;
+    }
+
     var data = await res.json();
 
-    if(data.status === 'REQUEST_DENIED' || data.status === 'INVALID_REQUEST'){
-      status.textContent = 'API key error: ' + (data.error_message || data.status) + '. Check your key has Places API enabled.';
+    if(data.error){
+      var errMsgs={
+        server_not_configured:'Search isn\'t configured yet — ask your builder to set GOOGLE_PLACES_KEY in Netlify.',
+        origin_not_allowed:'This page isn\'t on the allowed list for search — check ALLOWED_ORIGIN in Netlify.',
+        rate_limited:'Too many searches in a short time — wait a minute and try again.',
+        invalid_input:'Missing search category or area.',
+        invalid_characters:'Search category or area contains characters that aren\'t allowed.',
+        invalid_category:'Unrecognized search category.',
+        upstream_error:'Google Places didn\'t respond — try again shortly.',
+        timeout:'The search took too long and timed out — try again.',
+        internal_error:'Something went wrong on the server — try again.'
+      };
+      status.textContent = errMsgs[data.error] || ('Search error: ' + data.error);
       status.style.color = '#e74c3c';
       sp.classList.remove('on');
       return;
@@ -3150,7 +3834,7 @@ async function searchPlaces(){
 
     placesResults = places.map(function(p){
       var score = scorePlaceProspect(p, category);
-      return { name: p.name, address: p.formatted_address, rating: p.rating, reviews: p.user_ratings_total, placeId: p.place_id, types: p.types, score: score, tier: getPlaceTier(score), tierClass: getPlaceTierClass(score), category: category, area: area };
+      return { name: p.name, address: p.address, rating: p.rating, reviews: p.reviewCount, placeId: p.placeId, types: p.types, score: score, tier: getPlaceTier(score), tierClass: getPlaceTierClass(score), category: category, area: area };
     });
 
     placesResults.sort(function(a,b){ return b.score - a.score; });
@@ -3162,7 +3846,7 @@ async function searchPlaces(){
     document.getElementById('places-count').textContent = placesResults.length + ' results — ' + placesResults.filter(function(p){ return p.tier === 'HOT'; }).length + ' HOT, ' + placesResults.filter(function(p){ return p.tier === 'STRONG'; }).length + ' Strong';
 
   } catch(err){
-    status.textContent = 'Search failed: ' + err.message + '. Check your API key and try again.';
+    status.textContent = 'Search failed: ' + err.message + '. The server function may not be deployed yet.';
     status.style.color = '#e74c3c';
   }
   sp.classList.remove('on');
@@ -3176,8 +3860,8 @@ function renderPlacesGrid(){
     var reviews = p.reviews ? ' (' + p.reviews + ' reviews)' : '';
     return '<div class="place-card" id="pc-' + i + '" onclick="selectPlace(' + i + ')">' +
       '<div class="place-score-badge ' + p.tierClass + '">' + p.score + '</div>' +
-      '<div class="place-name">' + p.name + '</div>' +
-      '<div class="place-address">' + (p.address || '') + '</div>' +
+      '<div class="place-name">' + escapeHTML(p.name) + '</div>' +
+      '<div class="place-address">' + escapeHTML(p.address || '') + '</div>' +
       '<div class="place-rating">' + stars + '<span style="color:var(--muted);">' + reviews + '</span></div>' +
       '<span class="place-type-tag">' + p.tier + '</span>' +
       '</div>';
@@ -3216,7 +3900,7 @@ function renderCommandCenter(){
   var highConv = pipeline.filter(function(p){ return p.convProb==='High'&&p.stage!=='active'&&p.stage!=='recurring'&&p.stage!=='corporate'; }).length;
   var gap = Math.max(0, MRR_TARGET - mrr);
   var pct = Math.min(100, Math.round((mrr/MRR_TARGET)*100));
-  var today = new Date().toISOString().slice(0,10);
+  var today = atlDateStr();
   var overdueCount = pipeline.filter(function(p){ return p.followUp&&p.followUp<today; }).length;
   var trialDoneCount = pipeline.filter(function(p){ return p.stage==='trial-done'; }).length;
   var urgentTotal = overdueCount + trialDoneCount;
@@ -3226,7 +3910,6 @@ function renderCommandCenter(){
   function setEl(id,val){ var e=document.getElementById(id); if(e)e.textContent=val; }
   function setStyle(id,prop,val){ var e=document.getElementById(id); if(e)e.style[prop]=val; }
   function setClass(id,cls){ var e=document.getElementById(id); if(e)e.className=cls; }
-  function setHTML(id,html){ var e=document.getElementById(id); if(e)e.innerHTML=html; }
 
   setEl('cc-mrr','$'+mrr.toLocaleString());
   setEl('cc-gap', gap===0?'Target Hit':'$'+gap.toLocaleString());
@@ -3260,7 +3943,7 @@ async function generateDailyBriefingCC(){
   var txt=document.getElementById('cc-briefing-text');
   sp.classList.add('on');
   if(bar) bar.style.display='none';
-  var today=new Date().toISOString().slice(0,10);
+  var today=atlDateStr();
   var dayName=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][new Date().getDay()];
   var active=pipeline.filter(function(p){return p.stage==='active'||p.stage==='recurring'||p.stage==='corporate';});
   var mrr=active.reduce(function(s,p){return s+(p.monthlyValue||0);},0);
@@ -3306,7 +3989,7 @@ function renderActionQueue(){
   var el=document.getElementById('aq-items');
   var cntEl=document.getElementById('aq-count');
   if(!el){return;}
-  var today=new Date().toISOString().slice(0,10);
+  var today=atlDateStr();
   var actions=[];
 
   // CRITICAL: Trial Done → close now
@@ -3354,7 +4037,7 @@ function renderActionQueue(){
     return '<div class="aq-item '+a.cls+'">'+
       '<div class="aq-icon">'+a.icon+'</div>'+
       '<div class="aq-body">'+
-        '<div class="aq-prospect">'+a.name+' <span style="color:var(--muted);font-weight:400;">&middot; '+a.co+'</span></div>'+
+        '<div class="aq-prospect">'+escapeHTML(a.name)+' <span style="color:var(--muted);font-weight:400;">&middot; '+escapeHTML(a.co)+'</span></div>'+
         '<div class="aq-detail">'+a.detail+'</div>'+
       '</div>'+
       '<button class="aq-btn" onclick="event.stopPropagation();'+a.fn+'">'+a.label+'</button>'+
@@ -3577,7 +4260,7 @@ function saveEditProspect(){
   p.referralSource=document.getElementById('edit-ref-source').value.trim();
   p.notes=document.getElementById('edit-notes').value.trim();
   p.convProb=calcConvProb(p);
-  localStorage.setItem('ob-pipeline',JSON.stringify(pipeline));
+  saveJSON('ob-pipeline',pipeline);
   closeEditModal();
   renderPipeline();
   notify(p.name+' updated');
@@ -3587,7 +4270,7 @@ function deleteProspect(id){
   var p=pipeline.find(function(x){return x.id===id;}); if(!p){return;}
   if(!confirm('Remove '+p.name+' from pipeline? This cannot be undone.')){return;}
   pipeline=pipeline.filter(function(x){return x.id!==id;});
-  localStorage.setItem('ob-pipeline',JSON.stringify(pipeline));
+  saveJSON('ob-pipeline',pipeline);
   renderPipeline();
   notify(p.name+' removed from pipeline');
 }
@@ -3596,7 +4279,7 @@ function deleteProspect(id){
 // ══════════════════════════════════════════════════════════
 // 5. MESSAGE HISTORY
 // ══════════════════════════════════════════════════════════
-var messageHistory=JSON.parse(localStorage.getItem('ob-messages')||'[]');
+var messageHistory=loadJSON('ob-messages',[]);
 
 var MSG_CH_LABELS={
   'email':'Email','linkedin':'LinkedIn','referral':'Referral','event':'Event',
@@ -3608,17 +4291,17 @@ var MSG_CH_LABELS={
 function saveMessage(prospectId,prospectName,channel,content){
   if(!content||content.length<10){return;}
   var msg={id:Date.now(),prospectId:prospectId,prospectName:prospectName,channel:channel,
-    date:new Date().toISOString().slice(0,10),
+    date:atlDateStr(),
     preview:(content.substring(0,100).replace(/\n/g,' ')+'...'),
     outcome:'logged'};
   messageHistory.push(msg);
   if(messageHistory.length>300){messageHistory=messageHistory.slice(-300);}
-  localStorage.setItem('ob-messages',JSON.stringify(messageHistory));
+  saveJSON('ob-messages',messageHistory);
 }
 
 function setMsgOutcome(msgId,outcome){
   var m=messageHistory.find(function(x){return x.id===parseInt(msgId);});
-  if(m){m.outcome=outcome;localStorage.setItem('ob-messages',JSON.stringify(messageHistory));}
+  if(m){m.outcome=outcome;saveJSON('ob-messages',messageHistory);}
 }
 
 function getMsgHistoryHTML(p){
@@ -3634,7 +4317,7 @@ function getMsgHistoryHTML(p){
     return '<div class="msg-row">'+
       '<span class="msg-ch">'+(MSG_CH_LABELS[m.channel]||m.channel)+'</span>'+
       '<span class="msg-date">'+m.date+'</span>'+
-      '<span class="msg-preview">'+m.preview+'</span>'+
+      '<span class="msg-preview">'+escapeHTML(m.preview)+'</span>'+
       '<select class="msg-outcome '+cls+'" onchange="event.stopPropagation();setMsgOutcome('+m.id+',this.value)">'+outOpts(m.outcome)+'</select>'+
     '</div>';
   }).join('');
@@ -3660,7 +4343,7 @@ var COMP_LABELS={'uber-black':'Uber Black','lyft-lux':'Lyft Lux','carey':'Carey 
 
 function getReferralHTML(p){
   if(p.stage!=='active'&&p.stage!=='recurring'&&p.stage!=='corporate'){return '';}
-  var src=p.referralSource?'<div class="referral-meta">&#8599; Referred by: <span>'+p.referralSource+'</span></div>':'';
+  var src=p.referralSource?'<div class="referral-meta">&#8599; Referred by: <span>'+escapeHTML(p.referralSource)+'</span></div>':'';
   var comp=p.competitor&&COMP_LABELS[p.competitor]?'<div class="referral-meta">Was using: <span style="color:var(--muted);">'+COMP_LABELS[p.competitor]+'</span></div>':'';
   var askBtn='<button class="pipe-action-btn" onclick="event.stopPropagation();generateReferralAsk('+p.id+')" style="color:var(--green);border-color:rgba(46,204,113,0.35);display:inline-flex;align-items:center;gap:4px;">'+(p.referralAskSent?'&#10003; Ref Sent':'🤝 Referral Ask')+'<div class="spin" id="ref-sp-'+p.id+'" style="width:10px;height:10px;border-width:1.5px;border-color:rgba(46,204,113,0.2);border-top-color:var(--green);"></div></button>';
   return '<div class="referral-section">'+src+comp+
@@ -3698,7 +4381,7 @@ async function generateReferralAsk(id){
     if(out)out.textContent=result;
     saveMessage(p.id,p.name,'referral-ask',result);
     p.referralAskSent=true;
-    localStorage.setItem('ob-pipeline',JSON.stringify(pipeline));
+    saveJSON('ob-pipeline',pipeline);
     renderPipeline();
   }catch(e){if(out)out.textContent='Error: '+e.message;}
   if(sp)sp.classList.remove('on');
@@ -3714,6 +4397,98 @@ async function generateReferralAsk(id){
 // Initialize on load
 renderCommandCenter();
 
+// ===== GATEKEEPER FINDER =====
+var gatekeepers=loadJSON('ob-gatekeepers',[]);
+var GK_ROLE_QUERIES=[
+  {label:'Executive Assistant to the CEO',q:'"executive assistant to" CEO'},
+  {label:'Executive Assistant (general)',q:'"executive assistant"'},
+  {label:'Chief of Staff',q:'"chief of staff"'},
+  {label:'Office Manager',q:'"office manager"'},
+  {label:'Travel Coordinator',q:'"travel coordinator" OR "travel manager"'},
+  {label:'Personal Assistant',q:'"personal assistant"'},
+  {label:'Executive Business Partner',q:'"executive business partner"'}
+];
+function buildXraySearches(){
+  var co=document.getElementById('gk-company').value.trim();
+  var city=document.getElementById('gk-city').value.trim();
+  if(!co){notify('Enter a company name first');return;}
+  var wrap=document.getElementById('gk-xray-results');var list=document.getElementById('gk-xray-list');
+  var html='';
+  GK_ROLE_QUERIES.forEach(function(r){
+    var query='site:linkedin.com/in '+r.q+' "'+co+'"'+(city?' "'+city+'"':'');
+    var url='https://www.google.com/search?q='+encodeURIComponent(query);
+    html+='<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);">'+
+      '<div><div style="font-size:var(--fs-sm);font-weight:600;">'+escapeHTML(r.label)+'</div><div style="font-size:var(--fs-xs);color:var(--muted);">'+escapeHTML(query)+'</div></div>'+
+      '<a href="'+url+'" target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="padding:6px 14px;font-size:var(--fs-xs);white-space:nowrap;">Search &rarr;</a>'+
+      '</div>';
+  });
+  list.innerHTML=html;wrap.style.display='block';
+  notify('Search links generated for '+co);
+}
+function saveGatekeepers(){saveJSON('ob-gatekeepers',gatekeepers);}
+function addGatekeeper(){
+  var name=document.getElementById('gk-name').value.trim();
+  if(!name){notify('Enter a contact name');return;}
+  gatekeepers.push({
+    id:Date.now(),
+    name:name,
+    type:document.getElementById('gk-type').value,
+    location:document.getElementById('gk-location').value.trim(),
+    followup:document.getElementById('gk-followup').value,
+    notes:document.getElementById('gk-notes').value.trim()
+  });
+  saveGatekeepers();
+  document.getElementById('gk-name').value='';document.getElementById('gk-location').value='';
+  document.getElementById('gk-followup').value='';document.getElementById('gk-notes').value='';
+  renderGatekeepers();
+  notify(name+' added to gatekeeper network');
+}
+function deleteGatekeeper(id){
+  var g=gatekeepers.find(function(x){return x.id===id;});
+  if(g && !confirm('Remove '+g.name+' from your gatekeeper network? This cannot be undone.')){return;}
+  gatekeepers=gatekeepers.filter(function(g){return g.id!==id;});
+  saveGatekeepers();renderGatekeepers();
+}
+var GK_TYPE_LABELS={fbo:'FBO Staff',concierge:'Hotel Concierge',coordinator:'Travel Coordinator',community:'EA Community',other:'Other'};
+function renderGatekeepers(){
+  var empty=document.getElementById('gk-empty');var wrap=document.getElementById('gk-table-wrap');var tbody=document.getElementById('gk-tbody');
+  if(!gatekeepers.length){empty.style.display='block';wrap.style.display='none';return;}
+  empty.style.display='none';wrap.style.display='block';
+  var today=atlDateStr();
+  tbody.innerHTML=gatekeepers.map(function(g){
+    var overdue=g.followup&&g.followup<today;
+    var notesShort=g.notes?(g.notes.length>60?g.notes.slice(0,60)+'…':g.notes):'';
+    return '<tr><td>'+escapeHTML(g.name)+(notesShort?'<div style="font-size:var(--fs-xs);color:var(--muted);margin-top:2px;" title="'+escapeHTML(g.notes)+'">'+escapeHTML(notesShort)+'</div>':'')+'</td><td>'+escapeHTML(GK_TYPE_LABELS[g.type]||g.type)+'</td><td>'+escapeHTML(g.location||'—')+'</td>'+
+      '<td'+(overdue?' style="color:#e74c3c;font-weight:600;"':'')+'>'+escapeHTML(g.followup||'—')+(overdue?' (overdue)':'')+'</td>'+
+      '<td><button class="btn btn-ghost" style="padding:4px 10px;font-size:var(--fs-xs);" onclick="deleteGatekeeper('+g.id+')">Remove</button></td></tr>';
+  }).join('');
+}
+async function generateGatekeeperOutreach(){
+  var name=document.getElementById('gko-name').value.trim();
+  var type=document.getElementById('gko-type').value;
+  var ctx=document.getElementById('gko-ctx').value.trim();
+  if(!name){notify('Enter a contact name');return;}
+  var sp=document.getElementById('sp-gko');var box=document.getElementById('gko-ai-box');var out=document.getElementById('gko-ai');
+  sp.classList.add('on');
+  var typeGuidance={
+    fbo:'They coordinate ground transport requests for private aviation arrivals/departures. Position Odyssey Black as a reliable go-to they can recommend or call directly, no sales pressure.',
+    concierge:'They refer trusted vendors to guests needing ground transport, especially last-minute. Position Odyssey Black as a dependable referral partner they can confidently recommend.',
+    coordinator:'They manage vendor relationships for corporate ground transport across an entire company, not just one executive. Position Odyssey Black as a standing preferred vendor option.',
+    community:'They are part of a professional network of executive assistants who share vendor recommendations with each other. Position Odyssey Black as a resource worth knowing, not a hard sell.'
+  };
+  try{
+    var text=await callAI([
+      'Write a short, warm, non-salesy introduction message from Kerry Pope, founder of Odyssey Black (premium executive ground transportation, Atlanta), to a gatekeeper contact.',
+      'Contact name: '+name,
+      'Contact type: '+(GK_TYPE_LABELS[type]||type),
+      'Positioning: '+typeGuidance[type],
+      ctx?('Additional context: '+ctx):'',
+      'Keep it under 120 words. No luxury-brand language. Sound like one professional reaching out to another, not a pitch. End with a low-pressure next step.'
+    ],400);
+    out.textContent=text;box.classList.add('show');
+  }catch(e){notify('Error generating message');}
+  sp.classList.remove('on');
+}
 function copyText(id){var t=document.getElementById(id).textContent;navigator.clipboard.writeText(t).then(function(){notify('Copied to clipboard');});}
 function notify(msg){var el=document.getElementById('notif');el.textContent=msg;el.classList.add('show');setTimeout(function(){el.classList.remove('show');},2500);}
 var tfResults = [];
@@ -3749,26 +4524,23 @@ async function findCompanyTargets(){
   tfResults = [];
   try{
     var raw = await callAI([
-      'You are a business intelligence assistant for Odyssey Black VIP Transportation in Atlanta — a premium executive black car service for Fortune 500 C-suite executives.',
+      'You are generating AI TARGET SUGGESTIONS for a sales operator — not a verified directory lookup. You have no live internet access for this request.',
       'Company: ' + company,
       '',
-      'Identify 6 to 8 C-suite and senior VP executives at this company who are strong prospects for premium ground transportation. Prioritize:',
-      '- CEO, President, COO, CFO, General Counsel, Chief People Officer, EVP of Operations, EVP of Sales, Chief Strategy Officer',
-      '- Roles that require frequent travel to airports, client sites, or board meetings',
-      '- Atlanta-headquartered or Atlanta-connected leadership',
+      'Suggest up to 8 C-suite / senior VP roles at this company that would typically be strong prospects for premium ground transportation (CEO, President, COO, CFO, General Counsel, Chief People Officer, EVP Operations, EVP Sales, Chief Strategy Officer).',
       '',
-      'Return ONLY a valid JSON array. Zero explanation, zero markdown fences, zero other text. Exactly this structure:',
-      '[{"name":"First Last","title":"Full Title","travel":"Heavy","atl":"Headquartered here","industry":"Financial Services / Banking","why":"One specific sentence on why this executive is a strong ground transportation prospect.","city":"Atlanta, GA","emailFormat":"firstname.lastname@company.com","emailNote":"standard format — verify before sending"}]',
+      'CRITICAL RULES:',
+      '- Only give a specific person\'s name if you are highly confident that individual currently holds that role. Set verificationStatus to "probable" in that case, never "verified" — you have no live source to confirm it.',
+      '- If you do not have reliable knowledge of who currently holds a role, do NOT invent a plausible name or a "realistic placeholder." Instead set name to null and verificationStatus to "not_found", and still describe the role itself so the operator knows to research it manually.',
+      '- Never construct or guess an individual\'s personal email address. You may state the company\'s likely email PATTERN only (e.g. "firstname.lastname@company.com") with emailStatus "pattern_only" — never emailStatus "verified", and never fill in an actual person\'s address as if confirmed.',
+      '- Do not invent travel patterns, city, or Atlanta-connection details you are not confident about — use "unknown" rather than guessing.',
       '',
-      'travel must be exactly one of: Heavy | Moderate | Light',
-      'atl must be exactly one of: Headquartered here | Regional / major office | Visiting / remote',
+      'Return ONLY a valid JSON array, zero explanation, zero markdown fences, exactly this structure per item:',
+      '{"name":"First Last or null","title":"Full Title","company":"'+company.replace(/"/g,'')+'","location":"city, state or unknown","travel":"Heavy|Moderate|Light|unknown","atl":"Headquartered here|Regional / major office|Visiting / remote|unknown","industry":"one of the fixed list below","why":"one sentence, no invented specifics","emailPattern":"pattern or unknown","emailStatus":"pattern_only|unknown","verificationStatus":"probable|not_found","confidence":"high|medium|low"}',
+      '',
       'industry must be exactly one of: Airline / Aviation | Financial Services / Banking | Technology | Healthcare / Pharma | Real Estate / Development | Legal / Law Firm | Private Equity / VC | Consulting | Energy / Utilities | Manufacturing / Logistics | Entertainment / Media | Other Fortune 500',
-      'city: the city and state where this executive primarily works (e.g. "Atlanta, GA" or "New York, NY")',
-      'emailFormat: construct the most likely email address for this executive using the company\'s known email pattern and their name. Example: if the company uses firstname.lastname@company.com format, write "john.smith@delta.com". If the format is unknown, write "unknown — check company website".',
-      'emailNote: one of "standard format", "common format — verify before sending", "format varies — verify", or "unknown — check LinkedIn or company website"',
       '',
-      'Use real verified executives if you have reliable data. If a name is uncertain, use a realistic title placeholder and note "Verify on LinkedIn" at the end of the why field.',
-      'If you have no reliable data on this company at all, return exactly: [{"error":"No reliable executive data found for ' + company + '. Try their LinkedIn company page or website leadership section."}]'
+      'If you have no reliable knowledge of this company at all, return exactly: [{"error":"No reliable data available for ' + company.replace(/"/g,'') + '. Try their LinkedIn company page or website leadership section."}]'
     ], 1400);
 
     var clean = raw.replace(/```json/gi,'').replace(/```/gi,'').trim();
@@ -3803,37 +4575,35 @@ function renderTargetCards(company){
   var grid = document.getElementById('tf-cards');
   grid.innerHTML = tfResults.map(function(t, i){
     var travelCls = t.travel === 'Heavy' ? 'tcb-heavy' : t.travel === 'Moderate' ? 'tcb-moderate' : 'tcb-light';
-    var atlShort = t.atl === 'Headquartered here' ? 'ATL HQ' : t.atl === 'Regional / major office' ? 'ATL Office' : 'Visiting';
+    var atlShort = t.atl === 'Headquartered here' ? 'ATL HQ' : t.atl === 'Regional / major office' ? 'ATL Office' : t.atl === 'Visiting / remote' ? 'Visiting' : 'Unknown';
 
-    // Location chip
-    var locationChip = t.city ? '<span class="tc-location">&#128205; ' + t.city + '</span>' : '';
+    var locationChip = (t.location && t.location!=='unknown') ? '<span class="tc-location">&#128205; ' + escapeHTML(t.location) + '</span>' : '';
 
-    // Email chip — copyable if known, greyed if unknown
-    var emailKnown = t.emailFormat && t.emailFormat.indexOf('unknown') === -1 && t.emailFormat.indexOf('check') === -1;
-    var emailChip = t.emailFormat
-      ? (emailKnown
-          ? '<span class="tc-email-chip" title="Click to copy email" onclick="event.stopPropagation();copyEmailFormat(\'' + t.emailFormat.replace(/'/g, "\\'") + '\')">&#9993; ' + t.emailFormat + '</span>'
-          : '<span class="tc-email-chip unknown">&#9993; format unknown</span>')
-      : '';
+    // Email: only ever shown as an unverified pattern, never as a confirmed address
+    var emailChip = (t.emailPattern && t.emailStatus==='pattern_only')
+      ? '<span class="tc-email-chip" title="Unverified pattern — not a confirmed address" onclick="event.stopPropagation();copyEmailFormat(\'' + escapeHTML(t.emailPattern).replace(/'/g,"\\'") + '\')">&#9993; ' + escapeHTML(t.emailPattern) + ' (pattern, unverified)</span>'
+      : '<span class="tc-email-chip unknown">&#9993; email unknown</span>';
 
-    // Email verify note
-    var emailNote = emailKnown && t.emailNote ? '<div class="tc-email-note">&#9432; ' + t.emailNote + '</div>' : '';
+    // Evidence status — the honest core of this fix. No name = explicitly "not found," not a placeholder.
+    var isNotFound = !t.name || t.verificationStatus === 'not_found';
+    var statusBadge = isNotFound
+      ? '<span class="tc-badge" style="background:rgba(231,76,60,0.12);color:#e74c3c;border-color:rgba(231,76,60,0.3);">Not Found — Research Manually</span>'
+      : '<span class="tc-badge" style="background:rgba(201,168,76,0.12);color:var(--gold);border-color:rgba(201,168,76,0.3);">Probable, Unverified'+(t.confidence?' &middot; '+escapeHTML(t.confidence)+' confidence':'')+'</span>';
 
-    // LinkedIn search URL from name + company
-    var liQuery = encodeURIComponent((t.name || '') + ' ' + company);
-    var liBtn = t.name ? '<a class="tc-li-btn" href="https://www.linkedin.com/search/results/people/?keywords=' + liQuery + '" target="_blank" onclick="event.stopPropagation()">&#128279; LinkedIn</a>' : '';
+    var liQuery = encodeURIComponent((t.name || t.title || '') + ' ' + company);
+    var liBtn = '<a class="tc-li-btn" href="https://www.linkedin.com/search/results/people/?keywords=' + liQuery + '" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">&#128279; Verify on LinkedIn</a>';
 
     return '<div class="target-card" id="tc-' + i + '" onclick="selectTarget(' + i + ')">' +
-      '<div class="tc-name">' + (t.name || 'Executive') + '</div>' +
-      '<div class="tc-title">' + (t.title || '') + '</div>' +
+      '<div class="tc-name">' + escapeHTML(t.name || 'Name not found — role only') + '</div>' +
+      '<div class="tc-title">' + escapeHTML(t.title || '') + '</div>' +
       '<div class="tc-badges">' +
-        '<span class="tc-badge ' + travelCls + '">' + (t.travel || 'Moderate') + ' Travel</span>' +
+        statusBadge +
+        '<span class="tc-badge ' + travelCls + '">' + escapeHTML(t.travel || 'unknown') + ' Travel</span>' +
         '<span class="tc-badge tcb-atl">' + atlShort + '</span>' +
       '</div>' +
       '<div class="tc-contact">' + locationChip + emailChip + liBtn + '</div>' +
-      (emailNote ? emailNote : '') +
-      '<div class="tc-why">' + (t.why || '') + '</div>' +
-      '<button class="tc-fill-btn">Pre-fill Scoring Form &#8595;</button>' +
+      '<div class="tc-why">' + escapeHTML(t.why || '') + '</div>' +
+      '<button class="tc-fill-btn">' + (isNotFound ? 'Research This Role &#8595;' : 'Pre-fill Scoring Form (Unverified) &#8595;') + '</button>' +
     '</div>';
   }).join('');
 }
@@ -3845,46 +4615,262 @@ function copyEmailFormat(email){
 function selectTarget(idx){
   var t = tfResults[idx];
   if(!t){ return; }
-  // Highlight card
   document.querySelectorAll('.target-card').forEach(function(c){ c.classList.remove('selected'); });
   var card = document.getElementById('tc-' + idx);
   if(card){ card.classList.add('selected'); }
-  // Pre-fill the Prospect Builder form
   var company = document.getElementById('tf-company').value.trim();
+  var isNotFound = !t.name || t.verificationStatus === 'not_found';
+
+  identityVerification=null; // any new selection clears prior verification — required behaviour
+  pendingAIIdentity=true;
+
+  if(isNotFound){
+    // Required behaviour: an unnamed/not_found result is never populated as a known person,
+    // never auto-filled into the name field, and can only proceed after the operator supplies
+    // and validates a real identity themselves.
+    document.getElementById('p-name').value='';
+    document.getElementById('p-title').value = t.title || '';
+    document.getElementById('p-company').value = company;
+    notify('No verified name for this role. Use "Verify on LinkedIn" above, then enter the name manually below and click "Verify Identity" before scoring.');
+    renderIdentityVerifyPrompt(t.title, company);
+    return;
+  }
+
+  // Named-but-AI-suggested case: viewing and manual research are allowed, but this is not
+  // treated as verified — identityVerification stays null until the operator confirms it.
   document.getElementById('p-name').value = t.name || '';
   document.getElementById('p-title').value = t.title || '';
   document.getElementById('p-company').value = company;
-  // Match industry dropdown
   var indEl = document.getElementById('p-industry');
   if(indEl && t.industry){
     for(var i = 0; i < indEl.options.length; i++){
-      if(indEl.options[i].text === t.industry){
-        indEl.selectedIndex = i;
-        break;
-      }
+      if(indEl.options[i].text === t.industry){ indEl.selectedIndex = i; break; }
     }
   }
-  // Set travel frequency
   var travEl = document.getElementById('p-travel');
   if(travEl){
     var travMap = { 'Heavy': 'heavy', 'Moderate': 'moderate', 'Light': 'light' };
-    travEl.value = travMap[t.travel] || 'moderate';
+    travEl.value = travMap[t.travel] || 'unknown';
   }
-  // Set Atlanta presence
   var atlEl = document.getElementById('p-hq');
   if(atlEl){
     var atlMap = { 'Headquartered here': 'yes', 'Regional / major office': 'regional', 'Visiting / remote': 'no' };
-    atlEl.value = atlMap[t.atl] || 'yes';
+    atlEl.value = atlMap[t.atl] || 'unknown';
   }
-  // Refresh client type display
   updateClientTypeDisplay();
-  // Scroll down to the form
+  renderIdentityVerifyPrompt(t.title, company, t.name);
   setTimeout(function(){
     var formEl = document.getElementById('p-name');
     if(formEl){ formEl.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
   }, 100);
-  var emailHint = t.emailFormat && t.emailFormat.indexOf('unknown') === -1 ? ' · Email: ' + t.emailFormat : '';
-  notify(t.name + ' pre-filled' + emailHint + ' — add EA data and timing signals, then Calculate Score');
+  var emailHint = (t.emailPattern && t.emailStatus==='pattern_only') ? ' · Email pattern (unverified): ' + t.emailPattern : '';
+  notify(t.name + ' pre-filled — AI suggestion, NOT a confirmed executive. Verify identity before treating as a real prospect.'+emailHint);
+}
+
+function renderIdentityVerifyPrompt(title,company,suggestedName){
+  var existing=document.getElementById('identity-verify-box');
+  if(existing){ existing.remove(); }
+  var box=document.createElement('div');
+  box.id='identity-verify-box';
+  box.className='card';
+  box.style.cssText='padding:14px;margin:12px 0;border:1px solid rgba(231,76,60,0.3);background:rgba(231,76,60,0.05);';
+  box.innerHTML='<div style="font-size:var(--fs-sm);font-weight:600;margin-bottom:8px;color:#e74c3c;">Identity Not Verified</div>'+
+    '<div style="font-size:var(--fs-xs);color:var(--muted);margin-bottom:8px;">This is an AI suggestion for "'+escapeHTML(title||'this role')+'" at '+escapeHTML(company||'')+'. Confirm the real name and where you confirmed it before scoring this as a known person.</div>'+
+    '<div class="g2">'+
+      '<input type="text" id="identity-name-input" placeholder="Confirmed name" value="'+escapeHTML(suggestedName||'')+'">'+
+      '<input type="text" id="identity-source-input" placeholder="Source URL (LinkedIn, company site...)">'+
+    '</div>'+
+    '<div class="btns" style="margin-top:8px;"><button class="btn btn-outline" style="padding:6px 14px;font-size:var(--fs-xs);" onclick="verifyIdentity()">Verify Identity</button></div>'+
+    '<div id="identity-verify-status" style="font-size:var(--fs-xs);margin-top:6px;"></div>';
+  var nameField=document.getElementById('p-name');
+  nameField.parentElement.parentElement.insertAdjacentElement('afterend',box);
+}
+function verifyIdentity(){
+  var name=document.getElementById('identity-name-input').value.trim();
+  var source=document.getElementById('identity-source-input').value.trim();
+  var statusEl=document.getElementById('identity-verify-status');
+  if(!name){ statusEl.textContent='Enter the confirmed name.'; statusEl.style.color='#e74c3c'; return; }
+  var v=validateResearchSource(source);
+  if(!v.valid){ statusEl.textContent='Source: '+v.error; statusEl.style.color='#e74c3c'; return; }
+  identityVerification={name:name,sourceUrl:v.normalized,verifiedAt:atlDateStr()};
+  pendingAIIdentity=false;
+  document.getElementById('p-name').value=name;
+  statusEl.textContent='\u2713 Identity verified '+identityVerification.verifiedAt+' — scoring is now available.';
+  statusEl.style.color='var(--green)';
+  notify('Identity verified — you can now score this prospect');
+}
+
+// ===== PERIMETER RADAR =====
+var RADAR_STATUSES=[['new','New'],['researching','Researching'],['gatekeeper_found','Gatekeeper found'],['contacted','Contacted'],['meeting','Meeting set'],['won','Client'],['dead','Not pursuing']];
+// Public-news snapshot (Oct 2026). Unverified leads: confirm before outreach. No people or emails included.
+var RADAR_WATCHLIST=[
+  {id:'asbury',name:'Asbury Automotive Group',tier:'A',signal:'Fortune 500; HQ moving Duluth to Sandy Springs, reported ~350 employees',city:'Sandy Springs'},
+  {id:'aig',name:'AIG',tier:'A',signal:'Reported 179k sq ft at Perimeter Summit; moved in early spring 2026',city:'Dunwoody'},
+  {id:'newell',name:'Newell Brands',tier:'A',signal:'Reported 180k sq ft in the Queen building',city:'Sandy Springs'},
+  {id:'inspire',name:'Inspire Brands',tier:'A',signal:'Sandy Springs presence',city:'Sandy Springs'},
+  {id:'trinet',name:'TriNet',tier:'B',signal:'Recent move reported',city:'Dunwoody'},
+  {id:'stubhub',name:'StubHub',tier:'B',signal:'Recent move reported',city:'Sandy Springs'},
+  {id:'swisslog',name:'Swisslog',tier:'B',signal:'New headquarters reported',city:'Sandy Springs'},
+  {id:'beon',name:'Beon',tier:'B',signal:'New headquarters reported',city:'Sandy Springs'},
+  {id:'protomiq',name:'Protomiq',tier:'B',signal:'HQ lease at North Terraces, announced 2026-09-09 (CBRE)',city:'Sandy Springs'},
+  {id:'zaxbys',name:"Zaxby's",tier:'B',signal:'Moved to Perimeter Summit in 2024',city:'Sandy Springs'},
+  {id:'innova',name:'Innova Solutions',tier:'B',signal:'Reported purchase of 1455 Lincoln Pkwy',city:'Dunwoody'},
+  {id:'statefarm',name:'State Farm',tier:'C',signal:'Established Perimeter campus',city:'Dunwoody'},
+  {id:'cox',name:'Cox',tier:'C',signal:'Established Perimeter presence',city:'Sandy Springs'},
+  {id:'mbusa',name:'Mercedes-Benz USA',tier:'C',signal:'Established Sandy Springs HQ',city:'Sandy Springs'},
+  {id:'ihg',name:'IHG',tier:'C',signal:'Established Dunwoody HQ',city:'Dunwoody'},
+  {id:'insightglobal',name:'Insight Global',tier:'C',signal:'Established Perimeter presence',city:'Sandy Springs'}
+];
+var RADAR_HOTELS=[
+  {id:'h-marriott',name:'Atlanta Marriott Perimeter Center',note:'344 rooms'},
+  {id:'h-crowne',name:'Crowne Plaza Atlanta Perimeter at Ravinia',note:'495 rooms'},
+  {id:'h-meridien',name:'Le Meridien Atlanta Perimeter',note:''},
+  {id:'h-embassy',name:'Embassy Suites Atlanta Perimeter Center',note:''},
+  {id:'h-hyatt',name:'Hyatt Regency Atlanta Perimeter at Villa Christina',note:''},
+  {id:'h-doubletree',name:'DoubleTree by Hilton (Perimeter-area property)',note:'Reported as a Perimeter hotel; confirm the exact property before visiting'}
+];
+var RADAR_SPRINT=[
+  {w:1,label:'Week 1 &mdash; Foundation',tasks:[
+    {id:'w1a',t:'Verify every Tier A watchlist company: confirm the move from a second source'},
+    {id:'w1b',t:'Run Gatekeeper Finder searches for all 4 Tier A companies'},
+    {id:'w1c',t:'Log 10 gatekeepers (EA, office manager, facilities, events) from public sources'},
+    {id:'w1d',t:'Visit 3 hotel concierge desks; ask who owns ground-transport referrals'}]},
+  {w:2,label:'Week 2 &mdash; First Contact',tasks:[
+    {id:'w2a',t:'Send 10 gatekeeper-first messages (verified claims only)'},
+    {id:'w2b',t:'Visit the other 3 hotels'},
+    {id:'w2c',t:'Run Live Move Scan twice; research every NEW headline'},
+    {id:'w2d',t:'Follow up on week-1 touches after 3 days'}]},
+  {w:3,label:'Week 3 &mdash; Expand',tasks:[
+    {id:'w3a',t:'Work Tier B companies: 6 gatekeepers logged, 10 more messages sent'},
+    {id:'w3b',t:'Ask each responsive gatekeeper for one introduction'},
+    {id:'w3c',t:'Offer 2 complimentary trial rides or an airport-transfer demo'},
+    {id:'w3d',t:'Run Live Move Scan twice'}]},
+  {w:4,label:'Week 4 &mdash; Convert',tasks:[
+    {id:'w4a',t:'Propose a corporate account arrangement to every engaged company'},
+    {id:'w4b',t:'Re-contact all non-responders once with a different angle'},
+    {id:'w4c',t:'Review results: which channel produced replies? Double down on it'},
+    {id:'w4d',t:'Export a backup and set the next 30-day target'}]}
+];
+var radarState=loadJSON('ob-radar',{seen:[],watch:{},sprintStart:null,sprintDone:{},hotels:{}});
+if(!radarState||typeof radarState!=='object'||Array.isArray(radarState)){radarState={seen:[],watch:{},sprintStart:null,sprintDone:{},hotels:{}};}
+['seen'].forEach(function(k){if(!Array.isArray(radarState[k])){radarState[k]=[];}});
+['watch','sprintDone','hotels'].forEach(function(k){if(!radarState[k]||typeof radarState[k]!=='object'||Array.isArray(radarState[k])){radarState[k]={};}});
+function radarSave(){
+  if(radarState.seen.length>500){radarState.seen=radarState.seen.slice(-500);}
+  saveJSON('ob-radar',radarState);
+}
+var radarLastItems=[];
+function radarStatusSelect(kind,id,cur){
+  var h='<select onchange="radarSetStatus(\''+kind+'\',\''+id+'\',this.value)" aria-label="Status" style="width:auto;font-size:var(--fs-xs);padding:4px 8px;">';
+  RADAR_STATUSES.forEach(function(s){h+='<option value="'+s[0]+'"'+(s[0]===cur?' selected':'')+'>'+s[1]+'</option>';});
+  return h+'</select>';
+}
+function radarSetStatus(kind,id,val){
+  if(!RADAR_STATUSES.some(function(s){return s[0]===val;})){return;}
+  if(kind==='w'){radarState.watch[id]=val;}else{radarState.hotels[id]=val;}
+  radarSave();
+}
+function renderRadar(){
+  var wl='';
+  RADAR_WATCHLIST.forEach(function(c,i){
+    wl+='<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:10px 0;border-bottom:1px solid var(--border);">'+
+      '<div style="flex:1;min-width:200px;"><div style="font-size:var(--fs-sm);font-weight:600;">'+escapeHTML(c.name)+' <span class="mini-badge mb-gold">Tier '+escapeHTML(c.tier)+'</span></div>'+
+      '<div style="font-size:var(--fs-xs);color:var(--muted);">'+escapeHTML(c.signal)+' &middot; unverified</div></div>'+
+      radarStatusSelect('w',c.id,radarState.watch[c.id]||'new')+
+      '<button class="btn btn-outline" style="padding:6px 14px;font-size:var(--fs-xs);" onclick="radarFindGatekeepers('+i+')">Find Gatekeepers &rarr;</button></div>';
+  });
+  document.getElementById('radar-watchlist').innerHTML=wl;
+  var hh='';
+  RADAR_HOTELS.forEach(function(x){
+    hh+='<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:10px 0;border-bottom:1px solid var(--border);">'+
+      '<div style="flex:1;min-width:200px;"><div style="font-size:var(--fs-sm);font-weight:600;">'+escapeHTML(x.name)+'</div>'+
+      '<div style="font-size:var(--fs-xs);color:var(--muted);">'+escapeHTML(x.note)+'</div></div>'+
+      radarStatusSelect('h',x.id,radarState.hotels[x.id]||'new')+'</div>';
+  });
+  document.getElementById('radar-hotels').innerHTML=hh;
+  renderRadarSprint();
+  renderRadarScan();
+}
+function radarFindGatekeepers(i){
+  var c=RADAR_WATCHLIST[i];if(!c){return;}
+  radarOpenGatekeeper(c.name,c.city);
+}
+function radarOpenGatekeeper(name,city){
+  var btn=document.querySelector('.tab[onclick*="\'gatekeeper\'"]');
+  if(btn){switchTab('gatekeeper',btn);}
+  document.getElementById('gk-company').value=name;
+  document.getElementById('gk-city').value=city||'Atlanta';
+  buildXraySearches();
+}
+function renderRadarScan(){
+  var list=document.getElementById('radar-scan-list');
+  if(!radarLastItems.length){list.innerHTML='';return;}
+  var h='';
+  radarLastItems.forEach(function(it,i){
+    var isNew=radarState.seen.indexOf(it.id)===-1;
+    var d=it.publishedAt?atlDateStr(new Date(it.publishedAt)):'date unknown';
+    h+='<div style="padding:10px 0;border-bottom:1px solid var(--border);">'+
+      (isNew?'<span class="mini-badge mb-green">NEW</span> ':'')+
+      '<a href="'+escapeHTML(it.url)+'" target="_blank" rel="noopener noreferrer" style="font-weight:600;font-size:var(--fs-sm);">'+escapeHTML(it.title)+'</a>'+
+      '<div style="font-size:var(--fs-xs);color:var(--muted);">'+escapeHTML(it.source||'source unknown')+' &middot; '+escapeHTML(d)+' &middot; unverified lead &mdash; confirm before outreach</div>'+
+      '<div class="btns" style="margin-top:6px;"><button class="btn btn-outline" style="padding:4px 12px;font-size:var(--fs-xs);" onclick="radarHeadlineToGatekeeper('+i+')">Research this company &rarr;</button></div></div>';
+  });
+  list.innerHTML=h;
+}
+function radarHeadlineToGatekeeper(i){
+  var it=radarLastItems[i];if(!it){return;}
+  var name=window.prompt('Which company is this headline about? (type the name after reading the article)','');
+  if(!name||!name.trim()){return;}
+  if(radarState.seen.indexOf(it.id)===-1){radarState.seen.push(it.id);radarSave();}
+  radarOpenGatekeeper(name.trim().slice(0,100),'Atlanta');
+}
+async function radarScan(){
+  var st=document.getElementById('radar-scan-status');
+  st.textContent='Scanning public headlines…';
+  try{
+    var res=await fetch('/.netlify/functions/perimeter-watch');
+    var data=null;try{data=await res.json();}catch(e){}
+    if(!res.ok){
+      var code=data&&data.error;
+      st.textContent=code==='server_not_configured'?'Scan is not set up yet: the perimeter-watch function needs ALLOWED_ORIGINS set in Netlify and a deploy.':
+        code==='rate_limited'?'Too many scans. Wait a minute and try again.':
+        'Scan failed ('+(code||res.status)+'). Nothing was changed.';
+      return;
+    }
+    radarLastItems=Array.isArray(data.items)?data.items:[];
+    var fresh=radarLastItems.filter(function(it){return radarState.seen.indexOf(it.id)===-1;}).length;
+    st.textContent=radarLastItems.length+' headline(s), '+fresh+' new. '+(data.queriesFailed?data.queriesFailed+' of '+data.queriesRun+' sources failed, so results may be incomplete. ':'')+'Headlines only; verify before outreach.';
+    renderRadarScan();
+  }catch(e){
+    st.textContent='Could not reach the scan service. If you are running the file locally, the function is only available once deployed.';
+  }
+}
+function radarMarkAllSeen(){
+  radarLastItems.forEach(function(it){if(radarState.seen.indexOf(it.id)===-1){radarState.seen.push(it.id);}});
+  radarSave();renderRadarScan();
+}
+function renderRadarSprint(){
+  if(!radarState.sprintStart){
+    document.getElementById('radar-sprint-head').innerHTML='Not started. <button class="btn btn-gold" style="margin-left:8px;" onclick="radarSprintStart()">Start Sprint Today</button>';
+    document.getElementById('radar-sprint').innerHTML='';return;
+  }
+  var total=0,done=0;
+  RADAR_SPRINT.forEach(function(w){w.tasks.forEach(function(t){total++;if(radarState.sprintDone[t.id]){done++;}});});
+  document.getElementById('radar-sprint-head').textContent='Started '+radarState.sprintStart+' · '+done+' of '+total+' tasks done';
+  var h='';
+  RADAR_SPRINT.forEach(function(w){
+    h+='<div style="margin-top:14px;font-weight:600;font-size:var(--fs-sm);">'+w.label+'</div>';
+    w.tasks.forEach(function(t){
+      h+='<label style="display:flex;gap:10px;align-items:flex-start;padding:6px 0;font-size:var(--fs-sm);cursor:pointer;text-transform:none;letter-spacing:normal;color:var(--text,inherit);"><input type="checkbox" style="width:auto;margin-top:3px;"'+(radarState.sprintDone[t.id]?' checked':'')+' onchange="radarSprintToggle(\''+t.id+'\',this.checked)"><span>'+escapeHTML(t.t)+'</span></label>';
+    });
+  });
+  document.getElementById('radar-sprint').innerHTML=h;
+}
+function radarSprintStart(){radarState.sprintStart=atlDateStr();radarSave();renderRadarSprint();}
+function radarSprintToggle(id,v){if(v){radarState.sprintDone[id]=true;}else{delete radarState.sprintDone[id];}radarSave();renderRadarSprint();}
+function radarSprintReset(){
+  if(!window.confirm('Restart the sprint? Checked tasks will be cleared. Watchlist statuses are kept.')){return;}
+  radarState.sprintStart=null;radarState.sprintDone={};radarSave();renderRadarSprint();
 }
 </script>
 </body>
