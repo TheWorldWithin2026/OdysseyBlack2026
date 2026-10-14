@@ -533,6 +533,13 @@ textarea{resize:vertical;min-height:75px;}
 .tf-error{font-size:var(--fs-sm);color:#e74c3c;padding:8px 0 2px;}
 .tf-verify-note{font-size:var(--fs-xs);color:rgba(201,168,76,0.7);margin-top:10px;padding:8px 12px;border:1px solid rgba(201,168,76,0.2);border-radius:1px;background:rgba(201,168,76,0.03);}
 @media(max-width:640px){.target-cards{grid-template-columns:1fr;}}
+#vp-print-root{display:none}
+.vp-blank{background:#fff3b0;color:#111;padding:0 4px;border-radius:2px}
+.vp-paper{background:#fff;color:#111;font-family:Georgia,'Times New Roman',serif;padding:22px;border-radius:6px;overflow-x:auto}
+.vp-paper h1{font-size:22px;margin:0 0 2px}.vp-paper h2{font-size:15px;margin:18px 0 6px;border-bottom:1px solid #999;padding-bottom:3px}
+.vp-paper table{width:100%;border-collapse:collapse;font-size:13px}.vp-paper td,.vp-paper th{border-bottom:1px solid #ddd;padding:5px 6px;text-align:left;vertical-align:top}
+.vp-paper p{font-size:13px;line-height:1.45;margin:4px 0}
+@media print{body>*:not(#vp-print-root){display:none!important}body{background:#fff!important}#vp-print-root{display:block!important}.vp-blank{background:none!important}.vp-paper{padding:0}}
 </style>
 </head>
 <body>
@@ -593,6 +600,7 @@ textarea{resize:vertical;min-height:75px;}
     <button class="tab" onclick="switchTab('outreach',this)">AI Outreach</button>
     <button class="tab" onclick="switchTab('pipeline',this)">Pipeline</button>
     <button class="tab" onclick="switchTab('results',this)">&#128200; Results</button>
+    <button class="tab" onclick="switchTab('vendor',this)">&#128196; Vendor Packet</button>
     <button class="tab" onclick="switchTab('script',this)">Call Script</button>
     <button class="tab" onclick="switchTab('import',this)">Apollo Import</button>
     <button class="tab" onclick="switchTab('company',this)">Company Intel</button>
@@ -1615,6 +1623,33 @@ textarea{resize:vertical;min-height:75px;}
   </div>
 
   <!-- TAB 10: GATEKEEPER FINDER -->
+  <div class="panel" id="panel-vendor">
+    <div class="sec-tag">Get approved as a vendor</div>
+    <div class="sec-h">Vendor Packet &amp; Proposal</div>
+    <div class="sec-d">Fill in your real details once. Then make a one-page short version for first contact, or a full version for procurement, and print or save it as a PDF. Anything left blank prints as a line to complete by hand, so nothing is ever made up.</div>
+    <div class="card"><div class="sep-title"><span class="mini-badge mb-gold">Prepared for</span></div>
+      <div class="g2"><div><label for="vp-pick">Pick a prospect (optional)</label><select id="vp-pick" onchange="vpPick(this.value)"></select></div>
+      <div><label for="vp-for">Company</label><input type="text" id="vp-for" maxlength="120" oninput="vpSet('prop.forco',this.value)"></div></div>
+      <div class="g2"><div><label for="vp-attn">Attention (name and title)</label><input type="text" id="vp-attn" maxlength="120" oninput="vpSet('prop.attn',this.value)"></div>
+      <div><label for="vp-valid">Rates valid for (days)</label><input type="text" id="vp-valid" maxlength="3" inputmode="numeric" oninput="vpSet('prop.valid',this.value)"></div></div>
+    </div>
+    <div class="card"><div class="sep-title"><span class="mini-badge mb-green">Rates</span></div>
+      <div style="font-size:var(--fs-xs);color:var(--muted);margin-bottom:8px;">Tick the vehicles to include. Minibus and motorcoach are shown as services Odyssey Black manages, not vehicles it owns.</div>
+      <div id="vp-rates"></div>
+    </div>
+    <div class="card"><div class="sep-title"><span class="mini-badge mb-blue">Your company</span></div><div id="vp-co"></div></div>
+    <div class="card"><div class="sep-title"><span class="mini-badge mb-blue">Insurance</span></div>
+      <div style="font-size:var(--fs-xs);color:var(--muted);margin-bottom:8px;">Enter only what your certificate of insurance for Odyssey Black VIP LLC actually says. Check that the named insured on the certificate matches the company you are sending this under.</div><div id="vp-ins"></div></div>
+    <div class="card"><div class="sep-title"><span class="mini-badge mb-blue">Driver &amp; vehicle standards</span></div>
+      <div style="font-size:var(--fs-xs);color:var(--muted);margin-bottom:8px;">Only list screening you really do. Leave a box empty if you are unsure.</div><div id="vp-vet"></div></div>
+    <div class="card"><div class="sep-title"><span class="mini-badge mb-blue">Terms</span></div><div id="vp-terms"></div></div>
+    <div class="card"><div class="sep-title"><span class="mini-badge mb-gold">Preview</span></div>
+      <div id="vp-status" style="font-size:var(--fs-sm);margin-bottom:10px;"></div>
+      <div class="btns" style="margin-bottom:12px;"><button class="btn btn-gold" id="vp-btn-short" onclick="vpShow('short')">Short version</button><button class="btn btn-outline" id="vp-btn-full" onclick="vpShow('full')">Full version</button><button class="btn btn-outline" onclick="vpPrint()">Print / Save PDF</button></div>
+      <div id="vp-preview"></div>
+    </div>
+  </div>
+
   <div class="panel" id="panel-results">
     <div class="sec-tag">What is actually working</div>
     <div class="sec-h">Results by Channel</div>
@@ -1904,7 +1939,7 @@ function notify_safe(msg){
   // may not exist yet at the moment these utilities run — this wrapper is safe either way.
   try{ if(typeof notify==='function'){ notify(msg); } else { console.warn(msg); } }catch(e){ console.warn(msg); }
 }
-var APPROVED_BACKUP_KEYS=['ob-pipeline','ob-gatekeepers','ob-messages','ob-cal-progress','ob-event-mode','ob-radar'];
+var APPROVED_BACKUP_KEYS=['ob-pipeline','ob-gatekeepers','ob-messages','ob-cal-progress','ob-event-mode','ob-radar','ob-vendor'];
 var pendingRestore=null; // holds validated backup.keys while previewed, before the operator commits
 
 function csvCell(v){
@@ -2188,7 +2223,7 @@ var SIG_SCORES={'sig-hired':3,'sig-office':2,'sig-earnings':1,'sig-speaking':2,'
 var SIG_LABELS={'sig-hired':'Recently hired/promoted','sig-office':'Company opening ATL office','sig-earnings':'Upcoming earnings/board meeting','sig-speaking':'Speaking at ATL event','sig-reloc':'Relocating to Atlanta','sig-travel':'Increased travel activity'};
 var CHIP_IDS={'sig-hired':'chip-hired','sig-office':'chip-office','sig-earnings':'chip-earnings','sig-speaking':'chip-speaking','sig-reloc':'chip-reloc','sig-travel':'chip-travel'};
 
-function switchTab(n,el){document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});el.classList.add('active');document.getElementById('panel-'+n).classList.add('active');if(n==='pipeline'){renderPipeline();}if(n==='company'){buildCoMap();}if(n==='calendar'){initCalendar();updateKPIs();}if(n==='gatekeeper'){renderGatekeepers();}if(n==='radar'){renderRadar();}if(n==='today'){renderToday();}if(n==='results'){renderResults();}}
+function switchTab(n,el){document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});el.classList.add('active');document.getElementById('panel-'+n).classList.add('active');if(n==='pipeline'){renderPipeline();}if(n==='company'){buildCoMap();}if(n==='calendar'){initCalendar();updateKPIs();}if(n==='gatekeeper'){renderGatekeepers();}if(n==='radar'){renderRadar();}if(n==='today'){renderToday();}if(n==='results'){renderResults();}if(n==='vendor'){renderVendor();}}
 
 function toggleSig(sid,cid){var cb=document.getElementById(sid);var chip=document.getElementById(cid);cb.checked=!cb.checked;if(cb.checked){chip.classList.add('on');}else{chip.classList.remove('on');}refreshBM();}
 function refreshBM(){var total=0;Object.keys(SIG_SCORES).forEach(function(id){var el=document.getElementById(id);if(el&&el.checked){total+=SIG_SCORES[id];}});total=Math.min(total,10);var num=document.getElementById('bm-num'),fill=document.getElementById('bm-fill'),desc=document.getElementById('bm-desc');num.textContent=total;fill.style.width=(total*10)+'%';var c,d;if(total===0){c='var(--muted)';d='No signals active';}else if(total<=3){c='#e67e22';d='Mild timing - monitor';}else if(total<=6){c='var(--yellow)';d='Good timing - reach out soon';}else if(total<=8){c='var(--green)';d='Strong timing - act this week';}else{c='var(--gold)';d='PEAK MOMENT - reach out today';}num.style.color=c;fill.style.background=c;desc.style.color=c;desc.textContent=d;return total;}
@@ -5110,7 +5145,7 @@ async function cloudResolve(key,choice){
     }else{renderCloud();}
   }catch(e){cloudSet('conflict','That did not save. Check your connection and try again.');}
 }
-function cloudKeyLabel(k){return {'ob-pipeline':'Pipeline','ob-gatekeepers':'Gatekeepers','ob-messages':'Messages','ob-cal-progress':'Calendar progress','ob-event-mode':'Event mode','ob-radar':'Market Radar'}[k]||k;}
+function cloudKeyLabel(k){return {'ob-pipeline':'Pipeline','ob-gatekeepers':'Gatekeepers','ob-messages':'Messages','ob-cal-progress':'Calendar progress','ob-event-mode':'Event mode','ob-radar':'Market Radar','ob-vendor':'Vendor packet'}[k]||k;}
 function renderCloud(){
   var chip=document.getElementById('cloud-chip');
   var labels={off:'Cloud: off',checking:'Cloud: checking',syncing:'Cloud: syncing',synced:'Cloud: saved',error:'Cloud: not synced',conflict:'Cloud: choose data',newer:'Cloud: newer data'};
@@ -5315,6 +5350,132 @@ function renderResults(){
     '<div class="card"><div class="sep-title"><span class="mini-badge mb-gold">By travel frequency</span></div>'+resultTable(trows,'Travel')+'<div style="font-size:var(--fs-xs);color:var(--muted);margin-top:10px;">Travel frequency is your own entry for each prospect (an estimate unless you marked it verified). Use this to see whether heavy travelers actually reply and convert more, then aim your week there.</div></div>'+
     '<div class="card"><div class="sep-title"><span class="mini-badge mb-blue">Assistant route vs direct</span></div>'+resultTable(route)+'<div style="font-size:var(--fs-xs);color:var(--muted);margin-top:10px;">"Through an assistant" counts prospects where an assistant is recorded as active. Small samples can mislead.</div></div>'+
     '<div class="card"><div style="font-size:var(--fs-xs);color:var(--muted);">Replied = positive or declined response recorded. Trial+ = trial scheduled, trial done, or any client stage. Prospects added before channels were tracked show as "Not recorded".</div></div>';
+}
+
+// ===== Vendor Packet & Proposal =====
+var VP_DEFAULT={
+  prop:{forco:'',attn:'',valid:'30'},
+  co:{legal:'Odyssey Black VIP LLC',signer:'Kerry A. Pope, Founder & CEO',phone:'',email:'',web:'',address:''},
+  ins:{carrier:'',policy:'',auto:'',gl:'',umbrella:'',expires:'',addl:''},
+  vet:{mvr:'Owner-operator 7-year motor vehicle record (as of 16 Sep 2026): no citations, no license withdrawals, 0 points.',bg:'',drug:'',training:'',fleet:''},
+  terms:{cancel:'',gratuity:'',fuel:'',billing:'',payment:''}
+};
+var VP_FIELDS={
+  prop:{},
+  co:{legal:'Legal company name',signer:'Authorized signatory',phone:'Phone',email:'Email',web:'Website',address:'Business address'},
+  ins:{carrier:'Insurance carrier',policy:'Policy number(s)',auto:'Auto liability limits',gl:'General liability limits',umbrella:'Umbrella / excess limits',expires:'Policy expiration date',addl:'Additional insured available? (yes / no)'},
+  vet:{mvr:'Driving record standard',bg:'Background checks',drug:'Drug testing',training:'Training',fleet:'Vehicle standards'},
+  terms:{cancel:'Cancellation policy',gratuity:'Gratuity',fuel:'Fuel / tolls / parking',billing:'Billing (per trip, monthly invoice)',payment:'Payment terms'}
+};
+var VP_RATES_DEFAULT=[
+  {id:'sedan',label:'Executive Sedan',rate:'125',min:'3',on:true,note:''},
+  {id:'suv',label:'Executive SUV',rate:'150',min:'3',on:true,note:''},
+  {id:'sprinter',label:'Executive Mercedes-Benz Sprinter',rate:'190',min:'6',on:true,note:'Additional time beyond the booked hours: $220/hour.'},
+  {id:'minibus',label:'25-Passenger Executive Minibus',rate:'225',min:'4',on:false,note:'Coordinated and dispatched by Odyssey Black through commercial charter partners.'},
+  {id:'coach',label:'40-44 Passenger Executive Motorcoach',rate:'250',min:'4',on:false,note:'Coordinated and dispatched by Odyssey Black through commercial charter partners.'}
+];
+var vpMode='short';
+function vpClean(raw){
+  var st=JSON.parse(JSON.stringify(VP_DEFAULT));
+  st.rates=JSON.parse(JSON.stringify(VP_RATES_DEFAULT));
+  if(!raw||typeof raw!=='object'||Array.isArray(raw)){return st;}
+  Object.keys(VP_DEFAULT).forEach(function(g){
+    if(raw[g]&&typeof raw[g]==='object'&&!Array.isArray(raw[g])){Object.keys(VP_DEFAULT[g]).forEach(function(k){if(typeof raw[g][k]==='string'){st[g][k]=raw[g][k].slice(0,500);}});}
+  });
+  st.prop.valid=String(st.prop.valid).replace(/\D/g,'').slice(0,3);
+  if(Array.isArray(raw.rates)){raw.rates.forEach(function(r){
+    if(!r||typeof r!=='object'){return;}
+    var t=st.rates.filter(function(x){return x.id===r.id;})[0];if(!t){return;}
+    var num=function(v){v=String(v==null?'':v);return /^\d{1,5}(\.\d{1,2})?$/.test(v)?v:'';};
+    t.rate=num(r.rate);t.min=num(r.min);t.on=r.on===true;
+    if(typeof r.note==='string'){t.note=r.note.slice(0,300);}
+  });}
+  return st;
+}
+var vendorState=vpClean(loadJSON('ob-vendor',null));
+function vpSave(){saveJSON('ob-vendor',vendorState);}
+function vpSet(path,val){
+  var a=String(path).split('.');
+  if(a.length!==2||!VP_DEFAULT[a[0]]||!(a[1] in VP_DEFAULT[a[0]])){return;}
+  var v=String(val).slice(0,500);
+  if(path==='prop.valid'){v=v.replace(/\D/g,'').slice(0,3);}
+  vendorState[a[0]][a[1]]=v;vpSave();vpRefresh();
+}
+function vpRate(id,field,val){
+  var r=vendorState.rates.filter(function(x){return x.id===id;})[0];if(!r){return;}
+  if(field==='on'){r.on=!!val;}
+  else if(field==='rate'||field==='min'){val=String(val);r[field]=/^\d{1,5}(\.\d{1,2})?$/.test(val)?val:'';}
+  else if(field==='note'){r.note=String(val).slice(0,300);}
+  else{return;}
+  vpSave();vpRefresh();
+}
+function vpInput(group,k,label){
+  return '<div><label>'+escapeHTML(label)+'</label><input type="text" maxlength="500" value="'+escapeHTML(vendorState[group][k])+'" oninput="vpSet(\''+group+'.'+k+'\',this.value)"></div>';
+}
+function vpGroupHTML(g){return '<div class="g2">'+Object.keys(VP_FIELDS[g]).map(function(k){return vpInput(g,k,VP_FIELDS[g][k]);}).join('')+'</div>';}
+function renderVendor(){
+  var opts='<option value="">Choose from your pipeline...</option>';
+  var seen={};
+  pipeline.forEach(function(p){if(p.company&&!seen[p.company]){seen[p.company]=1;opts+='<option value="'+escapeHTML(p.id)+'">'+escapeHTML(p.company+(p.name?' — '+p.name:''))+'</option>';}});
+  document.getElementById('vp-pick').innerHTML=opts;
+  document.getElementById('vp-for').value=vendorState.prop.forco;
+  document.getElementById('vp-attn').value=vendorState.prop.attn;
+  document.getElementById('vp-valid').value=vendorState.prop.valid;
+  document.getElementById('vp-rates').innerHTML=vendorState.rates.map(function(r){
+    return '<div style="padding:8px 0;border-bottom:1px solid var(--border);"><label style="display:flex;gap:8px;align-items:center;font-weight:600;"><input type="checkbox" '+(r.on?'checked':'')+' onchange="vpRate(\''+r.id+'\',\'on\',this.checked)"> '+escapeHTML(r.label)+'</label>'+
+    '<div class="g2" style="margin-top:6px;"><div><label>$ per hour</label><input type="text" inputmode="decimal" maxlength="8" value="'+escapeHTML(r.rate)+'" oninput="vpRate(\''+r.id+'\',\'rate\',this.value)"></div><div><label>Minimum hours</label><input type="text" inputmode="decimal" maxlength="8" value="'+escapeHTML(r.min)+'" oninput="vpRate(\''+r.id+'\',\'min\',this.value)"></div></div>'+
+    '<label>Note shown under this vehicle (optional)</label><input type="text" maxlength="300" value="'+escapeHTML(r.note)+'" oninput="vpRate(\''+r.id+'\',\'note\',this.value)"></div>';}).join('');
+  document.getElementById('vp-co').innerHTML=vpGroupHTML('co');
+  document.getElementById('vp-ins').innerHTML=vpGroupHTML('ins');
+  document.getElementById('vp-vet').innerHTML=vpGroupHTML('vet');
+  document.getElementById('vp-terms').innerHTML=vpGroupHTML('terms');
+  vpRefresh();
+}
+function vpPick(id){
+  var p=pipeline.filter(function(x){return String(x.id)===String(id);})[0];if(!p){return;}
+  vendorState.prop.forco=String(p.company||'').slice(0,120);
+  vendorState.prop.attn=String((p.name||'')+(p.title?', '+p.title:'')).slice(0,120);
+  vpSave();document.getElementById('vp-for').value=vendorState.prop.forco;document.getElementById('vp-attn').value=vendorState.prop.attn;vpRefresh();
+}
+function vpShow(m){vpMode=(m==='full')?'full':'short';vpRefresh();}
+function vpBuild(mode){
+  var blanks=0;
+  function b(v){v=String(v||'').trim();if(!v){blanks++;return '<span class="vp-blank">__________</span>';}return escapeHTML(v);}
+  var S=vendorState,co=S.co,pr=S.prop;
+  var on=S.rates.filter(function(r){return r.on;});
+  var rows=on.map(function(r){
+    return '<tr><td><strong>'+escapeHTML(r.label)+'</strong>'+(r.note?'<br><span style="font-size:12px;color:#444;">'+escapeHTML(r.note)+'</span>':'')+'</td><td>'+(r.rate?'$'+escapeHTML(r.rate)+' / hour':b(''))+'</td><td>'+(r.min?escapeHTML(r.min)+'-hour minimum':b(''))+'</td></tr>';}).join('');
+  if(!on.length){rows='<tr><td colspan="3">No vehicles selected.</td></tr>';}
+  var h='<div class="vp-paper"><h1>'+escapeHTML(co.legal||'Odyssey Black VIP LLC')+'</h1><p><em>Executive ground transportation, Atlanta, Georgia</em></p>'+
+   '<p>Prepared for: '+b(pr.forco)+(pr.attn?' &mdash; Attn: '+escapeHTML(pr.attn):'')+'<br>Date: '+escapeHTML(atlDateStr())+(pr.valid?' &middot; Rates valid for '+escapeHTML(pr.valid)+' days':'')+'</p>'+
+   '<h2>Services</h2><p>Chauffeured airport transfers, hourly executive transportation, and group and event transportation for corporate travelers and visiting executives.</p>'+
+   '<h2>Rates</h2><table><tr><th>Vehicle</th><th>Rate</th><th>Minimum</th></tr>'+rows+'</table>'+
+   '<h2>Insurance</h2><p>Carrier: '+b(S.ins.carrier)+' &middot; Auto liability: '+b(S.ins.auto)+' &middot; Policy expires: '+b(S.ins.expires)+'</p>'+
+   '<h2>Driver standard</h2><p>'+b(S.vet.mvr)+'</p>';
+  if(mode==='full'){
+    h+='<h2>Insurance details</h2><table>'+['carrier','policy','auto','gl','umbrella','expires','addl'].map(function(k){return '<tr><td style="width:45%">'+escapeHTML(VP_FIELDS.ins[k])+'</td><td>'+b(S.ins[k])+'</td></tr>';}).join('')+'</table>'+
+    '<p style="font-size:12px;">A certificate of insurance is available on request.</p>'+
+    '<h2>Driver and vehicle standards</h2><table>'+['mvr','bg','drug','training','fleet'].map(function(k){return '<tr><td style="width:30%">'+escapeHTML(VP_FIELDS.vet[k])+'</td><td>'+b(S.vet[k])+'</td></tr>';}).join('')+'</table>'+
+    '<h2>Terms</h2><table>'+['cancel','gratuity','fuel','billing','payment'].map(function(k){return '<tr><td style="width:30%">'+escapeHTML(VP_FIELDS.terms[k])+'</td><td>'+b(S.terms[k])+'</td></tr>';}).join('')+'</table>'+
+    '<h2>Acceptance</h2><p>Authorized for '+escapeHTML(pr.forco||'the client')+': Name ____________________ Signature ____________________ Date ____________</p><p>Authorized for '+escapeHTML(co.legal||'Odyssey Black VIP LLC')+': '+b(co.signer)+'</p>';
+  }
+  h+='<h2>Contact</h2><p>'+b(co.signer)+'<br>'+b(co.phone)+' &middot; '+b(co.email)+'<br>'+b(co.web)+' &middot; '+b(co.address)+'</p></div>';
+  return {html:h,blanks:blanks};
+}
+function vpRefresh(){
+  var r=vpBuild(vpMode);
+  document.getElementById('vp-preview').innerHTML=r.html;
+  document.getElementById('vp-status').textContent=r.blanks?(r.blanks+' detail'+(r.blanks===1?'':'s')+' still blank (highlighted below). Fill them in before you send this.'):'Every field is filled in.';
+  document.getElementById('vp-btn-short').className='btn '+(vpMode==='short'?'btn-gold':'btn-outline');
+  document.getElementById('vp-btn-full').className='btn '+(vpMode==='full'?'btn-gold':'btn-outline');
+}
+function vpPrint(){
+  var r=vpBuild(vpMode);
+  var root=document.getElementById('vp-print-root');
+  if(!root){root=document.createElement('div');root.id='vp-print-root';document.body.appendChild(root);}
+  root.innerHTML=r.html;
+  if(r.blanks&&!confirm(r.blanks+' detail(s) are still blank and will print as lines. Print anyway?')){return;}
+  window.print();
 }
 </script>
 </body>
