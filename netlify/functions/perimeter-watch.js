@@ -26,6 +26,7 @@ const QUERIES = [
   'Brookhaven Georgia headquarters relocating',
   '"Central Perimeter" office lease new headquarters',
   '"Perimeter Summit" OR "North Terraces" OR "Concourse" office lease',
+  '"Concourse Office Park" OR "Queen Tower" Sandy Springs office lease headquarters',
   'Alpharetta headquarters relocating',
   'Alpharetta new office lease headquarters expansion',
   'Alpharetta "North Point" OR Windward OR Avalon office headquarters',
@@ -39,9 +40,10 @@ const QUERIES = [
 
 const PERIMETER_TERMS = ['perimeter', 'dunwoody', 'sandy springs', 'brookhaven', 'north terraces', 'perimeter summit', 'ravinia', 'concourse'];
 const ALPHARETTA_TERMS = ['alpharetta', 'windward', 'north point', 'johns creek', 'roswell', 'north fulton'];
+const CONCOURSE_TERMS = ['concourse', 'queen tower', 'collective at concourse'];
 const COBB_TERMS = ['cobb county', 'cumberland', 'galleria', 'vinings', 'marietta', 'kennesaw', 'smyrna'];
 const GWINNETT_TERMS = ['gwinnett', 'peachtree corners', 'norcross', 'duluth', 'lawrenceville', 'suwanee'];
-const AREA_TERMS = PERIMETER_TERMS.concat(ALPHARETTA_TERMS, COBB_TERMS, GWINNETT_TERMS);
+const AREA_TERMS = PERIMETER_TERMS.concat(CONCOURSE_TERMS, ALPHARETTA_TERMS, COBB_TERMS, GWINNETT_TERMS);
 const MOVE_TERMS = ['headquarters', 'hq', 'relocat', 'moving', 'moves', 'lease', 'expand', 'new office', 'opens office', 'consolidat', 'sq. ft', 'square feet', 'square-foot'];
 
 // Browsers omit the Origin header on same-site GET requests, so "no Origin" must not mean "reject".
@@ -113,6 +115,7 @@ function normaliseItems(raw) {
     const areas = [];
     if (PERIMETER_TERMS.some(function (t) { return hay.indexOf(t) !== -1; })) areas.push('perimeter');
     if (ALPHARETTA_TERMS.some(function (t) { return hay.indexOf(t) !== -1; })) areas.push('alpharetta');
+    if (CONCOURSE_TERMS.some(function (t) { return hay.indexOf(t) !== -1; })) areas.push('concourse');
     if (COBB_TERMS.some(function (t) { return hay.indexOf(t) !== -1; })) areas.push('cobb');
     if (GWINNETT_TERMS.some(function (t) { return hay.indexOf(t) !== -1; })) areas.push('gwinnett');
     const move = MOVE_TERMS.filter(function (t) { return hay.indexOf(t) !== -1; });
