@@ -1638,8 +1638,6 @@ textarea{resize:vertical;min-height:75px;}
       <div id="vp-rates"></div>
     </div>
     <div class="card"><div class="sep-title"><span class="mini-badge mb-blue">Your company</span></div><div id="vp-co"></div></div>
-    <div class="card"><div class="sep-title"><span class="mini-badge mb-blue">Insurance</span></div>
-      <div style="font-size:var(--fs-xs);color:var(--muted);margin-bottom:8px;">Enter only what your certificate of insurance actually says. The packet shows the named insured on the policy next to the coverage, so buyers see exactly who is insured.</div><div id="vp-ins"></div></div>
     <div class="card"><div class="sep-title"><span class="mini-badge mb-blue">Driver &amp; vehicle standards</span></div>
       <div style="font-size:var(--fs-xs);color:var(--muted);margin-bottom:8px;">Only list screening you really do. Leave a box empty if you are unsure.</div><div id="vp-vet"></div></div>
     <div class="card"><div class="sep-title"><span class="mini-badge mb-blue">Terms</span></div><div id="vp-terms"></div></div>
@@ -5355,15 +5353,13 @@ function renderResults(){
 // ===== Vendor Packet & Proposal =====
 var VP_DEFAULT={
   prop:{forco:'',attn:'',valid:'30'},
-  co:{legal:'Odyssey Black, LLC',signer:'Kerry A. Pope, Founder & CEO',authority:'',licno:'',phone:'678-481-1421',email:'concierge@odysseyblack.com',web:'odysseyblack.com',address:''},
-  ins:{insured:'',carrier:'Ethio-American Insurance Co',policy:'8789-GAL-0593-05',auto:'Bodily injury $100,000 per person / $300,000 per accident; property damage $50,000 per accident (scheduled autos only)',gl:'',umbrella:'',expires:'02/03/2027',addl:''},
+  co:{legal:'Odyssey Black, LLC',signer:'Kerry A. Pope, Founder & CEO',phone:'678-481-1421',email:'concierge@odysseyblack.com',web:'odysseyblack.com',address:''},
   vet:{mvr:'Owner-operator 7-year motor vehicle record (as of 16 Sep 2026): no citations, no license withdrawals, 0 points.',bg:'',drug:'',training:'Chauffeurs are trained in hospitality and discretion.',fleet:'Luxury black leather interior, heated seats, on-board Wi-Fi, phone chargers, complimentary water and newspaper.'},
   terms:{cancel:'',gratuity:'',fuel:'',billing:'',payment:''}
 };
 var VP_FIELDS={
   prop:{},
-  co:{legal:'Legal company name',signer:'Authorized signatory',authority:'Operating authority (whose license you operate under)',licno:'License number',phone:'Phone',email:'Email',web:'Website',address:'Business address'},
-  ins:{insured:'Named insured on the policy',carrier:'Insurance carrier',policy:'Policy number(s)',auto:'Auto liability limits',gl:'General liability limits',umbrella:'Umbrella / excess limits',expires:'Policy expiration date',addl:'Additional insured available? (yes / no)'},
+  co:{legal:'Legal company name',signer:'Authorized signatory',phone:'Phone',email:'Email',web:'Website',address:'Business address'},
   vet:{mvr:'Driving record standard',bg:'Background checks',drug:'Drug testing',training:'Training',fleet:'Vehicle standards'},
   terms:{cancel:'Cancellation policy',gratuity:'Gratuity',fuel:'Fuel / tolls / parking',billing:'Billing (per trip, monthly invoice)',payment:'Payment terms'}
 };
@@ -5395,7 +5391,9 @@ function vpClean(raw){
   });}
   return st;
 }
-var vendorState=vpClean(loadJSON('ob-vendor',null));
+var _vpRaw=loadJSON('ob-vendor',null);
+var vendorState=vpClean(_vpRaw);
+if(_vpRaw&&typeof _vpRaw==='object'&&(_vpRaw.ins||(_vpRaw.co&&typeof _vpRaw.co==='object'&&('authority' in _vpRaw.co||'licno' in _vpRaw.co)))){vpSave();}
 function vpSave(){saveJSON('ob-vendor',vendorState);}
 function vpSet(path,val){
   var a=String(path).split('.');
@@ -5429,7 +5427,6 @@ function renderVendor(){
     '<div class="g2" style="margin-top:6px;"><div><label>$ per hour</label><input type="text" inputmode="decimal" maxlength="8" value="'+escapeHTML(r.rate)+'" oninput="vpRate(\''+r.id+'\',\'rate\',this.value)"></div><div><label>Minimum hours</label><input type="text" inputmode="decimal" maxlength="8" value="'+escapeHTML(r.min)+'" oninput="vpRate(\''+r.id+'\',\'min\',this.value)"></div></div>'+
     '<label>Note shown under this vehicle (optional)</label><input type="text" maxlength="300" value="'+escapeHTML(r.note)+'" oninput="vpRate(\''+r.id+'\',\'note\',this.value)"></div>';}).join('');
   document.getElementById('vp-co').innerHTML=vpGroupHTML('co');
-  document.getElementById('vp-ins').innerHTML=vpGroupHTML('ins');
   document.getElementById('vp-vet').innerHTML=vpGroupHTML('vet');
   document.getElementById('vp-terms').innerHTML=vpGroupHTML('terms');
   vpRefresh();
@@ -5453,13 +5450,10 @@ function vpBuild(mode){
    '<p>Prepared for: '+b(pr.forco)+(pr.attn?' &mdash; Attn: '+escapeHTML(pr.attn):'')+'<br>Date: '+escapeHTML(atlDateStr())+(pr.valid?' &middot; Rates valid for '+escapeHTML(pr.valid)+' days':'')+'</p>'+
    '<h2>Services</h2><p>Chauffeured airport transfers, hourly executive transportation, and group and event transportation for corporate travelers and visiting executives.</p>'+
    '<h2>Rates</h2><table><tr><th>Vehicle</th><th>Rate</th><th>Minimum</th></tr>'+rows+'</table>'+
-   '<h2>Operating authority</h2><p>'+b(co.authority)+' License no.: '+b(co.licno)+'</p>'+
-   '<h2>Insurance</h2><p>Named insured: '+b(S.ins.insured)+' &middot; Carrier: '+b(S.ins.carrier)+' &middot; Auto liability: '+b(S.ins.auto)+' &middot; Policy expires: '+b(S.ins.expires)+'</p>'+
+   '<h2>Insurance</h2><p>Certificate of insurance available on request.</p>'+
    '<h2>Driver standard</h2><p>'+b(S.vet.mvr)+'</p>';
   if(mode==='full'){
-    h+='<h2>Insurance details</h2><table>'+['insured','carrier','policy','auto','gl','umbrella','expires','addl'].map(function(k){return '<tr><td style="width:45%">'+escapeHTML(VP_FIELDS.ins[k])+'</td><td>'+b(S.ins[k])+'</td></tr>';}).join('')+'</table>'+
-    '<p style="font-size:12px;">A certificate of insurance is available on request.</p>'+
-    '<h2>Driver and vehicle standards</h2><table>'+['mvr','bg','drug','training','fleet'].map(function(k){return '<tr><td style="width:30%">'+escapeHTML(VP_FIELDS.vet[k])+'</td><td>'+b(S.vet[k])+'</td></tr>';}).join('')+'</table>'+
+    h+='<h2>Driver and vehicle standards</h2><table>'+['mvr','bg','drug','training','fleet'].map(function(k){return '<tr><td style="width:30%">'+escapeHTML(VP_FIELDS.vet[k])+'</td><td>'+b(S.vet[k])+'</td></tr>';}).join('')+'</table>'+
     '<h2>Terms</h2><table>'+['cancel','gratuity','fuel','billing','payment'].map(function(k){return '<tr><td style="width:30%">'+escapeHTML(VP_FIELDS.terms[k])+'</td><td>'+b(S.terms[k])+'</td></tr>';}).join('')+'</table>'+
     '<h2>Acceptance</h2><p>Authorized for '+escapeHTML(pr.forco||'the client')+': Name ____________________ Signature ____________________ Date ____________</p><p>Authorized for '+escapeHTML(co.legal||'Odyssey Black, LLC')+': '+b(co.signer)+'</p>';
   }
