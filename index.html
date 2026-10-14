@@ -4813,14 +4813,15 @@ function renderRadarScan(){
       (isNew?'<span class="mini-badge mb-green">NEW</span> ':'')+
       '<a href="'+escapeHTML(it.url)+'" target="_blank" rel="noopener noreferrer" style="font-weight:600;font-size:var(--fs-sm);">'+escapeHTML(it.title)+'</a>'+
       '<div style="font-size:var(--fs-xs);color:var(--muted);">'+escapeHTML(it.source||'source unknown')+' &middot; '+escapeHTML(d)+' &middot; unverified lead &mdash; confirm before outreach</div>'+
-      '<div class="btns" style="margin-top:6px;"><button class="btn btn-outline" style="padding:4px 12px;font-size:var(--fs-xs);" onclick="radarHeadlineToGatekeeper('+i+')">Research this company &rarr;</button></div></div>';
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;"><input type="text" id="radar-co-'+i+'" maxlength="100" placeholder="Company named in this headline" aria-label="Company named in this headline" style="flex:1;min-width:180px;" onkeydown="if(event.key===\'Enter\')radarHeadlineToGatekeeper('+i+')"><button class="btn btn-outline" style="padding:6px 14px;font-size:var(--fs-xs);" onclick="radarHeadlineToGatekeeper('+i+')">Find Gatekeepers &rarr;</button></div></div>';
   });
   list.innerHTML=h;
 }
 function radarHeadlineToGatekeeper(i){
   var it=radarLastItems[i];if(!it){return;}
-  var name=window.prompt('Which company is this headline about? (type the name after reading the article)','');
-  if(!name||!name.trim()){return;}
+  var box=document.getElementById('radar-co-'+i);
+  var name=box?box.value:'';
+  if(!name||!name.trim()){notify('Type the company named in the headline first');if(box){box.focus();}return;}
   if(radarState.seen.indexOf(it.id)===-1){radarState.seen.push(it.id);radarSave();}
   radarOpenGatekeeper(name.trim().slice(0,100),'Atlanta');
 }
