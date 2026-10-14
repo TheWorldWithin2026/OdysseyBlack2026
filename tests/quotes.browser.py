@@ -68,8 +68,20 @@ with sync_playwright() as p:
         pg.click('#qt-lookup'); pg.wait_for_function("document.getElementById('qt-msg').textContent.indexOf('did not work')!==-1")
         t(f'[{w}] network failure is handled without errors',not errs)
         pg.unroute('**/.netlify/functions/distance*')
-        # hourly from vendor packet
-        t(f'[{w}] hourly alternative shown from Vendor Packet rates','$125.00/hr, 3-hour minimum ($375.00)' in pg.text_content('#qt-result') and 'Sprinter $190.00/hr' in pg.text_content('#qt-result'))
+        # hourly from vendor packet: Sedan/SUV +45% service rate, Sprinter/bus +25% gratuity
+        def hr(i): return pg.locator('[data-qt-hr="%s"]'%i).text_content().strip()
+        t(f'[{w}] hourly defaults to each minimum: Sedan 3 x $125 +45% = $543.75, SUV 3 x $150 +45% = $652.50',hr('sedan')=='$543.75' and hr('suv')=='$652.50')
+        t(f'[{w}] hourly Sprinter 6 x $190 +25% gratuity = $1,425.00',hr('sprinter')=='$1,425.00')
+        ht=pg.text_content('#qt-hourly')
+        t(f'[{w}] hourly lines name the right add-on per vehicle','Executive & Service Rate 45%' in ht and 'Gratuity 25%' in ht)
+        pg.fill('#qt-hours','8')
+        t(f'[{w}] 8 hours: Sedan $1,450.00, Sprinter 8 x 190 x 1.25 = $1,900.00',hr('sedan')=='$1,450.00' and hr('sprinter')=='$1,900.00')
+        pg.fill('#qt-hours','5')
+        t(f'[{w}] 5 hours: Sedan $906.25, Sprinter still its 6-hour minimum $1,425.00 and says minimum',hr('sedan')=='$906.25' and hr('sprinter')=='$1,425.00' and '(minimum)' in pg.text_content('#qt-hourly'))
+        pg.fill('#qt-hours','')
+        ht=pg.evaluate('qtHourlyText()')
+        t(f'[{w}] hourly copy text includes totals and both add-ons, no insurance or outside names','$1,425.00 total, including the 25% gratuity' in ht and '$543.75 total, including the 45% Executive & Service Rate' in ht and 'nsurance' not in ht and 'Theo' not in ht)
+        t(f'[{w}] bus rates are not shown until set in the Vendor Packet (minibus and coach defaults exist)', pg.locator('[data-qt-hr="minibus"]').count()==1)
         # save + log
         pg.fill('#qt-client','Newell Brands'); setv(pg,'#qt-miles','18.4')
         pg.click('#qt-result button:has-text("Save to quote log")')
@@ -112,6 +124,12 @@ with sync_playwright() as p:
         pg.click('button:has-text("Reset rates")')
         t(f'[{w}] reset restores 45%',pg.evaluate("qtState.svc")==45 and total(pg,'sedan')=='$152.84')
         t(f'[{w}] copy text states the service rate is included','Prices include the 45% Executive & Service Rate' in pg.evaluate('qtText()'))
+        gr=pg.locator('#qt-grat'); gr.fill('20'); gr.press('Tab')
+        t(f'[{w}] gratuity set to 20% reprices Sprinter: 1,140 x 1.20 = $1,368.00',pg.locator('[data-qt-hr="sprinter"]').text_content().strip()=='$1,368.00')
+        pg.reload(); open_tab(pg)
+        t(f'[{w}] gratuity persists across reload',pg.locator('[data-qt-hr="sprinter"]').text_content().strip()=='$1,368.00')
+        pg.click('button:has-text("Reset rates")')
+        t(f'[{w}] reset restores 25% gratuity',pg.evaluate("qtState.grat")==25 and pg.locator('[data-qt-hr="sprinter"]').text_content().strip()=='$1,425.00')
         # layout
         pg.fill('#qt-from','1'*5+' '+'Very Long Street Name '*8)
         t(f'[{w}] no horizontal scroll on the quotes tab',pg.evaluate("document.documentElement.scrollWidth<=window.innerWidth+1"))
@@ -121,12 +139,12 @@ with sync_playwright() as p:
     # hostile stored data
     ctx=b.new_context(viewport={'width':1200,'height':900}); pg=ctx.new_page(); errs=[]; pg.on('pageerror',lambda e:errs.append(str(e)))
     pg.goto('http://localhost:8765/index.html')
-    bad={'svc':'abc','rates':{'sedan':{'first':{'miles':'abc','rate':-5},'next':{'miles':1e9,'rate':'x'},'rem':'NaN','peak':99999,'days':[1,2,3]},'suv':'nope'},
+    bad={'svc':'abc','grat':-4,'rates':{'sedan':{'first':{'miles':'abc','rate':-5},'next':{'miles':1e9,'rate':'x'},'rem':'NaN','peak':99999,'days':[1,2,3]},'suv':'nope'},
          'log':[{'id':'qt-1','client':'<img src=x onerror=window.__pwn=1>','from':'a'*500,'to':None,'miles':'abc','sedan':'zzz','suv':-3,'status':'hacked','follow':'not-a-date','at':'2026-10-01','time':'25:99'},None,5,{'id':'qt-1234567','client':'ok','miles':99999,'sedan':5,'suv':6,'status':'won'},{'id':'qt-1234567','client':'dup','miles':1}]}
     pg.evaluate("localStorage.setItem('ob-quotes',%s)"%json.dumps(json.dumps(bad))); pg.reload(); open_tab(pg)
     s=pg.evaluate("qtState")
     t('hostile rates fall back to defaults/clamps',s['rates']['sedan']['first']['miles']==1 and s['rates']['sedan']['first']['rate']==65 and s['rates']['sedan']['rem']==3.15 and s['rates']['sedan']['peak']==15.25 and len(s['rates']['sedan']['days'])==7 and s['rates']['suv']['rem']==3.79)
-    t('hostile service rate falls back to 45',s['svc']==45)
+    t('hostile service rate and gratuity fall back to 45 and 25',s['svc']==45 and s['grat']==25)
     t('hostile log: junk rows dropped, ids regenerated/unique, status and numbers sanitized',len(s['log'])==3 and len(set(q['id'] for q in s['log']))==3 and all(q['status'] in('sent','won','lost') for q in s['log']) and s['log'][0]['sedan'] is None and s['log'][0]['suv'] is None and s['log'][0]['miles']==0 and s['log'][0]['follow']=='' and len(s['log'][0]['from'])==200 and s['log'][1]['miles']==2000)
     t('hostile client name is escaped, not executed',pg.evaluate("window.__pwn")is None and '<img' not in pg.inner_html('#qt-log').replace('&lt;img','') )
     t('hostile data raises no page errors',not errs)
