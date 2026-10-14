@@ -1679,7 +1679,7 @@ textarea{resize:vertical;min-height:75px;}
   <div class="panel" id="panel-quotes">
     <div class="sec-tag">Price a trip in seconds</div>
     <div class="sec-h">Quote Builder</div>
-    <div class="sec-d">Enter the pickup and drop-off. You get the Sedan and SUV price from your own distance rates, with the peak surcharge and the 45% Executive &amp; Service Rate included. Copy it into an email in one click. Treat the price as an estimate until you have compared it with your booking system (the check box below the prices does that).</div>
+    <div class="sec-d">Enter the pickup and drop-off. You get the Sedan and SUV price from your own distance rates, with the peak surcharge and the 45% Executive &amp; Service Rate included. Hourly vehicles (Sprinter and bus) add the 25% gratuity. Copy it into an email in one click. Treat the price as an estimate until you have compared it with your booking system (the check box below the prices does that).</div>
     <div class="card"><div class="sep-title"><span class="mini-badge mb-gold">Trip</span></div>
       <div class="g2"><div><label for="qt-pick">Pick a prospect (optional)</label><select id="qt-pick" onchange="qtPick(this.value)"></select></div>
       <div><label for="qt-client">Client or company</label><input type="text" id="qt-client" maxlength="100" oninput="qtCompute()"></div></div>
@@ -1693,6 +1693,12 @@ textarea{resize:vertical;min-height:75px;}
       <div style="max-width:320px;"><label for="qt-peak">Peak pricing</label><select id="qt-peak" onchange="qtCompute()"><option value="auto">Automatic, from the date and time</option><option value="yes">Treat as peak</option><option value="no">Treat as off-peak</option></select></div>
     </div>
     <div class="card"><div class="sep-title"><span class="mini-badge mb-green">Price</span></div><div id="qt-result"></div></div>
+    <div class="card"><div class="sep-title"><span class="mini-badge mb-green">By the hour</span></div>
+      <div style="font-size:var(--fs-xs);color:var(--muted);margin-bottom:8px;line-height:1.5;">Hourly rates come from your Vendor Packet. Sedan and SUV add the Executive &amp; Service Rate. Sprinter and bus add the gratuity.</div>
+      <div style="max-width:260px;margin-bottom:10px;"><label for="qt-hours">Hours booked (blank uses each vehicle's minimum)</label><input type="text" id="qt-hours" inputmode="decimal" maxlength="5" oninput="renderQtHourly()"></div>
+      <div id="qt-hourly"></div>
+      <div class="btns" style="margin-top:10px;"><button class="btn btn-outline" onclick="qtCopyHourly()">Copy hourly quote</button></div>
+    </div>
     <div class="card"><div class="sep-title"><span class="mini-badge mb-blue">Check against your booking system</span></div>
       <div style="font-size:var(--fs-xs);color:var(--muted);margin-bottom:8px;">Enter the same trip on your booking site and type the prices it shows. Any difference means one of the rates or the peak rule below needs adjusting.</div>
       <div class="g2"><div><label for="qt-chk-sedan">Booking site price, Sedan ($)</label><input type="text" id="qt-chk-sedan" inputmode="decimal" maxlength="9" oninput="qtCompute()"></div>
@@ -5961,6 +5967,7 @@ function renderForecast(){
 var QT_DAYS=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 var QT_VEHICLES=['sedan','suv'];
 var QT_SVC_DEFAULT=45;
+var QT_GRAT_DEFAULT=25;
 var QT_DEFAULT={
   sedan:{label:'Executive Sedan',first:{miles:1,rate:65},next:{miles:9,rate:0},rem:3.15,peak:15.25,days:[null,['14:00','18:59'],['14:00','19:59'],['14:00','19:59'],['14:00','19:59'],['14:00','23:59'],['00:00','05:59']]},
   suv:{label:'Executive SUV',first:{miles:1,rate:75},next:{miles:9,rate:0},rem:3.79,peak:20.05,days:[['00:00','05:59'],['14:00','18:59'],['14:00','19:59'],['14:00','19:59'],['14:00','19:59'],['14:00','23:59'],['00:00','05:59']]}
@@ -5970,9 +5977,9 @@ function qtRate(v,min,max,dflt){var n=parseFloat(v);return (isFinite(n)&&n>=min&
 function qtTime(v,dflt){return (typeof v==='string'&&/^([01]\d|2[0-3]):[0-5]\d$/.test(v))?v:dflt;}
 function qtMoneyOrNull(v){var n=parseFloat(v);return (isFinite(n)&&n>=0&&n<=100000)?Math.round(n*100)/100:null;}
 function qtClean(raw){
-  var out={rates:JSON.parse(JSON.stringify(QT_DEFAULT)),svc:QT_SVC_DEFAULT,log:[]};
+  var out={rates:JSON.parse(JSON.stringify(QT_DEFAULT)),svc:QT_SVC_DEFAULT,grat:QT_GRAT_DEFAULT,log:[]};
   if(!raw||typeof raw!=='object'||Array.isArray(raw)){return out;}
-  out.svc=qtRate(raw.svc,0,200,QT_SVC_DEFAULT);
+  out.svc=qtRate(raw.svc,0,200,QT_SVC_DEFAULT);out.grat=qtRate(raw.grat,0,200,QT_GRAT_DEFAULT);
   if(raw.rates&&typeof raw.rates==='object'){
     QT_VEHICLES.forEach(function(v){
       var r=raw.rates[v],d=QT_DEFAULT[v],o=out.rates[v];
@@ -6063,10 +6070,8 @@ function qtCompute(){
       (q.peakUnknown?'<div style="font-size:var(--fs-xs);margin-top:8px;">During peak hours: <strong>'+qtMoney(q.ifPeak)+'</strong> (+'+q.peakPct+'%). Add the pickup date and time to price it exactly.</div>':'')+
       (q.peakApplied?'':(q.peakUnknown?'':'<div style="font-size:var(--fs-xs);margin-top:8px;color:var(--muted);">Off-peak. Peak would be '+qtMoney(q.ifPeak)+'.</div>'))+'</div>';
   }).join('');
-  var hourly=qtHourlyRows();
   el.innerHTML='<div style="font-size:var(--fs-sm);margin-bottom:10px;">'+qtRound(inp.miles)+' miles'+(inp.date?' &middot; '+escapeHTML(inp.date):'')+(inp.time?' at '+escapeHTML(qtTime12(inp.time)):'')+'</div>'+
     '<div style="display:flex;flex-wrap:wrap;gap:12px;">'+tiles+'</div>'+
-    (hourly?'<div style="font-size:var(--fs-xs);color:var(--muted);margin-top:12px;line-height:1.6;">By the hour instead: '+hourly+'</div>':'')+
     '<div class="btns" style="margin-top:12px;"><button class="btn btn-gold" onclick="qtCopy()">Copy quote</button><button class="btn btn-outline" onclick="qtSaveQuote()">Save to quote log</button></div>';
   var cs=parseFloat(document.getElementById('qt-chk-sedan').value),cv=parseFloat(document.getElementById('qt-chk-suv').value),parts=[];
   [['Sedan',cs,qs[0]],['SUV',cv,qs[1]]].forEach(function(x){
@@ -6076,15 +6081,44 @@ function qtCompute(){
   });
   chk.innerHTML=parts.join('<br>');
 }
-function qtHourlyRows(){
-  var rows=[];
+var QT_HOURLY_IDS=['sedan','suv','sprinter','minibus','coach'];
+// Sedan and SUV carry the Executive & Service Rate; Sprinter and bus carry the gratuity.
+function qtHourlyCalc(){
+  var hrs=parseFloat((document.getElementById('qt-hours')||{}).value);
+  var out=[];
   (vendorState&&Array.isArray(vendorState.rates)?vendorState.rates:[]).forEach(function(r){
-    if(['sedan','suv','sprinter'].indexOf(r.id)===-1){return;}
+    if(QT_HOURLY_IDS.indexOf(r.id)===-1){return;}
     var rate=parseFloat(r.rate),min=parseFloat(r.min);
-    if(isFinite(rate)&&rate>0&&isFinite(min)&&min>0){rows.push(escapeHTML(r.label.replace('Executive ','').replace('Mercedes-Benz ',''))+' '+qtMoney(rate)+'/hr, '+min+'-hour minimum ('+qtMoney(rate*min)+')');}
+    if(!(isFinite(rate)&&rate>0&&isFinite(min)&&min>0)){return;}
+    var h=(isFinite(hrs)&&hrs>0)?hrs:min,minApplied=h<min;if(minApplied){h=min;}
+    var kind=(r.id==='sedan'||r.id==='suv')?'service':'gratuity';
+    var pct=kind==='service'?qtState.svc:qtState.grat;
+    var sub=qtRound(rate*h),add=qtRound(sub*pct/100);
+    out.push({id:r.id,label:r.label,rate:rate,hours:h,min:min,minApplied:minApplied,kind:kind,pct:pct,sub:sub,add:add,total:qtRound(sub+add)});
   });
-  return rows.join(' &middot; ');
+  return out;
 }
+function renderQtHourly(){
+  var el=document.getElementById('qt-hourly');if(!el){return;}
+  var rows=qtHourlyCalc();
+  if(!rows.length){el.innerHTML='<div style="font-size:var(--fs-sm);color:var(--muted);">No hourly rates are set in the Vendor Packet yet.</div>';return;}
+  el.innerHTML=rows.map(function(r){
+    var name=r.kind==='service'?'Executive &amp; Service Rate':'Gratuity';
+    return '<div style="padding:10px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-end;">'+
+      '<div style="flex:1;min-width:200px;"><div style="font-weight:600;font-size:var(--fs-sm);">'+escapeHTML(r.label)+'</div>'+
+      '<div style="font-size:var(--fs-xs);color:var(--muted);line-height:1.6;">'+r.hours+' hour'+(r.hours===1?'':'s')+(r.minApplied?' (minimum)':'')+' at '+qtMoney(r.rate)+' = '+qtMoney(r.sub)+'<br>'+name+' '+r.pct+'%: '+qtMoney(r.add)+'</div></div>'+
+      '<div style="font-size:22px;font-weight:700;" data-qt-hr="'+r.id+'">'+qtMoney(r.total)+'</div></div>';
+  }).join('');
+}
+function qtHourlyText(){
+  var rows=qtHourlyCalc();if(!rows.length){return '';}
+  var c=vendorState.co,L=[(c.legal||'Odyssey Black, LLC')+' - Hourly rates',''];
+  rows.forEach(function(r){L.push(r.label+': '+r.hours+' hour'+(r.hours===1?'':'s')+(r.minApplied?' (minimum)':'')+' at '+qtMoney(r.rate)+'/hour, '+qtMoney(r.total)+' total, including the '+r.pct+'% '+(r.kind==='service'?'Executive & Service Rate':'gratuity')+'.');});
+  L.push('');
+  var sig=[c.signer,c.phone,c.email,c.web].filter(function(x){return x;});
+  return L.join('\n')+sig.join('\n');
+}
+function qtCopyHourly(){var txt=qtHourlyText();if(!txt){notify('No hourly rates to copy.');return;}qtCopyText(txt,'Hourly quote copied.');}
 function qtTime12(t){var h=parseInt(t.slice(0,2),10),m=t.slice(3);return ((h%12)||12)+':'+m+' '+(h<12?'AM':'PM');}
 function qtText(){
   if(!qtLast){return '';}
@@ -6104,15 +6138,15 @@ function qtText(){
   var sig=[c.signer,c.phone,c.email,c.web].filter(function(x){return x;});
   return L.join('\n')+sig.join('\n');
 }
-function qtCopy(){
-  var txt=qtText();if(!txt){return;}
-  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(function(){notify('Quote copied.');},function(){qtCopyFallback(txt);});}
-  else{qtCopyFallback(txt);}
+function qtCopy(){var txt=qtText();if(txt){qtCopyText(txt,'Quote copied.');}}
+function qtCopyText(txt,msg){
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(function(){notify(msg);},function(){qtCopyFallback(txt,msg);});}
+  else{qtCopyFallback(txt,msg);}
 }
-function qtCopyFallback(txt){
+function qtCopyFallback(txt,msg){
   var ta=document.createElement('textarea');ta.value=txt;ta.setAttribute('readonly','');ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();
   var ok=false;try{ok=document.execCommand('copy');}catch(e){}
-  document.body.removeChild(ta);notify(ok?'Quote copied.':'Could not copy. Select the text on screen instead.');
+  document.body.removeChild(ta);notify(ok?msg:'Could not copy. Select the text on screen instead.');
 }
 function qtPick(v){
   if(v===''){return;}
@@ -6199,7 +6233,8 @@ function qtSetRate(veh,field,val){
   else{return;}
   qtSave();renderQuoteRates();qtCompute();
 }
-function qtSetSvc(val){qtState.svc=qtRate(val,0,200,QT_SVC_DEFAULT);qtSave();renderQuoteRates();qtCompute();}
+function qtSetGrat(val){qtState.grat=qtRate(val,0,200,QT_GRAT_DEFAULT);qtSave();renderQuoteRates();renderQtHourly();}
+function qtSetSvc(val){qtState.svc=qtRate(val,0,200,QT_SVC_DEFAULT);qtSave();renderQuoteRates();qtCompute();renderQtHourly();}
 function qtSetDay(veh,dow,kind,val){
   var r=qtState.rates[veh];if(!r||!(dow>=0&&dow<=6)){return;}
   if(kind==='on'){r.days[dow]=val?(r.days[dow]||['14:00','19:59']):null;}
@@ -6207,12 +6242,12 @@ function qtSetDay(veh,dow,kind,val){
   qtSave();renderQuoteRates();qtCompute();
 }
 function qtResetRates(){
-  if(!confirm('Reset the Sedan and SUV rates, peak hours and Executive & Service Rate to the values entered from the booking system?')){return;}
-  qtState.rates=JSON.parse(JSON.stringify(QT_DEFAULT));qtState.svc=QT_SVC_DEFAULT;qtSave();renderQuoteRates();qtCompute();
+  if(!confirm('Reset the Sedan and SUV rates, peak hours, Executive & Service Rate and gratuity to the values entered from the booking system?')){return;}
+  qtState.rates=JSON.parse(JSON.stringify(QT_DEFAULT));qtState.svc=QT_SVC_DEFAULT;qtState.grat=QT_GRAT_DEFAULT;qtSave();renderQuoteRates();qtCompute();renderQtHourly();
 }
 function renderQuoteRates(){
   var el=document.getElementById('qt-rates');if(!el){return;}
-  var svcRow='<div style="margin-bottom:12px;"><label for="qt-svc">Executive &amp; Service Rate (%), added to every fare</label><input type="text" id="qt-svc" inputmode="decimal" style="width:90px;" value="'+qtState.svc+'" onchange="qtSetSvc(this.value)"></div>';
+  var svcRow='<div style="margin-bottom:12px;"><label for="qt-svc">Executive &amp; Service Rate (%), added to every Sedan and SUV fare</label><input type="text" id="qt-svc" inputmode="decimal" style="width:90px;" value="'+qtState.svc+'" onchange="qtSetSvc(this.value)"> <span style="font-size:var(--fs-xs);color:var(--muted);">Sedan and SUV</span></div><div style="margin-bottom:12px;"><label for="qt-grat">Gratuity (%), added to Sprinter and bus hourly rates</label><input type="text" id="qt-grat" inputmode="decimal" style="width:90px;" value="'+qtState.grat+'" onchange="qtSetGrat(this.value)"></div>';
   function num(v,field,veh,label,w){return '<div><label>'+label+'</label><input type="text" inputmode="decimal" style="width:'+(w||90)+'px;" value="'+v+'" aria-label="'+escapeHTML(QT_DEFAULT[veh].label)+' '+label+'" onchange="qtSetRate(\''+veh+'\',\''+field+'\',this.value)"></div>';}
   el.innerHTML=svcRow+QT_VEHICLES.map(function(v){
     var r=qtState.rates[v];
@@ -6225,7 +6260,7 @@ function renderQuoteRates(){
       '<div style="font-size:var(--fs-xs);color:var(--muted);margin-bottom:4px;">Peak windows (pickup time)</div>'+days+'</details>';
   }).join('');
 }
-function renderQuotes(){qtFillPicker();renderQuoteRates();renderQuoteLog();qtCompute();}
+function renderQuotes(){qtFillPicker();renderQuoteRates();renderQuoteLog();qtCompute();renderQtHourly();}
 if(document.getElementById('today-body')){renderToday();}
 </script>
 </body>
