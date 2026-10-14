@@ -47,7 +47,7 @@ with sync_playwright() as p:
         pg.locator('#lk-cands label:has-text("USI Insurance Services") input').check()
         t(f'[{w}] ticking verifies with today\'s date and enables Add',pg.evaluate("lkState.checked['k-usi']")==pg.evaluate('atlDateStr()') and pg.locator('#lk-cands button:not([disabled])').count()==1)
         pg.locator('#lk-cands button:not([disabled])').click()
-        t(f'[{w}] USI added to Radar with Perimeter area and verified note',pg.evaluate("radarState.custom.filter(function(c){return c.name==='USI Insurance Services'&&c.area==='perimeter'&&c.note.indexOf('verified by you')!==-1}).length")==1)
+        t(f'[{w}] USI added to Radar with Concourse area and verified note',pg.evaluate("radarState.custom.filter(function(c){return c.name==='USI Insurance Services'&&c.area==='concourse'&&c.note.indexOf('verified by you')!==-1}).length")==1)
         t(f'[{w}] row now says on watchlist','On your Radar watchlist' in pg.inner_text('#lk-cands'))
         pg.locator('#lk-cands label:has-text("Sterling Seacrest") input').check()
         pg.locator('#lk-cands button:not([disabled])').click()

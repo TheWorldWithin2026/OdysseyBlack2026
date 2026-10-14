@@ -1634,7 +1634,7 @@ textarea{resize:vertical;min-height:75px;}
       <div class="g2"><div><label for="pt-name">Name</label><input type="text" id="pt-name" maxlength="100" placeholder="Person or organization"></div>
       <div><label for="pt-org">Organization (optional)</label><input type="text" id="pt-org" maxlength="100"></div></div>
       <div class="g2"><div><label for="pt-type">Type</label><select id="pt-type"><option value="hotel">Hotel concierge</option><option value="planner">Event / meeting planner</option><option value="assistant">Executive assistant</option><option value="client">Existing client</option><option value="other">Other</option></select></div>
-      <div><label for="pt-area">Area (optional)</label><select id="pt-area"><option value="">Not set</option><option value="perimeter">Perimeter</option><option value="alpharetta">Alpharetta / North Fulton</option><option value="cobb">Cobb</option><option value="gwinnett">Gwinnett</option></select></div></div>
+      <div><label for="pt-area">Area (optional)</label><select id="pt-area"><option value="">Not set</option><option value="perimeter">Perimeter</option><option value="concourse">Concourse (Sandy Springs)</option><option value="alpharetta">Alpharetta / North Fulton</option><option value="cobb">Cobb</option><option value="gwinnett">Gwinnett</option></select></div></div>
       <label for="pt-contact">How to reach them (optional)</label><input type="text" id="pt-contact" maxlength="200" placeholder="Phone, email or where you met">
       <label for="pt-notes">Notes (optional)</label><input type="text" id="pt-notes" maxlength="500" onkeydown="if(event.key==='Enter')ptAdd()">
       <div class="btns" style="margin-top:10px;"><button class="btn btn-gold" onclick="ptAdd()">Add partner</button><button class="btn btn-outline" onclick="ptImportHotels()">Import hotels from Market Radar</button></div>
@@ -1656,7 +1656,7 @@ textarea{resize:vertical;min-height:75px;}
         <div class="g2"><div><label for="lk-name">Company</label><input type="text" id="lk-name" maxlength="100"></div>
         <div><label for="lk-ind">Industry (your words)</label><input type="text" id="lk-ind" maxlength="60" list="lk-ind-list" placeholder="e.g. insurance brokerage"><datalist id="lk-ind-list"><option value="Insurance brokerage"><option value="Consumer goods"><option value="Media and communications"><option value="Financial services"><option value="Technology"><option value="Healthcare"><option value="Real estate"><option value="Professional services"><option value="Manufacturing and logistics"></datalist></div></div>
         <div class="g2"><div><label for="lk-size">Size</label><select id="lk-size"><option value="">Not sure</option><option value="smb">About 50-200 employees</option><option value="mid">About 200-1,000 employees</option><option value="large">1,000+ employees</option></select></div>
-        <div><label for="lk-area">Where their Atlanta office is</label><select id="lk-area"><option value="">Not sure</option><option value="perimeter">Perimeter</option><option value="alpharetta">Alpharetta / North Fulton</option><option value="cobb">Cobb</option><option value="gwinnett">Gwinnett</option></select></div></div>
+        <div><label for="lk-area">Where their Atlanta office is</label><select id="lk-area"><option value="">Not sure</option><option value="perimeter">Perimeter</option><option value="concourse">Concourse (Sandy Springs)</option><option value="alpharetta">Alpharetta / North Fulton</option><option value="cobb">Cobb</option><option value="gwinnett">Gwinnett</option></select></div></div>
         <div class="g2"><div><label for="lk-books">Who books their travel</label><select id="lk-books"><option value="">Not sure</option><option value="assistant">Executive assistant</option><option value="office">Office manager</option><option value="travel">Travel coordinator</option><option value="exec">The executive books it</option><option value="other">Other</option></select></div>
         <div><label for="lk-note">Note (optional)</label><input type="text" id="lk-note" maxlength="200" onkeydown="if(event.key==='Enter')lkAdd()"></div></div>
         <div class="btns" style="margin-top:10px;"><button class="btn btn-gold" onclick="lkAdd()">Add client</button></div>
@@ -1728,7 +1728,7 @@ textarea{resize:vertical;min-height:75px;}
       <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border);">
         <div style="font-size:var(--fs-sm);font-weight:600;margin-bottom:8px;">Add a company you are targeting</div>
         <div class="g2"><div><label for="rc-name">Company name</label><input type="text" id="rc-name" maxlength="100" placeholder="e.g. a company you know is expanding"></div>
-        <div><label for="rc-area">Area</label><select id="rc-area"><option value="perimeter">Perimeter / Sandy Springs / Dunwoody</option><option value="alpharetta">Alpharetta / North Fulton</option><option value="cobb">Cobb (Cumberland, Marietta, Kennesaw)</option><option value="gwinnett">Gwinnett (Peachtree Corners, Norcross, Duluth)</option></select></div></div>
+        <div><label for="rc-area">Area</label><select id="rc-area"><option value="perimeter">Perimeter / Sandy Springs / Dunwoody</option><option value="concourse">Concourse (Sandy Springs)</option><option value="alpharetta">Alpharetta / North Fulton</option><option value="cobb">Cobb (Cumberland, Marietta, Kennesaw)</option><option value="gwinnett">Gwinnett (Peachtree Corners, Norcross, Duluth)</option></select></div></div>
         <label for="rc-note">Why it is a target (optional)</label><input type="text" id="rc-note" maxlength="200" placeholder="e.g. new office, lots of visiting executives" onkeydown="if(event.key==='Enter')radarAddCompany()">
         <div class="btns" style="margin-top:10px;"><button class="btn btn-gold" onclick="radarAddCompany()">Add to Watchlist</button></div>
       </div>
@@ -4830,15 +4830,15 @@ function verifyIdentity(){
 // ===== PERIMETER RADAR =====
 var RADAR_STATUSES=[['new','New'],['researching','Researching'],['gatekeeper_found','Gatekeeper found'],['contacted','Contacted'],['meeting','Meeting set'],['won','Client'],['dead','Not pursuing']];
 // Public-news snapshot (Oct 2026). Unverified leads: confirm before outreach. No people or emails included.
-var RADAR_AREAS=[['all','All areas'],['perimeter','Perimeter'],['alpharetta','Alpharetta / North Fulton'],['cobb','Cobb'],['gwinnett','Gwinnett']];
-var RADAR_AREA_CITY={perimeter:'Sandy Springs',alpharetta:'Alpharetta',cobb:'Cobb County',gwinnett:'Gwinnett County'};
+var RADAR_AREAS=[['all','All areas'],['perimeter','Perimeter'],['concourse','Concourse (Sandy Springs)'],['alpharetta','Alpharetta / North Fulton'],['cobb','Cobb'],['gwinnett','Gwinnett']];
+var RADAR_AREA_CITY={perimeter:'Sandy Springs',concourse:'Sandy Springs',alpharetta:'Alpharetta',cobb:'Cobb County',gwinnett:'Gwinnett County'};
 function radarCleanArea(a){return RADAR_AREA_CITY[a]?a:'perimeter';}
 function radarAreaLabel(a){var f=RADAR_AREAS.filter(function(x){return x[0]===a;})[0];return f?f[1]:'Perimeter';}
 var radarArea='all';
 var RADAR_WATCHLIST=[
   {id:'asbury',name:'Asbury Automotive Group',tier:'A',signal:'Fortune 500; HQ moving Duluth to Sandy Springs, reported ~350 employees',city:'Sandy Springs'},
   {id:'aig',name:'AIG',tier:'A',signal:'Reported 179k sq ft at Perimeter Summit; moved in early spring 2026',city:'Dunwoody'},
-  {id:'newell',name:'Newell Brands',tier:'A',signal:'Reported 180k sq ft in the Queen building',city:'Sandy Springs'},
+  {id:'newell',name:'Newell Brands',tier:'A',area:'concourse',signal:'Reported 180k sq ft in the Queen building',city:'Sandy Springs'},
   {id:'inspire',name:'Inspire Brands',tier:'A',signal:'Sandy Springs presence',city:'Sandy Springs'},
   {id:'trinet',name:'TriNet',tier:'B',signal:'Recent move reported',city:'Dunwoody'},
   {id:'stubhub',name:'StubHub',tier:'B',signal:'Recent move reported',city:'Sandy Springs'},
@@ -4919,7 +4919,7 @@ function radarRemoveCompany(id){
   radarSave();renderRadar();
 }
 function radarSetArea(a){if(!RADAR_AREAS.some(function(x){return x[0]===a;})){return;}radarArea=a;renderRadar();}
-function radarInArea(item){return radarArea==='all'||(item.area||'perimeter')===radarArea;}
+function radarInArea(item){var a=item.area||'perimeter';return radarArea==='all'||a===radarArea||(radarArea==='perimeter'&&a==='concourse');}
 function radarSave(){
   if(radarState.seen.length>500){radarState.seen=radarState.seen.slice(-500);}
   saveJSON('ob-radar',radarState);
@@ -4979,7 +4979,7 @@ function renderRadarScan(){
   if(!radarLastItems.length){list.innerHTML='';return;}
   var h='';
   radarLastItems.forEach(function(it,i){
-    if(radarArea!=='all'&&!(Array.isArray(it.areas)&&it.areas.indexOf(radarArea)!==-1)){return;}
+    if(radarArea!=='all'&&!(Array.isArray(it.areas)&&(it.areas.indexOf(radarArea)!==-1||(radarArea==='perimeter'&&it.areas.indexOf('concourse')!==-1)))){return;}
     var isNew=radarState.seen.indexOf(it.id)===-1;
     var d=it.publishedAt?atlDateStr(new Date(it.publishedAt)):'date unknown';
     h+='<div style="padding:10px 0;border-bottom:1px solid var(--border);">'+
@@ -5629,13 +5629,13 @@ var LK_SIZES=[['','Not sure'],['smb','About 50-200 employees'],['mid','About 200
 var LK_APOLLO_SIZE={smb:'51-200',mid:'201-1000',large:'1001+'};
 var LK_BOOKS=[['','Not sure'],['assistant','Executive assistant'],['office','Office manager'],['travel','Travel coordinator'],['exec','The executive books it'],['other','Other']];
 var LK_TITLES={assistant:'executive assistant',office:'office manager',travel:'travel coordinator'};
-var LK_CITY={perimeter:'Perimeter Center Atlanta',alpharetta:'Alpharetta GA',cobb:'Cobb County GA',gwinnett:'Gwinnett County GA'};
+var LK_CITY={perimeter:'Perimeter Center Atlanta',concourse:'Concourse Sandy Springs GA',alpharetta:'Alpharetta GA',cobb:'Cobb County GA',gwinnett:'Gwinnett County GA'};
 var LK_CLIENT_STAGES=['active','recurring','corporate'];
 var lkConfirm='';
 
 var LK_SRC_SG='https://www.selectgeorgia.com/discover-georgia/industries/fortune-500-list';
 var LK_CANDS=[
-  {id:'k-usi',group:'Insurance brokerage',name:'USI Insurance Services',area:'perimeter',claim:'Reported moving its Atlanta financial-district office to The Collective at Concourse in Sandy Springs.',src:'https://www.costar.com/article/1050011444/global-insurance-brokerage-to-move-atlanta-offices-to-suburbs',label:'CoStar',date:'2020-06-26'},
+  {id:'k-usi',group:'Insurance brokerage',name:'USI Insurance Services',area:'concourse',claim:'Reported moving its Atlanta financial-district office to The Collective at Concourse in Sandy Springs.',src:'https://www.costar.com/article/1050011444/global-insurance-brokerage-to-move-atlanta-offices-to-suburbs',label:'CoStar',date:'2020-06-26'},
   {id:'k-hylant',group:'Insurance brokerage',name:'Hylant',area:'perimeter',claim:'Announced a new Atlanta office at 1050 Crown Pointe Parkway, Suite 730, Dunwoody.',src:'https://hylant.com/insights/blog/hylant-opens-new-office-in-atlanta',label:'Hylant press release',date:'2019-07-01'},
   {id:'k-onedigital',group:'Insurance brokerage',name:'OneDigital',area:'cobb',claim:'Lists its headquarters as 300 Galleria Pkwy SE, Suite 1100, Atlanta. Ranked 27 of 40 on the Atlanta Business Chronicle 2024 Largest Private Companies list.',src:'https://www.onedigital.com/blog/onedigital-named-to-atlanta-business-chronicles-2024-largest-private-companies-list',label:'OneDigital',date:'2024-01-01'},
   {id:'k-ssp',group:'Insurance brokerage',name:'Sterling Seacrest Pritchard',area:'',claim:'Ranked #6 of Atlanta\'s 10 largest property and casualty brokers by the Atlanta Business Chronicle (2021 premium volume). Office location not stated.',src:'https://sspins.com/sterling-seacrest-pritchard-recognized-as-one-of-atlantas-10-largest-property-and-casualty-insurance-brokers-and-agents/',label:'Company post',date:'2022-07-19'},
@@ -5776,7 +5776,7 @@ function renderLookalike(){
       '<div id="lk-from-'+i+'" style="font-size:var(--fs-xs);color:var(--muted);margin-bottom:8px;overflow-wrap:anywhere;">'+escapeHTML(from)+'</div>'+links+
       '<div style="font-size:var(--fs-xs);margin-top:8px;overflow-wrap:anywhere;"><strong>Apollo filters to copy:</strong> '+escapeHTML(apollo)+'</div>'+
       '<div class="g2" style="margin-top:10px;"><div><label for="lk-co-'+i+'">Company you found</label><input type="text" id="lk-co-'+i+'" maxlength="100"></div>'+
-      '<div><label for="lk-ar-'+i+'">Area</label><select id="lk-ar-'+i+'"><option value="perimeter">Perimeter</option><option value="alpharetta">Alpharetta / North Fulton</option><option value="cobb">Cobb</option><option value="gwinnett">Gwinnett</option></select></div></div>'+
+      '<div><label for="lk-ar-'+i+'">Area</label><select id="lk-ar-'+i+'"><option value="perimeter">Perimeter</option><option value="concourse">Concourse (Sandy Springs)</option><option value="alpharetta">Alpharetta / North Fulton</option><option value="cobb">Cobb</option><option value="gwinnett">Gwinnett</option></select></div></div>'+
       '<div class="btns" style="margin-top:8px;"><button class="btn btn-gold" onclick="lkAddToRadar('+i+')">Add to Radar watchlist</button></div></div>';
   }).join('');
 }

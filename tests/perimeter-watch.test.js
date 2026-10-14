@@ -15,15 +15,17 @@ const xml = `<rss><channel>
 <item><title>Both Co relocates headquarters between Dunwoody and Alpharetta</title><link>https://example.com/both</link><pubDate>Tue, 06 Oct 2026 13:00:00 GMT</pubDate></item>
 <item><title>Cobbco opens new headquarters in Cumberland</title><link>https://example.com/cobb</link><pubDate>Wed, 07 Oct 2026 12:00:00 GMT</pubDate></item>
 <item><title>Gwinco expands office lease in Peachtree Corners</title><link>https://example.com/gw</link><pubDate>Wed, 07 Oct 2026 13:00:00 GMT</pubDate></item>
+<item><title>Zeta signs lease at Concourse Office Park</title><link>https://example.com/zeta</link><pubDate>Wed, 07 Oct 2026 14:00:00 GMT</pubDate></item>
 <item><title>Houston company moves HQ</title><link>https://example.com/h</link></item>
 </channel></rss>`;
 
 const raw = parseRSS(xml);
-t('parses 10 items', raw.length === 10);
+t('parses 11 items', raw.length === 11);
 t('CDATA decoded', raw[0].title === 'Acme to relocate headquarters to Sandy Springs');
 t('description tags stripped', raw[0].desc === '350 jobs');
 const out = normaliseItems(raw);
-t('keeps only area+move matches, dedupes, drops unsafe URL (6 left)', out.length === 6);
+t('keeps only area+move matches, dedupes, drops unsafe URL (7 left)', out.length === 7);
+t('Concourse item tagged concourse and perimeter', JSON.stringify(out.find(i => i.title.startsWith('Zeta')).areas) === '["perimeter","concourse"]');
 t('Cobb item tagged cobb', JSON.stringify(out.find(i => i.title.startsWith('Cobbco')).areas) === '["cobb"]');
 t('Gwinnett item tagged gwinnett', JSON.stringify(out.find(i => i.title.startsWith('Gwinco')).areas) === '["gwinnett"]');
 t('Alpharetta item tagged alpharetta only', JSON.stringify(out.find(i => i.title.startsWith('Delta')).areas) === '["alpharetta"]');
@@ -67,7 +69,7 @@ t('safeUrl rejects non-http', safeUrl('data:text/html,x') === '' && safeUrl('htt
   global.fetch = async () => ({ ok: true, text: async () => xml });
   r = await mod.handler({ httpMethod: 'GET', headers: { origin: 'https://odysseyblack2026.netlify.app', 'x-nf-client-connection-ip': '2.2.2.2' } });
   const b = JSON.parse(r.body);
-  t('success path returns normalised unverified items', r.statusCode === 200 && b.items.length === 6 && b.queriesFailed === 0);
+  t('success path returns normalised unverified items', r.statusCode === 200 && b.items.length === 7 && b.queriesFailed === 0);
   for (let i = 0; i < 12; i++) r = await mod.handler({ httpMethod: 'GET', headers: { origin: 'https://odysseyblack2026.netlify.app', 'x-nf-client-connection-ip': '3.3.3.3' } });
   t('rate limit trips -> 429', r.statusCode === 429);
   console.log(fails ? fails + ' failure(s)' : 'All perimeter-watch tests passed.');
