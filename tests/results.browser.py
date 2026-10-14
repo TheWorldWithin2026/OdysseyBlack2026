@@ -7,13 +7,13 @@ def t(n,c):
     print(('PASS: ' if c else 'FAIL: ')+n)
     if not c: fails+=1
 SMALL=[
- {"id":1,"name":"A","company":"X","source":"linkedin","stage":"contacted","responseStatus":"positive","lastContact":"2026-10-01","ea":{"active":True,"name":"Ann"}},
- {"id":2,"name":"B","company":"X","source":"linkedin","stage":"contacted","responseStatus":"negative","lastContact":"2026-10-01"},
- {"id":3,"name":"C","company":"X","source":"linkedin","stage":"identified","responseStatus":"none"},
- {"id":4,"name":"D","company":"X","source":"referral","stage":"active","monthlyValue":3000,"responseStatus":"positive","lastContact":"2026-10-02"},
- {"id":5,"name":"E","company":"X","source":"hotel","stage":"trial-done","responseStatus":"pending"},
+ {"id":1,"travel":"heavy","name":"A","company":"X","source":"linkedin","stage":"contacted","responseStatus":"positive","lastContact":"2026-10-01","ea":{"active":True,"name":"Ann"}},
+ {"id":2,"travel":"heavy","name":"B","company":"X","source":"linkedin","stage":"contacted","responseStatus":"negative","lastContact":"2026-10-01"},
+ {"id":3,"travel":"moderate","name":"C","company":"X","source":"linkedin","stage":"identified","responseStatus":"none"},
+ {"id":4,"travel":"heavy","name":"D","company":"X","source":"referral","stage":"active","monthlyValue":3000,"responseStatus":"positive","lastContact":"2026-10-02"},
+ {"id":5,"travel":"light","name":"E","company":"X","source":"hotel","stage":"trial-done","responseStatus":"pending"},
  {"id":6,"name":"F","company":"X","source":"hotel","stage":"identified","responseStatus":"none"},
- {"id":7,"name":"G","company":"X","source":"xyz","stage":"contacted","responseStatus":"none","lastContact":"2026-10-03"}]
+ {"id":7,"travel":"xyz","name":"G","company":"X","source":"xyz","stage":"contacted","responseStatus":"none","lastContact":"2026-10-03"}]
 def mk(n,src,replied,start):
     return [{"id":start+i,"name":src+str(i),"company":"Y","source":src,"stage":"contacted","lastContact":"2026-10-01","responseStatus":"positive" if i<replied else "none"} for i in range(n)]
 BIG=mk(10,"cold",5,100)+mk(10,"linkedin",2,200)
@@ -32,6 +32,10 @@ with sync_playwright() as p:
         t(f'[{w}] unknown source grouped as Not recorded',row('Not recorded')[1]=='1')
         al=row('All prospects'); t(f'[{w}] total prospects counted (7)',al[1]=='7')
         t(f'[{w}] small samples flagged, no winner declared','too few to judge' in pg.inner_text('#results-body') and 'Not enough data' in pg.inner_text('#results-body'))
+        hv=row('Heavy'); t(f'[{w}] travel: Heavy 3 added, 3 contacted, 3 replied, 100%',hv[1:5]==['3','3','3','100%'])
+        t(f'[{w}] travel: Moderate 1 added, 0 contacted',row('Moderate')[1:3]==['1','0'])
+        t(f'[{w}] travel: Light 1 added',row('Light (occasional)')[1]=='1')
+        t(f'[{w}] travel: invalid/missing grouped as Not recorded (2)',pg.locator('#results-body tr',has_text='Not recorded').nth(1).locator('td').nth(1).text_content().strip()=='2')
         ea=row('Through an assistant'); dr=row('Direct to executive'); t(f'[{w}] assistant vs direct split',ea[1]=='1' and dr[1]=='6')
         t(f'[{w}] no horizontal PAGE scroll (table scrolls inside card)',not pg.evaluate('document.documentElement.scrollWidth>window.innerWidth+1'))
         pg.evaluate("localStorage.setItem('ob-pipeline',JSON.stringify(%s))"%json.dumps(BIG)); pg.reload(); pg.click('.tab[onclick*="results"]')
