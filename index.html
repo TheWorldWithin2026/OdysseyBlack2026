@@ -4827,7 +4827,7 @@ function renderRadarScan(){
     var d=it.publishedAt?atlDateStr(new Date(it.publishedAt)):'date unknown';
     h+='<div style="padding:10px 0;border-bottom:1px solid var(--border);">'+
       (isNew?'<span class="mini-badge mb-green">NEW</span> ':'')+
-      '<a href="'+escapeHTML(it.url)+'" target="_blank" rel="noopener noreferrer" style="font-weight:600;font-size:var(--fs-sm);">'+escapeHTML(it.title)+'</a>'+
+      '<a href="'+escapeHTML(it.url)+'" target="_blank" rel="noopener noreferrer" style="color:var(--gold);text-decoration:underline;font-weight:600;font-size:var(--fs-sm);">'+escapeHTML(it.title)+'</a>'+
       '<div style="font-size:var(--fs-xs);color:var(--muted);">'+escapeHTML(it.source||'source unknown')+' &middot; '+escapeHTML(d)+' &middot; unverified lead &mdash; confirm before outreach</div>'+
       '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;"><input type="text" id="radar-co-'+i+'" maxlength="100" placeholder="Company named in this headline" aria-label="Company named in this headline" style="flex:1;min-width:180px;" onkeydown="if(event.key===\'Enter\')radarHeadlineToGatekeeper('+i+')"><button class="btn btn-outline" style="padding:6px 14px;font-size:var(--fs-xs);" onclick="radarHeadlineToGatekeeper('+i+')">Find Gatekeepers &rarr;</button></div></div>';
   });
