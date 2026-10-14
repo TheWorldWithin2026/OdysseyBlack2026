@@ -1639,7 +1639,7 @@ textarea{resize:vertical;min-height:75px;}
     </div>
     <div class="card"><div class="sep-title"><span class="mini-badge mb-blue">Your company</span></div><div id="vp-co"></div></div>
     <div class="card"><div class="sep-title"><span class="mini-badge mb-blue">Insurance</span></div>
-      <div style="font-size:var(--fs-xs);color:var(--muted);margin-bottom:8px;">Enter only what your certificate of insurance for Odyssey Black VIP LLC actually says. Check that the named insured on the certificate matches the company you are sending this under.</div><div id="vp-ins"></div></div>
+      <div style="font-size:var(--fs-xs);color:var(--muted);margin-bottom:8px;">Enter only what your certificate of insurance for Odyssey Black, LLC actually says. Check that the named insured on the certificate matches the company you are sending this under.</div><div id="vp-ins"></div></div>
     <div class="card"><div class="sep-title"><span class="mini-badge mb-blue">Driver &amp; vehicle standards</span></div>
       <div style="font-size:var(--fs-xs);color:var(--muted);margin-bottom:8px;">Only list screening you really do. Leave a box empty if you are unsure.</div><div id="vp-vet"></div></div>
     <div class="card"><div class="sep-title"><span class="mini-badge mb-blue">Terms</span></div><div id="vp-terms"></div></div>
@@ -5355,7 +5355,7 @@ function renderResults(){
 // ===== Vendor Packet & Proposal =====
 var VP_DEFAULT={
   prop:{forco:'',attn:'',valid:'30'},
-  co:{legal:'Odyssey Black VIP LLC',signer:'Kerry A. Pope, Founder & CEO',phone:'678-481-1421',email:'concierge@odysseyblack.com',web:'odysseyblack.com',address:''},
+  co:{legal:'Odyssey Black, LLC',signer:'Kerry A. Pope, Founder & CEO',phone:'678-481-1421',email:'concierge@odysseyblack.com',web:'odysseyblack.com',address:''},
   ins:{carrier:'',policy:'',auto:'',gl:'',umbrella:'',expires:'',addl:''},
   vet:{mvr:'Owner-operator 7-year motor vehicle record (as of 16 Sep 2026): no citations, no license withdrawals, 0 points.',bg:'',drug:'',training:'Chauffeurs are trained in hospitality and discretion.',fleet:'Luxury black leather interior, heated seats, on-board Wi-Fi, phone chargers, complimentary water and newspaper.'},
   terms:{cancel:'',gratuity:'',fuel:'',billing:'',payment:''}
@@ -5382,6 +5382,7 @@ function vpClean(raw){
   Object.keys(VP_DEFAULT).forEach(function(g){
     if(raw[g]&&typeof raw[g]==='object'&&!Array.isArray(raw[g])){Object.keys(VP_DEFAULT[g]).forEach(function(k){if(typeof raw[g][k]==='string'){st[g][k]=raw[g][k].slice(0,500);}});}
   });
+  if(st.co.legal==='Odyssey Black VIP LLC'){st.co.legal='Odyssey Black, LLC';}
   st.prop.valid=String(st.prop.valid).replace(/\D/g,'').slice(0,3);
   if(Array.isArray(raw.rates)){raw.rates.forEach(function(r){
     if(!r||typeof r!=='object'){return;}
@@ -5446,7 +5447,7 @@ function vpBuild(mode){
   var rows=on.map(function(r){
     return '<tr><td><strong>'+escapeHTML(r.label)+'</strong>'+(r.note?'<br><span style="font-size:12px;color:#444;">'+escapeHTML(r.note)+'</span>':'')+'</td><td>'+(r.rate?'$'+escapeHTML(r.rate)+' / hour':b(''))+'</td><td>'+(r.min?escapeHTML(r.min)+'-hour minimum':b(''))+'</td></tr>';}).join('');
   if(!on.length){rows='<tr><td colspan="3">No vehicles selected.</td></tr>';}
-  var h='<div class="vp-paper"><h1>'+escapeHTML(co.legal||'Odyssey Black VIP LLC')+'</h1><p><em>Executive ground transportation, Atlanta, Georgia</em></p>'+
+  var h='<div class="vp-paper"><h1>'+escapeHTML(co.legal||'Odyssey Black, LLC')+'</h1><p><em>Executive ground transportation, Atlanta, Georgia</em></p>'+
    '<p>Prepared for: '+b(pr.forco)+(pr.attn?' &mdash; Attn: '+escapeHTML(pr.attn):'')+'<br>Date: '+escapeHTML(atlDateStr())+(pr.valid?' &middot; Rates valid for '+escapeHTML(pr.valid)+' days':'')+'</p>'+
    '<h2>Services</h2><p>Chauffeured airport transfers, hourly executive transportation, and group and event transportation for corporate travelers and visiting executives.</p>'+
    '<h2>Rates</h2><table><tr><th>Vehicle</th><th>Rate</th><th>Minimum</th></tr>'+rows+'</table>'+
@@ -5457,7 +5458,7 @@ function vpBuild(mode){
     '<p style="font-size:12px;">A certificate of insurance is available on request.</p>'+
     '<h2>Driver and vehicle standards</h2><table>'+['mvr','bg','drug','training','fleet'].map(function(k){return '<tr><td style="width:30%">'+escapeHTML(VP_FIELDS.vet[k])+'</td><td>'+b(S.vet[k])+'</td></tr>';}).join('')+'</table>'+
     '<h2>Terms</h2><table>'+['cancel','gratuity','fuel','billing','payment'].map(function(k){return '<tr><td style="width:30%">'+escapeHTML(VP_FIELDS.terms[k])+'</td><td>'+b(S.terms[k])+'</td></tr>';}).join('')+'</table>'+
-    '<h2>Acceptance</h2><p>Authorized for '+escapeHTML(pr.forco||'the client')+': Name ____________________ Signature ____________________ Date ____________</p><p>Authorized for '+escapeHTML(co.legal||'Odyssey Black VIP LLC')+': '+b(co.signer)+'</p>';
+    '<h2>Acceptance</h2><p>Authorized for '+escapeHTML(pr.forco||'the client')+': Name ____________________ Signature ____________________ Date ____________</p><p>Authorized for '+escapeHTML(co.legal||'Odyssey Black, LLC')+': '+b(co.signer)+'</p>';
   }
   h+='<h2>Contact</h2><p>'+b(co.signer)+'<br>'+b(co.phone)+' &middot; '+b(co.email)+'<br>'+b(co.web)+' &middot; '+b(co.address)+'</p></div>';
   return {html:h,blanks:blanks};
