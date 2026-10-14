@@ -599,7 +599,7 @@ textarea{resize:vertical;min-height:75px;}
     <button class="tab" onclick="switchTab('calendar',this)">90-Day Plan</button>
     <button class="tab" onclick="switchTab('strategy',this)">&#9733; War Room</button>
     <button class="tab" onclick="switchTab('markets',this)">&#9775; Market Expansion</button>
-    <button class="tab" onclick="switchTab('radar',this)">&#128225; Perimeter Radar</button>
+    <button class="tab" onclick="switchTab('radar',this)">&#128225; Market Radar</button>
     <button class="tab" onclick="switchTab('gatekeeper',this)">&#128273; Gatekeeper Finder</button>
   </div>
 
@@ -686,7 +686,7 @@ textarea{resize:vertical;min-height:75px;}
           <select id="p-source">
             <option value="linkedin">LinkedIn</option><option value="referral">Referral</option>
             <option value="event">Event / Conference</option><option value="cold">Cold outreach</option>
-            <option value="perimeter">Perimeter Radar (new arrival)</option><option value="hotel">Hotel concierge</option>
+            <option value="perimeter">Market Radar (new arrival)</option><option value="hotel">Hotel concierge</option>
           </select>
         </div>
       </div>
@@ -1623,13 +1623,14 @@ textarea{resize:vertical;min-height:75px;}
   </div>
 
   <div class="panel" id="panel-radar">
-    <div class="sec-tag">Perimeter Center &middot; Dunwoody &middot; Sandy Springs &middot; Brookhaven</div>
-    <div class="sec-h">Perimeter Radar</div>
+    <div class="sec-tag">Perimeter &middot; North Fulton &middot; Cobb &middot; Gwinnett</div>
+    <div class="sec-h">Market Radar</div>
+    <div class="btns" id="radar-area-chips" style="margin-bottom:14px;flex-wrap:wrap;"></div>
     <div class="sec-d">Watch for companies moving into the area, work a sourced watchlist, and run a 30-day sprint. Everything here is a <strong>lead, not a verified fact</strong> &mdash; confirm the company and the move before any outreach.</div>
 
     <div class="card">
       <div class="sep-title"><span class="mini-badge mb-gold">Live Move Scan</span></div>
-      <div class="sec-d" style="margin-bottom:14px;">Scans public news headlines for relocations, new headquarters and office leases in the Perimeter submarket. It is a headline monitor, not a directory &mdash; it can miss moves that were never reported.</div>
+      <div class="sec-d" style="margin-bottom:14px;">Scans public news headlines for relocations, new headquarters and office leases across Perimeter, Alpharetta / North Fulton, Cobb and Gwinnett. It is a headline monitor, not a directory &mdash; it can miss moves that were never reported.</div>
       <div class="btns"><button class="btn btn-gold" onclick="radarScan()">Scan Now</button><button class="btn btn-outline" onclick="radarMarkAllSeen()">Mark All Seen</button></div>
       <div id="radar-scan-status" style="font-size:var(--fs-xs);color:var(--muted);margin-top:10px;"></div>
       <div id="radar-scan-list" style="margin-top:12px;"></div>
@@ -1639,16 +1640,23 @@ textarea{resize:vertical;min-height:75px;}
       <div class="sep-title"><span class="mini-badge mb-blue">Watchlist &mdash; Public-News Snapshot</span></div>
       <div class="sec-d" style="margin-bottom:14px;">Compiled from public news and broker announcements as of October 2026. No individual contacts are included &mdash; use Gatekeeper Finder to find the right people. Verify each item before outreach.</div>
       <div id="radar-watchlist"></div>
+      <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border);">
+        <div style="font-size:var(--fs-sm);font-weight:600;margin-bottom:8px;">Add a company you are targeting</div>
+        <div class="g2"><div><label for="rc-name">Company name</label><input type="text" id="rc-name" maxlength="100" placeholder="e.g. a company you know is expanding"></div>
+        <div><label for="rc-area">Area</label><select id="rc-area"><option value="perimeter">Perimeter / Sandy Springs / Dunwoody</option><option value="alpharetta">Alpharetta / North Fulton</option><option value="cobb">Cobb (Cumberland, Marietta, Kennesaw)</option><option value="gwinnett">Gwinnett (Peachtree Corners, Norcross, Duluth)</option></select></div></div>
+        <label for="rc-note">Why it is a target (optional)</label><input type="text" id="rc-note" maxlength="200" placeholder="e.g. new office, lots of visiting executives" onkeydown="if(event.key==='Enter')radarAddCompany()">
+        <div class="btns" style="margin-top:10px;"><button class="btn btn-gold" onclick="radarAddCompany()">Add to Watchlist</button></div>
+      </div>
     </div>
 
     <div class="card">
       <div class="sep-title"><span class="mini-badge mb-green">Hotel Concierge Referral Channel</span></div>
-      <div class="sec-d" style="margin-bottom:14px;">Perimeter hotels host visiting executives and corporate groups. Ask each front desk or concierge who handles ground-transportation referrals, then log the visit.</div>
+      <div class="sec-d" style="margin-bottom:14px;">Perimeter and Alpharetta hotels host visiting executives and corporate groups. Ask each front desk or concierge who handles ground-transportation referrals, then log the visit.</div>
       <div id="radar-hotels"></div>
     </div>
 
     <div class="card">
-      <div class="sep-title"><span class="mini-badge mb-gold">30-Day Perimeter Sprint</span></div>
+      <div class="sep-title"><span class="mini-badge mb-gold">30-Day Sprint</span></div>
       <div id="radar-sprint-head" style="font-size:var(--fs-sm);margin-bottom:12px;"></div>
       <div id="radar-sprint"></div>
       <div class="btns" style="margin-top:12px;"><button class="btn btn-outline" onclick="radarSprintReset()">Restart Sprint</button></div>
@@ -4737,6 +4745,11 @@ function verifyIdentity(){
 // ===== PERIMETER RADAR =====
 var RADAR_STATUSES=[['new','New'],['researching','Researching'],['gatekeeper_found','Gatekeeper found'],['contacted','Contacted'],['meeting','Meeting set'],['won','Client'],['dead','Not pursuing']];
 // Public-news snapshot (Oct 2026). Unverified leads: confirm before outreach. No people or emails included.
+var RADAR_AREAS=[['all','All areas'],['perimeter','Perimeter'],['alpharetta','Alpharetta / North Fulton'],['cobb','Cobb'],['gwinnett','Gwinnett']];
+var RADAR_AREA_CITY={perimeter:'Sandy Springs',alpharetta:'Alpharetta',cobb:'Cobb County',gwinnett:'Gwinnett County'};
+function radarCleanArea(a){return RADAR_AREA_CITY[a]?a:'perimeter';}
+function radarAreaLabel(a){var f=RADAR_AREAS.filter(function(x){return x[0]===a;})[0];return f?f[1]:'Perimeter';}
+var radarArea='all';
 var RADAR_WATCHLIST=[
   {id:'asbury',name:'Asbury Automotive Group',tier:'A',signal:'Fortune 500; HQ moving Duluth to Sandy Springs, reported ~350 employees',city:'Sandy Springs'},
   {id:'aig',name:'AIG',tier:'A',signal:'Reported 179k sq ft at Perimeter Summit; moved in early spring 2026',city:'Dunwoody'},
@@ -4753,9 +4766,18 @@ var RADAR_WATCHLIST=[
   {id:'cox',name:'Cox',tier:'C',signal:'Established Perimeter presence',city:'Sandy Springs'},
   {id:'mbusa',name:'Mercedes-Benz USA',tier:'C',signal:'Established Sandy Springs HQ',city:'Sandy Springs'},
   {id:'ihg',name:'IHG',tier:'C',signal:'Established Dunwoody HQ',city:'Dunwoody'},
-  {id:'insightglobal',name:'Insight Global',tier:'C',signal:'Established Perimeter presence',city:'Sandy Springs'}
+  {id:'insightglobal',name:'Insight Global',tier:'C',signal:'Established Perimeter presence',city:'Sandy Springs'},
+  {id:'barracuda',name:'Barracuda Networks',tier:'B',area:'alpharetta',signal:'Reported 22K sq ft new lease at Georgia 400 Center (Bisnow, June 2026)',city:'Alpharetta'},
+  {id:'smithbuilt',name:'SmithBuilt Construction Group',tier:'C',area:'alpharetta',signal:'Reported 11K sq ft new lease at Georgia 400 Center (Bisnow, June 2026)',city:'Alpharetta'},
+  {id:'mativ',name:'Mativ',tier:'C',area:'alpharetta',signal:'HQ announced at 100 Kimball Place, Alpharetta, 150+ employees (2022 announcement; may have changed)',city:'Alpharetta'}
 ];
 var RADAR_HOTELS=[
+  {id:'a-marriott',area:'alpharetta',name:'Atlanta Marriott Alpharetta',note:'Reported 10,000+ sq ft of event space (Discover Alpharetta)'},
+  {id:'a-avalon',area:'alpharetta',name:'Hotel at Avalon, Autograph Collection',note:'Lists an executive boardroom and private event space (Discover Alpharetta)'},
+  {id:'a-embassy',area:'alpharetta',name:'Embassy Suites by Hilton Atlanta Alpharetta',note:'Listed with meeting space (Discover Alpharetta)'},
+  {id:'a-doubletree',area:'alpharetta',name:'DoubleTree by Hilton Atlanta - Alpharetta',note:'Listed with meeting space (Discover Alpharetta)'},
+  {id:'a-courtyard',area:'alpharetta',name:'Courtyard Atlanta Alpharetta/Avalon Area',note:'Listed with meeting space (Discover Alpharetta)'},
+  {id:'a-even',area:'alpharetta',name:'EVEN Hotel Alpharetta - Avalon Area',note:'Listed with meeting space (Discover Alpharetta)'},
   {id:'h-marriott',name:'Atlanta Marriott Perimeter Center',note:'344 rooms'},
   {id:'h-crowne',name:'Crowne Plaza Atlanta Perimeter at Ravinia',note:'495 rooms'},
   {id:'h-meridien',name:'Le Meridien Atlanta Perimeter',note:''},
@@ -4785,10 +4807,34 @@ var RADAR_SPRINT=[
     {id:'w4c',t:'Review results: which channel produced replies? Double down on it'},
     {id:'w4d',t:'Export a backup and set the next 30-day target'}]}
 ];
-var radarState=loadJSON('ob-radar',{seen:[],watch:{},sprintStart:null,sprintDone:{},hotels:{}});
+var radarState=loadJSON('ob-radar',{seen:[],watch:{},sprintStart:null,sprintDone:{},hotels:{},custom:[]});
 if(!radarState||typeof radarState!=='object'||Array.isArray(radarState)){radarState={seen:[],watch:{},sprintStart:null,sprintDone:{},hotels:{}};}
 ['seen'].forEach(function(k){if(!Array.isArray(radarState[k])){radarState[k]=[];}});
 ['watch','sprintDone','hotels'].forEach(function(k){if(!radarState[k]||typeof radarState[k]!=='object'||Array.isArray(radarState[k])){radarState[k]={};}});
+// Custom watchlist entries come from the user (and possibly a restored backup): validate everything, never trust ids.
+radarState.custom=(Array.isArray(radarState.custom)?radarState.custom:[]).filter(function(c){return c&&typeof c.name==='string'&&c.name.trim();}).slice(0,100).map(function(c,i){
+  return {id:/^c-\d{6,}$/.test(String(c.id))?String(c.id):'c-'+(Date.now()+i),name:c.name.trim().slice(0,100),area:radarCleanArea(c.area),note:String(c.note||'').slice(0,200)};
+});
+function radarAllWatch(){
+  return RADAR_WATCHLIST.map(function(c){return c;}).concat(radarState.custom.map(function(c){
+    return {id:c.id,name:c.name,tier:'A',custom:true,area:c.area,signal:c.note||'Added by you',city:RADAR_AREA_CITY[c.area]};
+  }));
+}
+function radarAddCompany(){
+  var name=document.getElementById('rc-name').value.trim();
+  if(!name){notify('Enter a company name');return;}
+  if(radarState.custom.length>=100){notify('Watchlist is full (100 custom companies)');return;}
+  radarState.custom.push({id:'c-'+Date.now(),name:name.slice(0,100),area:radarCleanArea(document.getElementById('rc-area').value),note:document.getElementById('rc-note').value.trim().slice(0,200)});
+  document.getElementById('rc-name').value='';document.getElementById('rc-note').value='';
+  radarSave();renderRadar();notify(name+' added to watchlist');
+}
+function radarRemoveCompany(id){
+  if(!window.confirm('Remove this company from your watchlist?')){return;}
+  radarState.custom=radarState.custom.filter(function(c){return c.id!==id;});delete radarState.watch[id];
+  radarSave();renderRadar();
+}
+function radarSetArea(a){if(!RADAR_AREAS.some(function(x){return x[0]===a;})){return;}radarArea=a;renderRadar();}
+function radarInArea(item){return radarArea==='all'||(item.area||'perimeter')===radarArea;}
 function radarSave(){
   if(radarState.seen.length>500){radarState.seen=radarState.seen.slice(-500);}
   saveJSON('ob-radar',radarState);
@@ -4805,28 +4851,35 @@ function radarSetStatus(kind,id,val){
   radarSave();
 }
 function renderRadar(){
+  var chips='';
+  RADAR_AREAS.forEach(function(a){chips+='<button class="btn '+(radarArea===a[0]?'btn-gold':'btn-outline')+'" style="padding:6px 14px;font-size:var(--fs-xs);" onclick="radarSetArea(\''+a[0]+'\')">'+escapeHTML(a[1])+'</button>';});
+  document.getElementById('radar-area-chips').innerHTML=chips;
   var wl='';
-  RADAR_WATCHLIST.forEach(function(c,i){
+  radarAllWatch().forEach(function(c,i){
+    if(!radarInArea(c)){return;}
     wl+='<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:10px 0;border-bottom:1px solid var(--border);">'+
-      '<div style="flex:1;min-width:200px;"><div style="font-size:var(--fs-sm);font-weight:600;">'+escapeHTML(c.name)+' <span class="mini-badge mb-gold">Tier '+escapeHTML(c.tier)+'</span></div>'+
-      '<div style="font-size:var(--fs-xs);color:var(--muted);">'+escapeHTML(c.signal)+' &middot; unverified</div></div>'+
+      '<div style="flex:1;min-width:200px;"><div style="font-size:var(--fs-sm);font-weight:600;">'+escapeHTML(c.name)+' <span class="mini-badge mb-gold">'+(c.custom?'Yours':'Tier '+escapeHTML(c.tier))+'</span> <span class="mini-badge mb-blue">'+escapeHTML(radarAreaLabel(c.area||'perimeter'))+'</span></div>'+
+      '<div style="font-size:var(--fs-xs);color:var(--muted);">'+escapeHTML(c.signal)+(c.custom?'':' &middot; unverified')+'</div></div>'+
       radarStatusSelect('w',c.id,radarState.watch[c.id]||'new')+
-      '<button class="btn btn-outline" style="padding:6px 14px;font-size:var(--fs-xs);" onclick="radarFindGatekeepers('+i+')">Find Gatekeepers &rarr;</button></div>';
+      '<button class="btn btn-outline" style="padding:6px 14px;font-size:var(--fs-xs);" onclick="radarFindGatekeepers('+i+')">Find Gatekeepers &rarr;</button>'+(c.custom?'<button class="btn btn-ghost" style="padding:6px 10px;font-size:var(--fs-xs);" onclick="radarRemoveCompany(\''+c.id+'\')" aria-label="Remove">Remove</button>':'')+'</div>';
   });
+  if(!wl){wl='<div style="font-size:var(--fs-sm);color:var(--muted);">No researched companies for this area yet. Run a scan, or add companies you know are targets below.</div>';}
   document.getElementById('radar-watchlist').innerHTML=wl;
   var hh='';
   RADAR_HOTELS.forEach(function(x){
+    if(!radarInArea(x)){return;}
     hh+='<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:10px 0;border-bottom:1px solid var(--border);">'+
       '<div style="flex:1;min-width:200px;"><div style="font-size:var(--fs-sm);font-weight:600;">'+escapeHTML(x.name)+'</div>'+
       '<div style="font-size:var(--fs-xs);color:var(--muted);">'+escapeHTML(x.note)+'</div></div>'+
       radarStatusSelect('h',x.id,radarState.hotels[x.id]||'new')+'</div>';
   });
+  if(!hh){hh='<div style="font-size:var(--fs-sm);color:var(--muted);">No hotels listed for this area yet. Hotel lists so far cover Perimeter and Alpharetta.</div>';}
   document.getElementById('radar-hotels').innerHTML=hh;
   renderRadarSprint();
   renderRadarScan();
 }
 function radarFindGatekeepers(i){
-  var c=RADAR_WATCHLIST[i];if(!c){return;}
+  var c=radarAllWatch()[i];if(!c){return;}
   radarOpenGatekeeper(c.name,c.city);
 }
 function radarOpenGatekeeper(name,city){
@@ -4841,6 +4894,7 @@ function renderRadarScan(){
   if(!radarLastItems.length){list.innerHTML='';return;}
   var h='';
   radarLastItems.forEach(function(it,i){
+    if(radarArea!=='all'&&!(Array.isArray(it.areas)&&it.areas.indexOf(radarArea)!==-1)){return;}
     var isNew=radarState.seen.indexOf(it.id)===-1;
     var d=it.publishedAt?atlDateStr(new Date(it.publishedAt)):'date unknown';
     h+='<div style="padding:10px 0;border-bottom:1px solid var(--border);">'+
@@ -4857,7 +4911,7 @@ function radarHeadlineToGatekeeper(i){
   var name=box?box.value:'';
   if(!name||!name.trim()){notify('Type the company named in the headline first');if(box){box.focus();}return;}
   if(radarState.seen.indexOf(it.id)===-1){radarState.seen.push(it.id);radarSave();}
-  radarOpenGatekeeper(name.trim().slice(0,100),'Atlanta');
+  radarOpenGatekeeper(name.trim().slice(0,100),(Array.isArray(it.areas)&&it.areas.length===1&&RADAR_AREA_CITY[it.areas[0]]&&it.areas[0]!=='perimeter')?RADAR_AREA_CITY[it.areas[0]]:'Atlanta');
 }
 async function radarScan(){
   var st=document.getElementById('radar-scan-status');
@@ -4873,7 +4927,7 @@ async function radarScan(){
       return;
     }
     radarLastItems=Array.isArray(data.items)?data.items:[];
-    radarState.lastScanAt=new Date().toISOString();radarState.scanCache=radarLastItems.slice(0,20).map(function(it){return {id:String(it.id).slice(0,140),title:String(it.title).slice(0,300),url:String(it.url).slice(0,500),source:String(it.source||'').slice(0,100)};});radarSave();
+    radarState.lastScanAt=new Date().toISOString();radarState.scanCache=radarLastItems.slice(0,20).map(function(it){return {id:String(it.id).slice(0,140),title:String(it.title).slice(0,300),url:String(it.url).slice(0,500),source:String(it.source||'').slice(0,100),areas:(Array.isArray(it.areas)?it.areas:[]).slice(0,4)};});radarSave();
     var fresh=radarLastItems.filter(function(it){return radarState.seen.indexOf(it.id)===-1;}).length;
     st.textContent=radarLastItems.length+' headline(s), '+fresh+' new. '+(data.queriesFailed?data.queriesFailed+' of '+data.queriesRun+' sources failed, so results may be incomplete. ':'')+'Headlines only; verify before outreach.';
     renderRadarScan();
@@ -5056,7 +5110,7 @@ async function cloudResolve(key,choice){
     }else{renderCloud();}
   }catch(e){cloudSet('conflict','That did not save. Check your connection and try again.');}
 }
-function cloudKeyLabel(k){return {'ob-pipeline':'Pipeline','ob-gatekeepers':'Gatekeepers','ob-messages':'Messages','ob-cal-progress':'Calendar progress','ob-event-mode':'Event mode','ob-radar':'Perimeter Radar'}[k]||k;}
+function cloudKeyLabel(k){return {'ob-pipeline':'Pipeline','ob-gatekeepers':'Gatekeepers','ob-messages':'Messages','ob-cal-progress':'Calendar progress','ob-event-mode':'Event mode','ob-radar':'Market Radar'}[k]||k;}
 function renderCloud(){
   var chip=document.getElementById('cloud-chip');
   var labels={off:'Cloud: off',checking:'Cloud: checking',syncing:'Cloud: syncing',synced:'Cloud: saved',error:'Cloud: not synced',conflict:'Cloud: choose data',newer:'Cloud: newer data'};
@@ -5168,14 +5222,14 @@ function renderToday(){
   var cache=Array.isArray(radarState.scanCache)?radarState.scanCache:[];
   var fresh=cache.filter(function(it){return radarState.seen.indexOf(it.id)===-1;});
   if(ageDays===null||ageDays>=3){
-    total++;rh+=todayItem('med','Check for companies moving into Perimeter',ageDays===null?'No scan yet. A scan takes a few seconds.':'Last scan was '+ageDays+' days ago.',[todayBtn('Scan now','todayScan()',true)]);
+    total++;rh+=todayItem('med','Check for companies moving into your target areas',ageDays===null?'No scan yet. A scan takes a few seconds.':'Last scan was '+ageDays+' days ago.',[todayBtn('Scan now','todayScan()',true)]);
   }
   fresh.slice(0,3).forEach(function(it){
     total++;
     rh+=todayItem('high','<a href="'+escapeHTML(it.url)+'" target="_blank" rel="noopener noreferrer" style="color:var(--gold);text-decoration:underline;">'+escapeHTML(it.title)+'</a>',escapeHTML(it.source||'source unknown')+' &middot; unverified lead',[todayBtn('Open Radar','todayGoTab(\'radar\')',true)]);
   });
-  RADAR_WATCHLIST.forEach(function(c,i){c._i=i;});
-  var nextCo=RADAR_WATCHLIST.filter(function(c){return c.tier==='A'&&!radarState.watch[c.id];}).slice(0,2);
+  var allW=radarAllWatch();allW.forEach(function(c,i){c._i=i;});
+  var nextCo=allW.filter(function(c){return c.tier==='A'&&!radarState.watch[c.id];}).slice(0,2);
   nextCo.forEach(function(c){
     total++;
     rh+=todayItem('med','Research '+escapeHTML(c.name),escapeHTML(c.signal)+' &middot; unverified',[todayBtn('Find gatekeepers','radarFindGatekeepers('+c._i+')',true)]);
@@ -5195,7 +5249,7 @@ function renderToday(){
   body.innerHTML=
     todaySection('Pipeline','mb-gold',pipeHtml,'No pipeline follow-ups are due. Add prospects or set follow-up dates in Pipeline.')+
     todaySection('Gatekeepers','mb-blue',gkHtml,'No gatekeeper follow-ups are due.')+
-    todaySection('Perimeter Radar','mb-green',rh,'Nothing new from the Radar today.')+
+    todaySection('Market Radar','mb-green',rh,'Nothing new from the Radar today.')+
     todaySection('Sprint','mb-gold',sh,'All of this week\'s sprint tasks are done.');
   var sm=document.getElementById('today-summary');
   if(sm){sm.textContent=total?(total+' thing'+(total===1?'':'s')+' need'+(total===1?'s':'')+' you today. Start at the top.'):'You are all caught up. Add prospects, or run a Radar scan.';}
@@ -5205,7 +5259,7 @@ async function todayScan(){await radarScan();renderToday();}
 renderToday();
 
 // ===== RESULTS BY CHANNEL =====
-var RESULT_CHANNELS={'linkedin':'LinkedIn','referral':'Referral','event':'Event / Conference','cold':'Cold outreach','perimeter':'Perimeter Radar (new arrival)','hotel':'Hotel concierge'};
+var RESULT_CHANNELS={'linkedin':'LinkedIn','referral':'Referral','event':'Event / Conference','cold':'Cold outreach','perimeter':'Market Radar (new arrival)','hotel':'Hotel concierge'};
 var RESULT_TRIAL_STAGES=['trial-sched','trial-done','active','recurring','corporate'];
 var RESULT_CLIENT_STAGES=['active','recurring','corporate'];
 var RESULT_MIN_SAMPLE=10;

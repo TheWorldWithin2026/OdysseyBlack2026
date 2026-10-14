@@ -1,7 +1,7 @@
 // netlify/functions/perimeter-watch.js
 //
 // Headline monitor for companies relocating to / expanding in the Perimeter
-// Center submarket (Dunwoody, Sandy Springs, Brookhaven). Pulls public Google
+// Center submarket (Dunwoody, Sandy Springs, Brookhaven) Alpharetta/North Fulton, Cobb and Gwinnett (the suburban markets outside I-285). Pulls public Google
 // News RSS results for FIXED server-side queries (no client input reaches the
 // query string), filters by keyword, de-duplicates and returns a normalised
 // list.
@@ -25,10 +25,23 @@ const QUERIES = [
   'Dunwoody headquarters relocation lease',
   'Brookhaven Georgia headquarters relocating',
   '"Central Perimeter" office lease new headquarters',
-  '"Perimeter Summit" OR "North Terraces" OR "Concourse" office lease'
+  '"Perimeter Summit" OR "North Terraces" OR "Concourse" office lease',
+  'Alpharetta headquarters relocating',
+  'Alpharetta new office lease headquarters expansion',
+  'Alpharetta "North Point" OR Windward OR Avalon office headquarters',
+  'moving headquarters to Alpharetta Georgia',
+  'Johns Creek OR Roswell Georgia headquarters relocating office lease',
+  'Cumberland OR Galleria OR Marietta OR Kennesaw Georgia headquarters relocation office lease',
+  'Cobb County Georgia new corporate headquarters',
+  'Peachtree Corners OR Norcross OR Duluth Georgia headquarters relocating office lease',
+  'Gwinnett County Georgia new corporate headquarters'
 ];
 
-const AREA_TERMS = ['perimeter', 'dunwoody', 'sandy springs', 'brookhaven', 'north terraces', 'perimeter summit', 'ravinia', 'concourse'];
+const PERIMETER_TERMS = ['perimeter', 'dunwoody', 'sandy springs', 'brookhaven', 'north terraces', 'perimeter summit', 'ravinia', 'concourse'];
+const ALPHARETTA_TERMS = ['alpharetta', 'windward', 'north point', 'johns creek', 'roswell', 'north fulton'];
+const COBB_TERMS = ['cobb county', 'cumberland', 'galleria', 'vinings', 'marietta', 'kennesaw', 'smyrna'];
+const GWINNETT_TERMS = ['gwinnett', 'peachtree corners', 'norcross', 'duluth', 'lawrenceville', 'suwanee'];
+const AREA_TERMS = PERIMETER_TERMS.concat(ALPHARETTA_TERMS, COBB_TERMS, GWINNETT_TERMS);
 const MOVE_TERMS = ['headquarters', 'hq', 'relocat', 'moving', 'moves', 'lease', 'expand', 'new office', 'opens office', 'consolidat', 'sq. ft', 'square feet', 'square-foot'];
 
 // Browsers omit the Origin header on same-site GET requests, so "no Origin" must not mean "reject".
@@ -97,6 +110,11 @@ function normaliseItems(raw) {
   raw.forEach(function (it) {
     const hay = (it.title + ' ' + it.desc).toLowerCase();
     const area = AREA_TERMS.filter(function (t) { return hay.indexOf(t) !== -1; });
+    const areas = [];
+    if (PERIMETER_TERMS.some(function (t) { return hay.indexOf(t) !== -1; })) areas.push('perimeter');
+    if (ALPHARETTA_TERMS.some(function (t) { return hay.indexOf(t) !== -1; })) areas.push('alpharetta');
+    if (COBB_TERMS.some(function (t) { return hay.indexOf(t) !== -1; })) areas.push('cobb');
+    if (GWINNETT_TERMS.some(function (t) { return hay.indexOf(t) !== -1; })) areas.push('gwinnett');
     const move = MOVE_TERMS.filter(function (t) { return hay.indexOf(t) !== -1; });
     if (!area.length || !move.length) return;
     const url = safeUrl(it.link);
@@ -111,6 +129,7 @@ function normaliseItems(raw) {
       source: (it.source || '').slice(0, 100),
       url: url,
       publishedAt: isNaN(d.getTime()) ? null : d.toISOString(),
+      areas: areas,
       matchedKeywords: area.concat(move),
       status: 'unverified_lead'
     });
