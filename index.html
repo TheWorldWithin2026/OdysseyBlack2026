@@ -5280,8 +5280,8 @@ function resultRow(label,s){
   var small=s.contacted<RESULT_MIN_SAMPLE;
   return '<tr><td style="font-weight:600;">'+escapeHTML(label)+'</td><td>'+s.added+'</td><td>'+s.contacted+'</td><td>'+s.replied+'</td><td>'+resultPct(s.replied,s.contacted)+'</td><td>'+s.trial+'</td><td>'+s.clients+'</td><td>$'+s.mrr.toLocaleString()+'</td><td style="color:var(--muted);font-size:var(--fs-xs);">'+(small?'too few to judge':'')+'</td></tr>';
 }
-function resultTable(rowsHtml){
-  return '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:var(--fs-sm);min-width:560px;"><thead><tr style="text-align:left;color:var(--muted);font-size:var(--fs-xs);"><th>Channel</th><th>Added</th><th>Contacted</th><th>Replied</th><th>Reply rate</th><th>Trial+</th><th>Clients</th><th>MRR</th><th></th></tr></thead><tbody>'+rowsHtml+'</tbody></table></div>';
+function resultTable(rowsHtml,first){
+  return '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:var(--fs-sm);min-width:560px;"><thead><tr style="text-align:left;color:var(--muted);font-size:var(--fs-xs);"><th>'+escapeHTML(first||'Channel')+'</th><th>Added</th><th>Contacted</th><th>Replied</th><th>Reply rate</th><th>Trial+</th><th>Clients</th><th>MRR</th><th></th></tr></thead><tbody>'+rowsHtml+'</tbody></table></div>';
 }
 function renderResults(){
   var el=document.getElementById('results-body');if(!el){return;}
@@ -5305,10 +5305,14 @@ function renderResults(){
   var viaEA=pipeline.filter(function(p){return p.ea&&p.ea.active&&p.ea.name;});
   var direct=pipeline.filter(function(p){return !(p.ea&&p.ea.active&&p.ea.name);});
   var route=resultRow('Through an assistant',resultStats(viaEA))+resultRow('Direct to executive',resultStats(direct));
+  var TRAVEL_LABELS=[['heavy','Heavy (weekly flights)'],['moderate','Moderate (2-3x per month)'],['light','Light (occasional)'],['unknown','Not recorded']];
+  var tg={};pipeline.forEach(function(p){var k=['heavy','moderate','light'].indexOf(p.travel)!==-1?p.travel:'unknown';(tg[k]=tg[k]||[]).push(p);});
+  var trows='';TRAVEL_LABELS.forEach(function(t){if(tg[t[0]]){trows+=resultRow(t[1],resultStats(tg[t[0]]));}});
   var funnel=[['Added',all.added],['Contacted',all.contacted],['Replied',all.replied],['Trial ride or beyond',all.trial],['Clients',all.clients]].map(function(f){return '<div style="flex:1;min-width:110px;text-align:center;"><div style="font-size:var(--fs-xl,24px);color:var(--gold);">'+f[1]+'</div><div style="font-size:var(--fs-xs);color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">'+f[0]+'</div></div>';}).join('');
   el.innerHTML=
     '<div class="card"><div class="sep-title"><span class="mini-badge mb-gold">Funnel</span></div><div style="display:flex;flex-wrap:wrap;gap:12px;">'+funnel+'</div></div>'+
     '<div class="card"><div class="sep-title"><span class="mini-badge mb-green">By channel</span></div>'+resultTable(rows)+'<div style="font-size:var(--fs-sm);margin-top:12px;">'+verdict+'</div></div>'+
+    '<div class="card"><div class="sep-title"><span class="mini-badge mb-gold">By travel frequency</span></div>'+resultTable(trows,'Travel')+'<div style="font-size:var(--fs-xs);color:var(--muted);margin-top:10px;">Travel frequency is your own entry for each prospect (an estimate unless you marked it verified). Use this to see whether heavy travelers actually reply and convert more, then aim your week there.</div></div>'+
     '<div class="card"><div class="sep-title"><span class="mini-badge mb-blue">Assistant route vs direct</span></div>'+resultTable(route)+'<div style="font-size:var(--fs-xs);color:var(--muted);margin-top:10px;">"Through an assistant" counts prospects where an assistant is recorded as active. Small samples can mislead.</div></div>'+
     '<div class="card"><div style="font-size:var(--fs-xs);color:var(--muted);">Replied = positive or declined response recorded. Trial+ = trial scheduled, trial done, or any client stage. Prospects added before channels were tracked show as "Not recorded".</div></div>';
 }
