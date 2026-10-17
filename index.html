@@ -1752,6 +1752,15 @@ textarea{resize:vertical;min-height:75px;}
     <div class="sec-d">Watch for companies moving into the area, work a sourced watchlist, and run a 30-day sprint. Everything here is a <strong>lead, not a verified fact</strong> &mdash; confirm the company and the move before any outreach.</div>
 
     <div class="card">
+      <div class="sep-title"><span class="mini-badge mb-gold">Company Research</span></div>
+      <div class="sec-d" style="margin-bottom:14px;">Type a company and press Research. The app searches public web pages and returns the official website, address, main phone, publicly named executives and recent news, each with its source link. It leaves out anything it cannot source. Everything is unverified until you confirm it. Each lookup uses a small amount of your Anthropic credit.</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;"><input type="text" id="rsch-name" maxlength="100" placeholder="Company name" aria-label="Company to research" style="flex:1;min-width:180px;" onkeydown="if(event.key==='Enter')rschGo()"><button class="btn btn-gold" id="rsch-btn" onclick="rschGo()">Research</button></div>
+      <div id="rsch-status" style="font-size:var(--fs-xs);color:var(--muted);margin-top:10px;" aria-live="polite"></div>
+      <div id="rsch-result" style="margin-top:12px;"></div>
+      <div id="rsch-saved" style="margin-top:12px;overflow-wrap:anywhere;"></div>
+    </div>
+
+    <div class="card">
       <div class="sep-title"><span class="mini-badge mb-gold">Live Move Scan</span></div>
       <div class="sec-d" style="margin-bottom:14px;">Scans public news headlines for relocations, new headquarters and office leases across Perimeter, Alpharetta / North Fulton, Cobb and Gwinnett. It is a headline monitor, not a directory &mdash; it can miss moves that were never reported.</div>
       <div class="btns"><button class="btn btn-gold" onclick="radarScan()">Scan Now</button><button class="btn btn-outline" onclick="radarMarkAllSeen()">Mark All Seen</button></div>
@@ -2027,7 +2036,7 @@ function notify_safe(msg){
   // may not exist yet at the moment these utilities run — this wrapper is safe either way.
   try{ if(typeof notify==='function'){ notify(msg); } else { console.warn(msg); } }catch(e){ console.warn(msg); }
 }
-var APPROVED_BACKUP_KEYS=['ob-pipeline','ob-gatekeepers','ob-messages','ob-cal-progress','ob-event-mode','ob-radar','ob-vendor','ob-partners','ob-lookalike','ob-forecast','ob-quotes'];
+var APPROVED_BACKUP_KEYS=['ob-pipeline','ob-gatekeepers','ob-messages','ob-cal-progress','ob-event-mode','ob-radar','ob-vendor','ob-partners','ob-lookalike','ob-forecast','ob-quotes','ob-research'];
 var pendingRestore=null; // holds validated backup.keys while previewed, before the operator commits
 
 function csvCell(v){
@@ -4984,7 +4993,7 @@ function renderRadar(){
       '<div style="flex:1;min-width:200px;"><div style="font-size:var(--fs-sm);font-weight:600;">'+escapeHTML(c.name)+' <span class="mini-badge mb-gold">'+(c.custom?'Yours':'Tier '+escapeHTML(c.tier))+'</span> <span class="mini-badge mb-blue">'+escapeHTML(radarAreaLabel(c.area||'perimeter'))+'</span></div>'+
       '<div style="font-size:var(--fs-xs);color:var(--muted);">'+escapeHTML(c.signal)+(c.custom?'':' &middot; unverified')+'</div></div>'+
       radarStatusSelect('w',c.id,radarState.watch[c.id]||'new')+
-      '<button class="btn btn-outline" style="padding:6px 14px;font-size:var(--fs-xs);" onclick="radarFindGatekeepers('+i+')">Find Gatekeepers &rarr;</button>'+(c.custom?'<button class="btn btn-ghost" style="padding:6px 10px;font-size:var(--fs-xs);" onclick="radarRemoveCompany(\''+c.id+'\')" aria-label="Remove">Remove</button>':'')+'</div>';
+      '<button class="btn btn-outline" style="padding:6px 14px;font-size:var(--fs-xs);" onclick="radarFindGatekeepers('+i+')">Find Gatekeepers &rarr;</button>'+'<button class="btn btn-outline" style="padding:6px 14px;font-size:var(--fs-xs);" onclick="rschFromWatch('+i+')">Research</button>'+(c.custom?'<button class="btn btn-ghost" style="padding:6px 10px;font-size:var(--fs-xs);" onclick="radarRemoveCompany(\''+c.id+'\')" aria-label="Remove">Remove</button>':'')+'</div>';
   });
   if(!wl){wl='<div style="font-size:var(--fs-sm);color:var(--muted);">No researched companies for this area yet. Run a scan, or add companies you know are targets below.</div>';}
   document.getElementById('radar-watchlist').innerHTML=wl;
@@ -5024,7 +5033,7 @@ function renderRadarScan(){
       (isNew?'<span class="mini-badge mb-green">NEW</span> ':'')+
       '<a href="'+escapeHTML(it.url)+'" target="_blank" rel="noopener noreferrer" style="color:var(--gold);text-decoration:underline;font-weight:600;font-size:var(--fs-sm);">'+escapeHTML(it.title)+'</a>'+
       '<div style="font-size:var(--fs-xs);color:var(--muted);">'+escapeHTML(it.source||'source unknown')+' &middot; '+escapeHTML(d)+' &middot; unverified lead &mdash; confirm before outreach</div>'+
-      '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;"><input type="text" id="radar-co-'+i+'" maxlength="100" placeholder="Company named in this headline" aria-label="Company named in this headline" style="flex:1;min-width:180px;" onkeydown="if(event.key===\'Enter\')radarHeadlineToGatekeeper('+i+')"><button class="btn btn-outline" style="padding:6px 14px;font-size:var(--fs-xs);" onclick="radarHeadlineToGatekeeper('+i+')">Find Gatekeepers &rarr;</button></div></div>';
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;"><input type="text" id="radar-co-'+i+'" maxlength="100" placeholder="Company named in this headline" aria-label="Company named in this headline" style="flex:1;min-width:180px;" onkeydown="if(event.key===\'Enter\')radarHeadlineToGatekeeper('+i+')"><button class="btn btn-outline" style="padding:6px 14px;font-size:var(--fs-xs);" onclick="radarHeadlineToGatekeeper('+i+')">Find Gatekeepers &rarr;</button><button class="btn btn-outline" style="padding:6px 14px;font-size:var(--fs-xs);" onclick="rschFromHeadline('+i+')">Research</button></div></div>';
   });
   list.innerHTML=h;
 }
@@ -5233,7 +5242,7 @@ async function cloudResolve(key,choice){
     }else{renderCloud();}
   }catch(e){cloudSet('conflict','That did not save. Check your connection and try again.');}
 }
-function cloudKeyLabel(k){return {'ob-pipeline':'Pipeline','ob-gatekeepers':'Gatekeepers','ob-messages':'Messages','ob-cal-progress':'Calendar progress','ob-event-mode':'Event mode','ob-radar':'Market Radar','ob-vendor':'Vendor packet','ob-partners':'Partners','ob-lookalike':'Lookalikes','ob-forecast':'Forecast','ob-quotes':'Quotes'}[k]||k;}
+function cloudKeyLabel(k){return {'ob-pipeline':'Pipeline','ob-gatekeepers':'Gatekeepers','ob-messages':'Messages','ob-cal-progress':'Calendar progress','ob-event-mode':'Event mode','ob-radar':'Market Radar','ob-vendor':'Vendor packet','ob-partners':'Partners','ob-lookalike':'Lookalikes','ob-forecast':'Forecast','ob-quotes':'Quotes','ob-research':'Company research'}[k]||k;}
 function renderCloud(){
   var chip=document.getElementById('cloud-chip');
   var labels={off:'Cloud: off',checking:'Cloud: checking',syncing:'Cloud: syncing',synced:'Cloud: saved',error:'Cloud: not synced',conflict:'Cloud: choose data',newer:'Cloud: newer data'};
@@ -6262,6 +6271,117 @@ function renderQuoteRates(){
 }
 function renderQuotes(){qtFillPicker();renderQuoteRates();renderQuoteLog();qtCompute();renderQtHourly();}
 if(document.getElementById('today-body')){renderToday();}
+
+// ===== COMPANY RESEARCH (Market Radar foundation) =====
+// Sourced profile for one company: website, address, main phone, publicly named executives, news.
+// The server drops any fact whose source page was not actually retrieved; this side re-checks the shape.
+function rschUrl(v){v=String(v==null?'':v).trim();return (v.length<=500&&/^https?:\/\/[^\s<>"'`]+$/i.test(v))?v:'';}
+function rschText(v,max){return String(v==null?'':v).replace(/[\u0000-\u001f<>]/g,' ').replace(/\s+/g,' ').trim().slice(0,max);}
+function rschFact(f,max){if(!f||typeof f!=='object'){return null;}var t=rschText(f.text,max),s=rschUrl(f.source);return (t&&s)?{text:t,source:s}:null;}
+function rschClean(raw){
+  var out={items:[]};
+  if(!raw||typeof raw!=='object'||Array.isArray(raw)||!Array.isArray(raw.items)){return out;}
+  var seen={};
+  raw.items.slice(0,100).forEach(function(p,i){
+    if(!p||typeof p!=='object'){return;}
+    var name=rschText(p.name,100);if(!name){return;}
+    var id=(typeof p.id==='string'&&/^rp-\d{6,}$/.test(p.id)&&!seen[p.id])?p.id:'rp-'+(Date.now()+i);
+    while(seen[id]){id=id+'1';}
+    seen[id]=1;
+    var web=null;
+    if(p.website&&typeof p.website==='object'){var wu=rschUrl(p.website.url),ws=rschUrl(p.website.source);if(wu&&ws){web={url:wu,source:ws};}}
+    var people=(Array.isArray(p.people)?p.people:[]).slice(0,6).map(function(x){
+      if(!x||typeof x!=='object'){return null;}
+      var n=rschText(x.name,80),s=rschUrl(x.source);return (n.length>=2&&s)?{name:n,title:rschText(x.title,100),source:s}:null;}).filter(Boolean);
+    var news=(Array.isArray(p.news)?p.news:[]).slice(0,5).map(function(x){
+      if(!x||typeof x!=='object'){return null;}
+      var t=rschText(x.title,200),u=rschUrl(x.url);return (t&&u)?{title:t,url:u}:null;}).filter(Boolean);
+    out.items.push({id:id,name:name,city:rschText(p.city,40),at:ptDate(p.at),website:web,address:rschFact(p.address,200),phone:rschFact(p.phone,30),people:people,news:news,summary:rschText(p.summary,300)});
+  });
+  return out;
+}
+var rschState=rschClean(loadJSON('ob-research',null));
+function rschSave(){saveJSON('ob-research',rschState);}
+var rschBusy=false,rschCurrent='',rschConfirm='';
+function rschCity(){return RADAR_AREA_CITY[radarArea]||'Atlanta';}
+function rschMsg(t){var e=document.getElementById('rsch-status');if(e){e.textContent=t;}}
+function rschSetBusy(b){var e=document.getElementById('rsch-btn');if(e){e.disabled=b;}}
+function rschHost(u){try{return new URL(u).hostname.replace(/^www\./,'');}catch(e){return u;}}
+function rschLink(u,label){return '<a href="'+escapeHTML(u)+'" target="_blank" rel="noopener noreferrer" style="color:var(--gold);text-decoration:underline;">'+escapeHTML(label)+'</a>';}
+function rschSrc(u){return ' <span style="font-size:var(--fs-xs);">('+rschLink(u,'source: '+rschHost(u))+')</span>';}
+function rschGo(){rschRun(document.getElementById('rsch-name').value,rschCity());}
+function rschStart(name,city){
+  var box=document.getElementById('rsch-name');if(box){box.value=String(name||'').slice(0,100);box.scrollIntoView({behavior:'smooth',block:'center'});}
+  rschRun(name,city||rschCity());
+}
+function rschFromWatch(i){var c=radarAllWatch()[i];if(c){rschStart(c.name,c.city);}}
+function rschFromHeadline(i){
+  var it=radarLastItems[i];if(!it){return;}
+  var box=document.getElementById('radar-co-'+i);var name=box?box.value.trim():'';
+  if(!name){notify('Type the company named in the headline first');if(box){box.focus();}return;}
+  var city=(Array.isArray(it.areas)&&it.areas.length===1&&RADAR_AREA_CITY[it.areas[0]]&&it.areas[0]!=='perimeter')?RADAR_AREA_CITY[it.areas[0]]:'Atlanta';
+  rschStart(name,city);
+}
+async function rschRun(name,city){
+  name=String(name==null?'':name).replace(/\s+/g,' ').trim();
+  if(!/^[A-Za-z0-9 &.,'\-\/()]{2,100}$/.test(name)){rschMsg('Enter the company name using letters and numbers only.');return;}
+  if(rschBusy){return;}
+  rschBusy=true;rschSetBusy(true);rschMsg('Researching '+name+'. This can take up to 30 seconds...');
+  try{
+    var res=await fetch('/.netlify/functions/company-research',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({company:name,city:city||'Atlanta'})});
+    var data={};try{data=await res.json();}catch(e){}
+    if(res.ok&&data.status==='OK'&&data.profile&&typeof data.profile==='object'){
+      var p=rschClean({items:[Object.assign({},data.profile,{name:name,city:city||'',at:atlDateStr()})]}).items[0];
+      if(p){
+        rschState.items=rschState.items.filter(function(x){return x.name.toLowerCase()!==p.name.toLowerCase();});
+        rschState.items.unshift(p);if(rschState.items.length>100){rschState.items.length=100;}
+        rschCurrent=p.id;rschSave();renderResearch();
+        var found=(p.website?1:0)+(p.address?1:0)+(p.phone?1:0)+p.people.length+p.news.length;
+        rschMsg((found?'Done. ':'Nothing could be sourced for this company. ')+'Everything below is unverified: confirm it before outreach.'+(data.dropped>0?' '+data.dropped+' item'+(data.dropped===1?' was':'s were')+' left out because its source could not be confirmed.':''));
+      }else{rschMsg('The lookup returned nothing usable. Try again.');}
+    }else{
+      var m={web_search_not_enabled:'Web search is not turned on for your Anthropic account. Enable it in the Anthropic Console (Settings), then try again.',
+        server_not_configured:'Company research is not set up on the server yet.',
+        rate_limited:'Too many lookups. Wait a minute and try again.',daily_cap:'The daily lookup limit was reached. Try again tomorrow.',
+        upstream_busy:'The research service is busy. Try again in a minute.',timeout:'The lookup took too long and was cut off. Try again, or use Find Gatekeepers and search by hand.',
+        incomplete:'The lookup did not finish. Try again.',unreadable:'The lookup did not return a usable answer. Try again.',invalid_input:'Check the company name. Use letters and numbers only.'};
+      rschMsg(m[data.error]||'The lookup did not work. Try again, or use Find Gatekeepers and search by hand.');
+    }
+  }catch(e){rschMsg('The lookup did not work. Check your connection and try again.');}
+  rschBusy=false;rschSetBusy(false);
+}
+function rschToGatekeeper(id){var p=rschState.items.filter(function(x){return x.id===id;})[0];if(p){radarOpenGatekeeper(p.name,p.city||'Atlanta');}}
+function rschView(id){if(rschState.items.some(function(x){return x.id===id;})){rschCurrent=id;renderResearch();}}
+function rschDelete(id){
+  if(rschConfirm!==id){rschConfirm=id;renderResearch();return;}
+  rschState.items=rschState.items.filter(function(x){return x.id!==id;});rschConfirm='';if(rschCurrent===id){rschCurrent='';}rschSave();renderResearch();
+}
+function rschCard(p){
+  var none='<span style="color:var(--muted);">Not found in public sources.</span>';
+  function row(label,html){return '<div style="margin-top:8px;"><div style="font-size:var(--fs-xs);color:var(--muted);">'+label+'</div><div style="font-size:var(--fs-sm);overflow-wrap:anywhere;">'+html+'</div></div>';}
+  var h='<div style="border:1px solid var(--border);padding:14px;overflow-wrap:anywhere;">'+
+    '<div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center;"><div style="font-weight:600;">'+escapeHTML(p.name)+(p.city?' <span class="mini-badge mb-blue">'+escapeHTML(p.city)+'</span>':'')+'</div><div style="font-size:var(--fs-xs);color:var(--muted);">Researched '+escapeHTML(p.at||'')+' &middot; unverified, confirm before outreach</div></div>'+
+    (p.summary?'<div style="font-size:var(--fs-sm);margin-top:8px;">'+escapeHTML(p.summary)+'</div>':'');
+  h+=row('Website',p.website?rschLink(p.website.url,rschHost(p.website.url))+(p.website.source!==p.website.url?rschSrc(p.website.source):''):none);
+  h+=row('Address',p.address?escapeHTML(p.address.text)+rschSrc(p.address.source):none);
+  h+=row('Main phone',p.phone?escapeHTML(p.phone.text)+rschSrc(p.phone.source):none);
+  h+=row('Publicly named executives',p.people.length?'<ul style="margin:4px 0 0 18px;padding:0;">'+p.people.map(function(x){return '<li>'+escapeHTML(x.name)+(x.title?', '+escapeHTML(x.title):'')+rschSrc(x.source)+'</li>';}).join('')+'</ul>':none);
+  h+=row('Recent news',p.news.length?'<ul style="margin:4px 0 0 18px;padding:0;">'+p.news.map(function(x){return '<li>'+rschLink(x.url,x.title)+'</li>';}).join('')+'</ul>':none);
+  h+='<div class="btns" style="margin-top:12px;"><button class="btn btn-gold" onclick="rschToGatekeeper(\''+p.id+'\')">Find Gatekeepers &rarr;</button></div></div>';
+  return h;
+}
+function renderResearch(){
+  var box=document.getElementById('rsch-result');if(!box){return;}
+  var items=rschState.items;
+  var cur=items.filter(function(x){return x.id===rschCurrent;})[0];
+  box.innerHTML=cur?rschCard(cur):'';
+  var sv=document.getElementById('rsch-saved');
+  if(!items.length){sv.innerHTML='';return;}
+  sv.innerHTML='<div style="font-size:var(--fs-xs);color:var(--muted);margin-bottom:4px;">Saved research ('+items.length+')</div>'+items.slice(0,30).map(function(x){
+    return '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:var(--fs-sm);"><span>'+escapeHTML(x.name)+' <span style="color:var(--muted);font-size:var(--fs-xs);">'+escapeHTML(x.at||'')+'</span></span><span>'+todayBtn('View','rschView(\''+x.id+'\')')+' '+todayBtn(rschConfirm===x.id?'Click again to delete':'Delete','rschDelete(\''+x.id+'\')')+'</span></div>';
+  }).join('');
+}
+if(typeof renderRadar==='function'&&document.getElementById('panel-radar')){renderResearch();}
 </script>
 </body>
 </html>
