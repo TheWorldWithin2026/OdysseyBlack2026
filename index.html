@@ -599,6 +599,7 @@ textarea{resize:vertical;min-height:75px;}
     <button class="tab" onclick="switchTab('prospect',this)">Prospect Builder</button>
     <button class="tab" onclick="switchTab('outreach',this)">AI Outreach</button>
     <button class="tab" onclick="switchTab('pipeline',this)">Pipeline</button>
+    <button class="tab" onclick="switchTab('companies',this)">&#127970; Companies</button>
     <button class="tab" onclick="switchTab('results',this)">&#128200; Results</button>
     <button class="tab" onclick="switchTab('partners',this)">&#129309; Partners</button>
     <button class="tab" onclick="switchTab('lookalike',this)">&#128269; Lookalikes</button>
@@ -1077,6 +1078,23 @@ textarea{resize:vertical;min-height:75px;}
   </div>
 
   <!-- TAB 4: CALL SCRIPT -->
+  <div class="panel" id="panel-companies">
+    <div class="sec-tag">Acquisition</div>
+    <div class="sec-h">Companies</div>
+    <div class="sec-d">One page per company: its contacts, its opportunities, recent activity and next steps. Everything you save here is a record you entered or a sourced research result. Nothing is verified until you record a check.</div>
+    <div id="acq-top"></div>
+    <div class="card">
+      <div class="sep-title"><span class="mini-badge mb-gold">Add a company</span></div>
+      <div class="g2"><div><label for="acq-new-name">Company name</label><input type="text" id="acq-new-name" maxlength="100" onkeydown="if(event.key==='Enter')acqAddCompany()"></div><div><label for="acq-new-web">Website (optional)</label><input type="text" id="acq-new-web" maxlength="200" onkeydown="if(event.key==='Enter')acqAddCompany()"></div></div>
+      <div class="btns"><button class="btn btn-gold" onclick="acqAddCompany()">Add company</button></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;"><select id="acq-radar-pick" aria-label="Add a company from the Radar watchlist" style="flex:1;min-width:200px;"></select><button class="btn btn-outline" onclick="acqAddFromWatch()">Add</button></div>
+      <div style="margin-top:14px;"><label for="acq-search">Search your companies</label><input type="text" id="acq-search" maxlength="100" oninput="acqSetFilter(this.value)" placeholder="Start typing a name"></div>
+    </div>
+    <div id="acq-list"></div>
+    <div id="acq-detail"></div>
+    <div id="acq-dups"></div>
+  </div>
+
   <div class="panel" id="panel-script">
     <div class="sec-tag">Live Conversations</div>
     <div class="sec-h">Call Script Builder</div>
@@ -1885,6 +1903,13 @@ textarea{resize:vertical;min-height:75px;}
       <button class="modal-x" onclick="closeBackupModal()">&times;</button>
     </div>
     <div class="modal-bd">
+      <div class="sep-title"><span class="mini-badge mb-gold">How your data is stored</span></div>
+      <div style="font-size:var(--fs-xs);color:var(--muted);line-height:1.6;margin-bottom:14px;">
+        <p style="margin-bottom:6px;"><strong style="color:var(--text);">No login for the app.</strong> Anyone who opens the site address sees the screens, but the screens hold no data. Your records are saved inside this browser, on this device.</p>
+        <p style="margin-bottom:6px;"><strong style="color:var(--text);">Cloud Sync is separate and optional.</strong> It is a sign-in to a Supabase account. Synced rows are stored per signed-in user, and the project is set up so each user can read and change only their own rows (row-level security, defined in supabase/001_ob_store.sql in the repository). Whether that setup is applied on the live project, and whether public sign-ups are turned off, cannot be checked from this app. Confirm both in Supabase.</p>
+        <p style="margin-bottom:6px;"><strong style="color:var(--text);">Companies, contacts, opportunities and activity are not synced.</strong> They stay in this browser and are included only in Export Full Backup. Keep a backup. A second browser or device would hold different records.</p>
+        <p><strong style="color:var(--text);">Costs and profit are not stored in the app.</strong></p>
+      </div>
       <div class="sep-title"><span class="mini-badge mb-green">Cloud Sync</span></div>
       <div id="cloud-signed-out" style="margin-bottom:12px;">
         <div class="sec-d" style="margin-bottom:10px;">Sign in to keep a copy of your data in the cloud so it survives a cleared browser or a new device. The app still works without it.</div>
@@ -1924,6 +1949,14 @@ textarea{resize:vertical;min-height:75px;}
       <div class="sep-title" style="margin-top:18px;"><span class="mini-badge" style="background:rgba(231,76,60,0.08);border:1px solid rgba(231,76,60,0.25);color:#e74c3c;">Recovery</span></div>
       <div id="backup-snapshots-list" style="font-size:var(--fs-sm);color:var(--muted);"></div>
     </div>
+  </div>
+</div>
+
+<!-- COMPANIES MODAL (outcome, next step, verification, do-not-contact, duplicates) -->
+<div class="modal-overlay" id="acq-modal" onclick="if(event.target===this)acqModalClose()" role="dialog" aria-modal="true" aria-labelledby="acq-modal-title">
+  <div class="modal-box" style="max-width:560px;">
+    <div class="modal-hd"><div class="modal-title" id="acq-modal-title"></div><button class="modal-x" onclick="acqModalClose()" aria-label="Close">&times;</button></div>
+    <div class="modal-bd" id="acq-modal-body"></div>
   </div>
 </div>
 
@@ -2036,7 +2069,7 @@ function notify_safe(msg){
   // may not exist yet at the moment these utilities run — this wrapper is safe either way.
   try{ if(typeof notify==='function'){ notify(msg); } else { console.warn(msg); } }catch(e){ console.warn(msg); }
 }
-var APPROVED_BACKUP_KEYS=['ob-pipeline','ob-gatekeepers','ob-messages','ob-cal-progress','ob-event-mode','ob-radar','ob-vendor','ob-partners','ob-lookalike','ob-forecast','ob-quotes','ob-research'];
+var APPROVED_BACKUP_KEYS=['ob-pipeline','ob-gatekeepers','ob-messages','ob-cal-progress','ob-event-mode','ob-radar','ob-vendor','ob-partners','ob-lookalike','ob-forecast','ob-quotes','ob-research','ob-acq'];
 var pendingRestore=null; // holds validated backup.keys while previewed, before the operator commits
 
 function csvCell(v){
@@ -2194,7 +2227,7 @@ function previewBackupFile(file){
       try{
         var val=JSON.parse(raw);
         accepted[k]=raw;
-        summaryLines.push(k+': '+(Array.isArray(val)?val.length+' records':'1 object')+' — will restore');
+        summaryLines.push(k+': '+(k==='ob-acq'?acqBackupSummary(val):(Array.isArray(val)?val.length+' records':'1 object'))+' — will restore');
       }catch(e){
         rejectedKeys.push(k+' (unreadable)');
       }
@@ -2239,6 +2272,7 @@ function restoreBackup(mode){
         localStorage.setItem(k,pendingRestore[k]);
       } else {
         // Merge: dedupe by id, keep the newer record when both sides have updatedAt, otherwise keep both
+        if(k==='ob-acq'){ saveJSON(k,acqMergeRaw(loadJSON(k,null),JSON.parse(pendingRestore[k]))); return; }
         var incoming=JSON.parse(pendingRestore[k]);
         var current=loadJSON(k,Array.isArray(incoming)?[]:{});
         if(Array.isArray(incoming)&&Array.isArray(current)){
@@ -2320,7 +2354,7 @@ var SIG_SCORES={'sig-hired':3,'sig-office':2,'sig-earnings':1,'sig-speaking':2,'
 var SIG_LABELS={'sig-hired':'Recently hired/promoted','sig-office':'Company opening ATL office','sig-earnings':'Upcoming earnings/board meeting','sig-speaking':'Speaking at ATL event','sig-reloc':'Relocating to Atlanta','sig-travel':'Increased travel activity'};
 var CHIP_IDS={'sig-hired':'chip-hired','sig-office':'chip-office','sig-earnings':'chip-earnings','sig-speaking':'chip-speaking','sig-reloc':'chip-reloc','sig-travel':'chip-travel'};
 
-function switchTab(n,el){document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});el.classList.add('active');document.getElementById('panel-'+n).classList.add('active');if(n==='pipeline'){renderPipeline();}if(n==='company'){buildCoMap();}if(n==='calendar'){initCalendar();updateKPIs();}if(n==='gatekeeper'){renderGatekeepers();}if(n==='radar'){renderRadar();}if(n==='today'){renderToday();}if(n==='results'){renderResults();}if(n==='vendor'){renderVendor();}if(n==='partners'){renderPartners();}if(n==='lookalike'){renderLookalike();}if(n==='forecast'){renderForecast();}if(n==='quotes'){renderQuotes();}}
+function switchTab(n,el){document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});el.classList.add('active');document.getElementById('panel-'+n).classList.add('active');if(n==='pipeline'){renderPipeline();}if(n==='company'){buildCoMap();}if(n==='calendar'){initCalendar();updateKPIs();}if(n==='gatekeeper'){renderGatekeepers();}if(n==='radar'){renderRadar();}if(n==='today'){renderToday();}if(n==='results'){renderResults();}if(n==='vendor'){renderVendor();}if(n==='partners'){renderPartners();}if(n==='lookalike'){renderLookalike();}if(n==='forecast'){renderForecast();}if(n==='quotes'){renderQuotes();}if(n==='companies'){renderCompanies();}}
 
 function toggleSig(sid,cid){var cb=document.getElementById(sid);var chip=document.getElementById(cid);cb.checked=!cb.checked;if(cb.checked){chip.classList.add('on');}else{chip.classList.remove('on');}refreshBM();}
 function refreshBM(){var total=0;Object.keys(SIG_SCORES).forEach(function(id){var el=document.getElementById(id);if(el&&el.checked){total+=SIG_SCORES[id];}});total=Math.min(total,10);var num=document.getElementById('bm-num'),fill=document.getElementById('bm-fill'),desc=document.getElementById('bm-desc');num.textContent=total;fill.style.width=(total*10)+'%';var c,d;if(total===0){c='var(--muted)';d='No signals active';}else if(total<=3){c='#e67e22';d='Mild timing - monitor';}else if(total<=6){c='var(--yellow)';d='Good timing - reach out soon';}else if(total<=8){c='var(--green)';d='Strong timing - act this week';}else{c='var(--gold)';d='PEAK MOMENT - reach out today';}num.style.color=c;fill.style.background=c;desc.style.color=c;desc.textContent=d;return total;}
@@ -4958,7 +4992,7 @@ function radarAddCompany(){
   if(radarState.custom.length>=100){notify('Watchlist is full (100 custom companies)');return;}
   radarState.custom.push({id:'c-'+Date.now(),name:name.slice(0,100),area:radarCleanArea(document.getElementById('rc-area').value),note:document.getElementById('rc-note').value.trim().slice(0,200)});
   document.getElementById('rc-name').value='';document.getElementById('rc-note').value='';
-  radarSave();renderRadar();notify(name+' added to watchlist');
+  radarSave();renderRadar();var lastC=radarState.custom[radarState.custom.length-1];if(lastC&&typeof acqFromRadar==='function'){acqFromRadar(lastC.name,RADAR_AREA_CITY[lastC.area]||'',lastC.note,null);}notify(name+' added to watchlist');
 }
 function radarRemoveCompany(id){
   if(!window.confirm('Remove this company from your watchlist?')){return;}
@@ -5100,7 +5134,7 @@ function radarSprintReset(){
 // Only the publishable key lives here (safe by design); row-level security restricts rows to the signed-in owner.
 var CLOUD_URL='https://cicghvjkunvozriicykw.supabase.co';
 var CLOUD_KEY='sb_publishable_TuJJvWydTF5TmnsupabKMg_vNNxDKyL';
-var CLOUD_KEYS=APPROVED_BACKUP_KEYS.slice();
+var CLOUD_KEYS=APPROVED_BACKUP_KEYS.filter(function(k){return k!=='ob-acq';}); // Companies data stays on this device: not synced to the cloud
 var cloudSession=loadJSON('ob-cloud-session',null);
 var cloudMeta=loadJSON('ob-cloud-meta',{});
 if(!cloudMeta||typeof cloudMeta!=='object'||Array.isArray(cloudMeta)){cloudMeta={};}
@@ -5320,7 +5354,7 @@ function renderToday(){
   var total=0;
   // 1. Pipeline
   var rows=[];
-  var open=pipeline.filter(function(p){return TODAY_INACTIVE_STAGES.indexOf(p.stage)===-1;});
+  var open=pipeline.filter(function(p){return TODAY_INACTIVE_STAGES.indexOf(p.stage)===-1&&!acqNameRestricted(p.company,p.name);});
   open.filter(function(p){return p.stage==='trial-done';}).forEach(function(p){
     rows.push({r:0,h:todayItem('crit',escapeHTML(p.name)+' &middot; '+escapeHTML(p.company||''),'Trial ride done. Close within 48 hours.',[todayBtn('Open Pipeline','todayGoTab(\'pipeline\')',true),todayBtn('Log touch','todayLogTouch('+p.id+')')])});
   });
@@ -5341,7 +5375,7 @@ function renderToday(){
   total+=rows.length;
   var pipeHtml=rows.slice(0,8).map(function(x){return x.h;}).join('')+(rows.length>8?'<div style="font-size:var(--fs-xs);color:var(--muted);padding-top:8px;">+ '+(rows.length-8)+' more in Pipeline</div>':'');
   // 2. Gatekeepers
-  var gk=gatekeepers.filter(function(g){return g.followup&&g.followup<=today;}).sort(function(a,b){return a.followup<b.followup?-1:1;});
+  var gk=gatekeepers.filter(function(g){return g.followup&&g.followup<=today&&!acqNameRestricted('',g.name);}).sort(function(a,b){return a.followup<b.followup?-1:1;});
   total+=gk.length;
   var gkHtml=gk.slice(0,6).map(function(g){
     var d=todayDaysBetween(g.followup,today);
@@ -5394,7 +5428,9 @@ function renderToday(){
     sh='<div style="font-size:var(--fs-xs);color:var(--muted);margin-bottom:6px;">Week '+wk+' of 4</div>'+
       (pending.length?pending.map(function(t){return todayItem('low',escapeHTML(t.t),'',[todayBtn('Done','todaySprintTick(\''+t.id+'\')')]);}).join(''):'');
   }
+  var acqT=acqTodayBlock(today);total+=acqT.count;
   body.innerHTML=
+    (acqT.html?todaySection('Acquisition','mb-gold',acqT.html,''):'')+
     todaySection('Pipeline','mb-gold',pipeHtml,'No pipeline follow-ups are due. Add prospects or set follow-up dates in Pipeline.')+
     todaySection('Gatekeepers','mb-blue',gkHtml,'No gatekeeper follow-ups are due.')+
     todaySection('Market Radar','mb-green',rh,'Nothing new from the Radar today.')+
@@ -6320,6 +6356,7 @@ function rschFromHeadline(i){
   var box=document.getElementById('radar-co-'+i);var name=box?box.value.trim():'';
   if(!name){notify('Type the company named in the headline first');if(box){box.focus();}return;}
   var city=(Array.isArray(it.areas)&&it.areas.length===1&&RADAR_AREA_CITY[it.areas[0]]&&it.areas[0]!=='perimeter')?RADAR_AREA_CITY[it.areas[0]]:'Atlanta';
+  acqPendingSource=(it.url?{url:it.url,label:String(it.title||'').slice(0,150),date:String(it.date||'').slice(0,10),name:name}:null);
   rschStart(name,city);
 }
 async function rschRun(name,city){
@@ -6335,7 +6372,7 @@ async function rschRun(name,city){
       if(p){
         rschState.items=rschState.items.filter(function(x){return x.name.toLowerCase()!==p.name.toLowerCase();});
         rschState.items.unshift(p);if(rschState.items.length>100){rschState.items.length=100;}
-        rschCurrent=p.id;rschSave();renderResearch();
+        rschCurrent=p.id;rschSave();renderResearch();if(typeof acqFromResearch==='function'){acqFromResearch(p);}
         var found=(p.website?1:0)+(p.address?1:0)+(p.phone?1:0)+p.people.length+p.news.length;
         rschMsg((found?'Done. ':'Nothing could be sourced for this company. ')+'Everything below is unverified: confirm it before outreach.'+(data.dropped>0?' '+data.dropped+' item'+(data.dropped===1?' was':'s were')+' left out because its source could not be confirmed.':''));
       }else{rschMsg('The lookup returned nothing usable. Try again.');}
@@ -6382,6 +6419,838 @@ function renderResearch(){
   }).join('');
 }
 if(typeof renderRadar==='function'&&document.getElementById('panel-radar')){renderResearch();}
+
+// ===== COMPANIES, CONTACTS, OPPORTUNITIES (Release 0 + 1a) =====
+// Saved only in this browser under ob-acq. Included in Export Full Backup. NOT synced to the cloud.
+// Existing tabs (Pipeline, Gatekeepers, Research, Radar) keep their own data and are never modified by this block.
+var acqReady=false;
+var ACQ_OWNERS=['Kerry','Anthony'];
+var ACQ_CHANNELS=[['call','Phone call'],['email','Email'],['linkedin','LinkedIn message'],['inperson','In person'],['other','Other']];
+var ACQ_OUTCOMES=[['no_response','No response or voicemail'],['callback','Asked for a callback'],['existing_provider','Has an existing provider'],['future_need','Future need'],['conversation','Spoke with someone'],['declined','Declined'],['dnc','Asked not to be contacted']];
+var ACQ_TYPES=[['airport','Airport transportation'],['executive','Executive account'],['event','Event or summit'],['group','Group or shuttle'],['other','Other']];
+var ACQ_STAGES=[['identified','Identified'],['contacted','Contacted'],['qualified','Qualified'],['quoted','Quoted'],['booked','Booked']];
+var ACQ_LEVELS=[['listed','Publicly listed'],['contact','Confirmed contact'],['booker','Confirmed booker']];
+var ACQ_SOURCES=['Company website','LinkedIn','Apollo','Phone call','Referral','Company Research','Other'];
+var ACQ_QUAL=[['need','Transportation need'],['frequency','Expected frequency'],['routes','Typical routes'],['vehicles','Vehicle requirements'],['timing','Timing'],['provider','Current provider (if volunteered)'],['authority','Booking authority'],['approval','Vendor approval process'],['nextStep','Agreed next step']];
+var ACQ_SCRIPT_DEFAULT='Hello, this is Kerry Pope with Odyssey Black, an executive transportation company here in Atlanta. Who arranges ground transportation for visiting leadership at your office? I\'d like to send them a short introduction. May I have their name and the best way to reach them?';
+function acqKeys(l){return l.map(function(x){return x[0];});}
+function acqLabel(l,k){for(var i=0;i<l.length;i++){if(l[i][0]===k){return l[i][1];}}return '';}
+function acqPick(v,arr,def){return arr.indexOf(v)!==-1?v:def;}
+function acqText(v,max){return String(v==null?'':v).replace(/[\u0000-\u001f<>]/g,' ').replace(/\s+/g,' ').trim().slice(0,max);}
+function acqUrl(v){v=String(v==null?'':v).trim();return (v.length<=500&&/^https?:\/\/[^\s<>"'`]+$/i.test(v))?v:'';}
+function acqWebsite(v){v=String(v==null?'':v).trim();if(v&&!/^https?:\/\//i.test(v)&&/^[a-z0-9][a-z0-9.\-]*\.[a-z]{2,}(\/\S*)?$/i.test(v)){v='https://'+v;}return acqUrl(v);}
+function acqEmail(v){v=String(v==null?'':v).trim().toLowerCase();return (v.length<=120&&/^[^\s@<>"'`]+@[^\s@<>"'`]+\.[^\s@<>"'`]+$/.test(v))?v:'';}
+function acqFact(f,max){if(!f||typeof f!=='object'){return null;}var t=acqText(f.text,max),s=acqUrl(f.source);return (t&&s)?{text:t,source:s}:null;}
+function acqNorm(n){
+  var s=String(n==null?'':n).toLowerCase().replace(/&/g,' and ').replace(/[^a-z0-9 ]+/g,' ').replace(/\s+/g,' ').trim();
+  var t=s?s.split(' '):[];
+  if(t[0]==='the'&&t.length>1){t.shift();}
+  var drop={inc:1,llc:1,corp:1,corporation:1,co:1,company:1,ltd:1,lp:1,llp:1,incorporated:1,limited:1};
+  while(t.length>1&&drop[t[t.length-1]]){t.pop();}
+  return t.join(' ');
+}
+function acqDomain(u){try{return new URL(u).hostname.replace(/^www\./,'').toLowerCase();}catch(e){return '';}}
+function acqSlug(s){return String(s==null?'':s).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,60);}
+function acqPhoneKey(p){var d=String(p==null?'':p).replace(/\D/g,'');return d.length>=10?d.slice(-10):'';}
+function acqNewId(p){return p+'-'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
+
+function acqClean(raw){
+  var out={v:1,migratedAt:'',script:'',companies:[],contacts:[],opps:[],acts:[],dismissed:[]};
+  if(!raw||typeof raw!=='object'||Array.isArray(raw)){return out;}
+  out.migratedAt=ptDate(raw.migratedAt);
+  out.script=acqText(raw.script,1000);
+  var ids={};
+  function okId(id,p){return typeof id==='string'&&id.indexOf(p+'-')===0&&/^[a-z]{2}-[a-z0-9-]{2,90}$/.test(id)&&!ids[id];}
+  function num(v){v=+v;return isFinite(v)&&v>0?v:0;}
+  function dnc(d){return (d&&typeof d==='object'&&d.on===true)?{on:true,date:ptDate(d.date),reason:acqText(d.reason,200)}:null;}
+  (Array.isArray(raw.companies)?raw.companies:[]).slice(0,500).forEach(function(c){
+    if(!c||typeof c!=='object'||!okId(c.id,'co')){return;}
+    var name=acqText(c.name,100);if(!name){return;}
+    ids[c.id]=1;
+    var links=(Array.isArray(c.sourceLinks)?c.sourceLinks:[]).slice(0,12).map(function(l){if(!l||typeof l!=='object'){return null;}var u=acqUrl(l.url);return u?{url:u,label:acqText(l.label,150),date:ptDate(l.date)}:null;}).filter(Boolean);
+    var r=null;
+    if(c.research&&typeof c.research==='object'){
+      var rr=c.research,wu=rr.website&&typeof rr.website==='object'?acqUrl(rr.website.url):'',ws=rr.website&&typeof rr.website==='object'?acqUrl(rr.website.source):'';
+      r={at:ptDate(rr.at),city:acqText(rr.city,40),summary:acqText(rr.summary,300),website:(wu&&ws)?{url:wu,source:ws}:null,address:acqFact(rr.address,200),phone:acqFact(rr.phone,30),
+        people:(Array.isArray(rr.people)?rr.people:[]).slice(0,6).map(function(x){if(!x||typeof x!=='object'){return null;}var n=acqText(x.name,80),s=acqUrl(x.source);return (n.length>=2&&s)?{name:n,title:acqText(x.title,100),source:s}:null;}).filter(Boolean),
+        news:(Array.isArray(rr.news)?rr.news:[]).slice(0,5).map(function(x){if(!x||typeof x!=='object'){return null;}var t=acqText(x.title,200),u=acqUrl(x.url);return (t&&u)?{title:t,url:u}:null;}).filter(Boolean)};
+    }
+    out.companies.push({id:c.id,name:name,website:acqWebsite(c.website),address:acqText(c.address,200),phone:acqText(c.phone,30),area:acqText(c.area,40),
+      source:acqPick(c.source,['research','radar','pipeline','manual'],'manual'),sourceLinks:links,researchedAt:ptDate(c.researchedAt),research:r,notes:acqText(c.notes,500),
+      dnc:dnc(c.dnc),archivedInto:(typeof c.archivedInto==='string'&&/^co-[a-z0-9-]{2,90}$/.test(c.archivedInto))?c.archivedInto:'',createdAt:ptDate(c.createdAt),updatedAt:num(c.updatedAt)});
+  });
+  var coIds={};out.companies.forEach(function(c){coIds[c.id]=1;});
+  out.companies.forEach(function(c){if(c.archivedInto&&(!coIds[c.archivedInto]||c.archivedInto===c.id)){c.archivedInto='';}});
+  (Array.isArray(raw.contacts)?raw.contacts:[]).slice(0,1500).forEach(function(c){
+    if(!c||typeof c!=='object'||!okId(c.id,'ct')){return;}
+    var name=acqText(c.name,100);if(!name){return;}
+    ids[c.id]=1;
+    var verif=(Array.isArray(c.verif)?c.verif:[]).slice(0,10).map(function(v){if(!v||typeof v!=='object'){return null;}var lv=acqPick(v.level,acqKeys(ACQ_LEVELS),'');var what=acqText(v.what,120),how=acqText(v.how,120);return (lv&&what&&how)?{level:lv,what:what,how:how,by:acqText(v.by,60),at:ptDate(v.at)}:null;}).filter(Boolean);
+    out.contacts.push({id:c.id,companyId:(typeof c.companyId==='string'&&coIds[c.companyId])?c.companyId:'',name:name,role:acqText(c.role,100),email:acqEmail(c.email),phone:acqText(c.phone,30),
+      source:acqText(c.source,60),sourceUrl:acqUrl(c.sourceUrl),verif:verif,dnc:dnc(c.dnc),notes:acqText(c.notes,300),origin:acqText(c.origin,40),
+      archivedInto:(typeof c.archivedInto==='string'&&/^ct-[a-z0-9-]{2,90}$/.test(c.archivedInto)&&c.archivedInto!==c.id)?c.archivedInto:'',createdAt:ptDate(c.createdAt),updatedAt:num(c.updatedAt)});
+  });
+  var ctIds={};out.contacts.forEach(function(c){ctIds[c.id]=1;});
+  out.contacts.forEach(function(c){if(c.archivedInto&&!ctIds[c.archivedInto]){c.archivedInto='';}});
+  (Array.isArray(raw.opps)?raw.opps:[]).slice(0,1000).forEach(function(o){
+    if(!o||typeof o!=='object'||!okId(o.id,'op')){return;}
+    ids[o.id]=1;
+    var na=null;
+    if(o.nextAction&&typeof o.nextAction==='object'&&ptDate(o.nextAction.date)){
+      na={text:acqText(o.nextAction.text,150),date:ptDate(o.nextAction.date),kind:acqPick(o.nextAction.kind,['outreach','callback','other'],'outreach'),contactId:(typeof o.nextAction.contactId==='string'&&ctIds[o.nextAction.contactId])?o.nextAction.contactId:''};
+    }
+    var q={};ACQ_QUAL.forEach(function(k){q[k[0]]=acqText(o.qual&&typeof o.qual==='object'?o.qual[k[0]]:'',200);});
+    var status=acqPick(o.status,['open','paused','closed'],'open');
+    out.opps.push({id:o.id,companyId:(typeof o.companyId==='string'&&coIds[o.companyId])?o.companyId:'',
+      contactIds:(Array.isArray(o.contactIds)?o.contactIds:[]).filter(function(x){return typeof x==='string'&&ctIds[x];}).slice(0,10),
+      title:acqText(o.title,120)||'Transportation need',type:acqPick(o.type,acqKeys(ACQ_TYPES),'other'),stage:acqPick(o.stage,acqKeys(ACQ_STAGES),'identified'),status:status,
+      owner:acqPick(o.owner,ACQ_OWNERS,'Kerry'),nextAction:na,pauseReason:acqText(o.pauseReason,150),closeReason:acqPick(o.closeReason,['declined','lost'],''),closedAt:ptDate(o.closedAt),
+      qual:q,notes:acqText(o.notes,300),createdAt:ptDate(o.createdAt),updatedAt:num(o.updatedAt)});
+  });
+  var opIds={};out.opps.forEach(function(o){opIds[o.id]=1;});
+  (Array.isArray(raw.acts)?raw.acts:[]).slice(0,5000).forEach(function(a){
+    if(!a||typeof a!=='object'||!okId(a.id,'ac')){return;}
+    ids[a.id]=1;
+    var kind=acqPick(a.kind,['attempt','log'],'attempt');
+    var oc=acqPick(a.outcome,acqKeys(ACQ_OUTCOMES),'');
+    var spoke=a.spoke===true,need=a.need===true;
+    out.acts.push({id:a.id,at:ptDate(a.at),companyId:(typeof a.companyId==='string'&&coIds[a.companyId])?a.companyId:'',oppId:(typeof a.oppId==='string'&&opIds[a.oppId])?a.oppId:'',
+      contactId:(typeof a.contactId==='string'&&ctIds[a.contactId])?a.contactId:'',kind:kind,channel:acqPick(a.channel,acqKeys(ACQ_CHANNELS),''),outcome:oc,note:acqText(a.note,400),
+      spoke:spoke,need:need,qualified:(kind==='attempt'&&oc==='conversation'&&spoke&&need&&a.qualified===true),createdAt:num(a.createdAt)});
+  });
+  out.dismissed=(Array.isArray(raw.dismissed)?raw.dismissed:[]).filter(function(x){return typeof x==='string'&&/^[a-z]{2}-[a-z0-9-]{2,90}\|[a-z]{2}-[a-z0-9-]{2,90}$/.test(x);}).slice(0,300);
+  return out;
+}
+// Restore (Merge) for ob-acq: union by id per collection; the newer record wins; nothing is dropped.
+function acqMergeRaw(curRaw,incRaw){
+  var a=acqClean(curRaw),b=acqClean(incRaw);
+  ['companies','contacts','opps','acts'].forEach(function(k){
+    var m={};a[k].forEach(function(r){m[r.id]=r;});
+    b[k].forEach(function(r){var e=m[r.id];if(!e||(r.updatedAt||r.createdAt||0)>=(e.updatedAt||e.createdAt||0)){m[r.id]=r;}});
+    a[k]=Object.keys(m).map(function(i){return m[i];});
+  });
+  b.dismissed.forEach(function(x){if(a.dismissed.indexOf(x)===-1){a.dismissed.push(x);}});
+  a.migratedAt=a.migratedAt||b.migratedAt;a.script=a.script||b.script;
+  return acqClean(a);
+}
+function acqBackupSummary(v){if(!v||typeof v!=='object'){return 'no companies (Replace will clear current companies, Merge keeps them)';}var s=acqClean(v);return s.companies.length+' companies, '+s.contacts.length+' contacts, '+s.opps.length+' opportunities, '+s.acts.length+' activities';}
+var acq=acqClean(loadJSON('ob-acq',null));
+function acqSave(){return saveJSON('ob-acq',acq);}
+function acqTouch(r){r.updatedAt=Date.now();return r;}
+function acqCo(id){for(var i=0;i<acq.companies.length;i++){if(acq.companies[i].id===id){return acq.companies[i];}}return null;}
+function acqCt(id){for(var i=0;i<acq.contacts.length;i++){if(acq.contacts[i].id===id){return acq.contacts[i];}}return null;}
+function acqOp(id){for(var i=0;i<acq.opps.length;i++){if(acq.opps[i].id===id){return acq.opps[i];}}return null;}
+function acqLiveCos(){return acq.companies.filter(function(c){return !c.archivedInto;});}
+function acqLiveCts(){return acq.contacts.filter(function(c){return !c.archivedInto;});}
+function acqCoName(id){var c=acqCo(id);return c?c.name:'';}
+
+// ---- Do-not-contact ----
+function acqCoRestricted(id){var c=acqCo(id);return !!(c&&c.dnc&&c.dnc.on);}
+function acqCtRestricted(c){return !!(c&&((c.dnc&&c.dnc.on)||acqCoRestricted(c.companyId)));}
+// Reason an open opportunity must not produce an outreach task ('' means it may).
+function acqOppSuppressed(o){
+  if(acqCoRestricted(o.companyId)){return 'Company is marked do not contact';}
+  var na=o.nextAction;
+  if(na&&na.contactId){var c=acqCt(na.contactId);if(c&&c.dnc&&c.dnc.on){return 'Contact is marked do not contact';}}
+  if(o.status==='closed'){return 'Closed';}
+  if(o.status==='paused'){return 'Paused';}
+  return '';
+}
+// Used by the older Today sections (Pipeline, Gatekeepers) so a restriction also stops those reminders.
+function acqNameRestricted(companyName,personName){
+  if(!acqReady){return false;}
+  var nk=acqNorm(companyName||'');
+  if(nk&&acq.companies.some(function(c){return !c.archivedInto&&c.dnc&&c.dnc.on&&acqNorm(c.name)===nk;})){return true;}
+  var pk=acqNorm(personName||'');if(!pk){return false;}
+  return acq.contacts.some(function(c){
+    if(c.archivedInto||!(c.dnc&&c.dnc.on)||acqNorm(c.name)!==pk){return false;}
+    return !nk||!c.companyId||acqNorm(acqCoName(c.companyId))===nk;
+  });
+}
+
+// ---- Records ----
+function acqBlankCo(name,id){return {id:id||acqNewId('co'),name:acqText(name,100),website:'',address:'',phone:'',area:'',source:'manual',sourceLinks:[],researchedAt:'',research:null,notes:'',dnc:null,archivedInto:'',createdAt:atlDateStr(),updatedAt:Date.now()};}
+function acqFindCo(st,name){
+  var nk=acqNorm(name);if(!nk){return null;}
+  for(var i=0;i<st.companies.length;i++){var c=st.companies[i];if(!c.archivedInto&&acqNorm(c.name)===nk){return c;}}
+  return null;
+}
+function acqAddLink(co,url,label,date){
+  url=acqUrl(url);if(!url){return;}
+  if(co.sourceLinks.some(function(l){return l.url===url;})){return;}
+  if(co.sourceLinks.length<12){co.sourceLinks.push({url:url,label:acqText(label,150),date:ptDate(date)||atlDateStr()});}
+}
+// Create or update a company from a saved Company Research profile. Keeps the sourced facts and the research date.
+function acqApplyResearch(st,p,det){
+  var nk=acqNorm(p.name);if(!nk){return null;}
+  var co=acqFindCo(st,p.name);
+  if(!co){
+    var id=det?('co-m-'+(acqSlug(nk)||acqNewId('x'))):acqNewId('co');
+    co=acqBlankCo(p.name,id);co.source='research';st.companies.push(co);
+  }
+  if(p.website&&!co.website){co.website=p.website.url;}
+  if(p.address&&!co.address){co.address=p.address.text;}
+  if(p.phone&&!co.phone){co.phone=p.phone.text;}
+  if(p.city&&!co.area){co.area=acqText(p.city,40);}
+  if(!co.researchedAt||(p.at||'')>=co.researchedAt){
+    co.research={at:p.at||'',city:p.city||'',summary:p.summary||'',website:p.website||null,address:p.address||null,phone:p.phone||null,people:(p.people||[]).slice(0,6),news:(p.news||[]).slice(0,5)};
+    co.researchedAt=p.at||co.researchedAt;
+  }
+  acqTouch(co);
+  return co;
+}
+var acqPendingSource=null;
+function acqFromResearch(p){
+  if(!acqReady||!p){return;}
+  var co=acqApplyResearch(acq,p,false);
+  if(!co){return;}
+  if(acqPendingSource){if(acqNorm(acqPendingSource.name||'')===acqNorm(p.name)){acqAddLink(co,acqPendingSource.url,acqPendingSource.label,acqPendingSource.date);}acqPendingSource=null;}
+  acqSave();notify('Saved to Companies: '+co.name);
+  if(document.getElementById('panel-companies')&&document.getElementById('panel-companies').classList.contains('active')){renderCompanies();}
+  if(typeof renderToday==='function'){renderToday();}
+}
+function acqFromRadar(name,area,note,link){
+  if(!acqReady){return null;}
+  name=acqText(name,100);if(!name){return null;}
+  var co=acqFindCo(acq,name);
+  if(!co){co=acqBlankCo(name);co.source='radar';acq.companies.push(co);}
+  if(area&&!co.area){co.area=acqText(area,40);}
+  if(note&&!co.notes){co.notes=acqText(note,500);}
+  if(link&&link.url){acqAddLink(co,link.url,link.label,link.date);}
+  acqTouch(co);acqSave();return co;
+}
+
+// ---- Release 0: integrity check and one-time import (safe to run again) ----
+function acqCheck(st){
+  var seen={},bad='';
+  function chk(id){if(seen[id]){bad='Duplicate record id '+id;}seen[id]=1;}
+  st.companies.forEach(function(c){chk(c.id);});st.contacts.forEach(function(c){chk(c.id);});st.opps.forEach(function(o){chk(o.id);});st.acts.forEach(function(a){chk(a.id);});
+  if(bad){return bad;}
+  var co={};st.companies.forEach(function(c){co[c.id]=1;});var ct={};st.contacts.forEach(function(c){ct[c.id]=1;});
+  st.contacts.forEach(function(c){if(c.companyId&&!co[c.companyId]){bad='Contact '+c.id+' points to a missing company';}});
+  st.opps.forEach(function(o){if(o.companyId&&!co[o.companyId]){bad='Opportunity '+o.id+' points to a missing company';}o.contactIds.forEach(function(x){if(!ct[x]){bad='Opportunity '+o.id+' points to a missing contact';}});});
+  return bad;
+}
+function acqMigrate(){
+  var prevRaw=null;try{prevRaw=localStorage.getItem('ob-acq');}catch(e){}
+  try{
+    var st=acqClean(JSON.parse(JSON.stringify(acq)));
+    var c0=st.companies.length,t0=st.contacts.length;
+    var rs=(typeof rschState!=='undefined'&&rschState&&Array.isArray(rschState.items))?rschState.items:[];
+    var preSig={};st.companies.forEach(function(c){var o=JSON.parse(JSON.stringify(c));var u=o.updatedAt;delete o.updatedAt;preSig[c.id]={sig:JSON.stringify(o),u:u};});
+    rs.forEach(function(p){acqApplyResearch(st,p,true);});
+    (typeof radarState!=='undefined'&&radarState&&Array.isArray(radarState.custom)?radarState.custom:[]).forEach(function(r){
+      var nk=acqNorm(r.name);if(!nk){return;}
+      var co=acqFindCo(st,r.name);
+      if(!co){co=acqBlankCo(r.name,'co-m-'+(acqSlug(nk)||acqNewId('x')));co.source='radar';co.area=acqText(RADAR_AREA_CITY&&RADAR_AREA_CITY[r.area]||'',40);co.notes=acqText(r.note,500);st.companies.push(co);}
+    });
+    function addContact(id,name,role,companyName,extra){
+      name=acqText(name,100);if(!name||!id){return;}
+      if(st.contacts.some(function(c){return c.id===id;})){return;}
+      var coId='';
+      if(companyName&&acqNorm(companyName)){
+        var co=acqFindCo(st,companyName);
+        if(!co){co=acqBlankCo(companyName,'co-m-'+(acqSlug(acqNorm(companyName))||acqNewId('x')));co.source='pipeline';st.companies.push(co);}
+        coId=co.id;
+      }
+      st.contacts.push({id:id,companyId:coId,name:name,role:acqText(role,100),email:acqEmail(extra&&extra.email),phone:acqText(extra&&extra.phone,30),source:acqText(extra&&extra.source,60),sourceUrl:'',verif:[],dnc:null,notes:acqText(extra&&extra.notes,300),origin:acqText(extra&&extra.origin,40),archivedInto:'',createdAt:atlDateStr(),updatedAt:Date.now()});
+    }
+    (Array.isArray(pipeline)?pipeline:[]).forEach(function(p){
+      if(!p||typeof p!=='object'){return;}
+      var key=acqSlug(p.id)||acqSlug((p.name||'')+'-'+(p.company||''));if(!key){return;}
+      addContact('ct-m-p-'+key,p.name,p.title,p.company,{source:'Imported from Pipeline',origin:'pipeline'});
+      if(p.ea&&p.ea.active&&p.ea.name){addContact('ct-m-e-'+key,p.ea.name,'Executive assistant',p.company,{email:p.ea.email,phone:p.ea.phone,source:'Imported from Pipeline',origin:'pipeline'});}
+    });
+    (Array.isArray(gatekeepers)?gatekeepers:[]).forEach(function(g){
+      if(!g||typeof g!=='object'){return;}
+      var key=acqSlug(g.id)||acqSlug(g.name);if(!key){return;}
+      addContact('ct-m-g-'+key,g.name,(typeof GK_TYPE_LABELS!=='undefined'&&GK_TYPE_LABELS[g.type])||g.type||'',''  ,{source:'Imported from Gatekeepers',origin:'gatekeeper',notes:[g.location,g.notes].filter(Boolean).join(' | ')});
+    });
+    st.companies.forEach(function(c){var pr=preSig[c.id];if(!pr){return;}var o=JSON.parse(JSON.stringify(c));delete o.updatedAt;if(JSON.stringify(o)===pr.sig){c.updatedAt=pr.u;}});
+    st.migratedAt=atlDateStr();
+    var bad=acqCheck(st);if(bad){throw new Error(bad);}
+    var json=JSON.stringify(st);
+    localStorage.setItem('ob-acq',json);
+    if(localStorage.getItem('ob-acq')!==json){throw new Error('The browser did not keep the saved copy');}
+    acq=acqClean(JSON.parse(json));
+    return {ok:true,companies:acq.companies.length-c0,contacts:acq.contacts.length-t0};
+  }catch(e){
+    try{if(prevRaw===null){localStorage.removeItem('ob-acq');}else{localStorage.setItem('ob-acq',prevRaw);}}catch(e2){}
+    return {ok:false,error:String(e&&e.message||e).slice(0,160)};
+  }
+}
+
+// ---- Counts, modal, small helpers ----
+var acqSel='',acqFilter='',acqEditing=false,acqCtx=null,acqPendingCreate=null;
+function acqE(s){return escapeHTML(s);}
+function acqModal(title,html){document.getElementById('acq-modal-title').textContent=title;document.getElementById('acq-modal-body').innerHTML=html;document.getElementById('acq-modal').classList.add('open');}
+function acqModalClose(){var m=document.getElementById('acq-modal');if(m){m.classList.remove('open');}acqCtx=null;acqPendingCreate=null;}
+function acqVal(id){var e=document.getElementById(id);return e?e.value:'';}
+function acqChk(id){var e=document.getElementById(id);return !!(e&&e.checked);}
+function acqRefresh(){renderCompanies();if(typeof renderToday==='function'){renderToday();}}
+function acqOptions(list,sel,blank){var h=blank?'<option value="">'+acqE(blank)+'</option>':'';list.forEach(function(x){var v=Array.isArray(x)?x[0]:x,l=Array.isArray(x)?x[1]:x;h+='<option value="'+acqE(v)+'"'+(v===sel?' selected':'')+'>'+acqE(l)+'</option>';});return h;}
+function acqFieldHtml(label,id,val,max,type,ph){return '<div><label for="'+id+'">'+label+'</label><input type="'+(type||'text')+'" id="'+id+'" maxlength="'+max+'" value="'+acqE(val||'')+'"'+(ph?' placeholder="'+acqE(ph)+'"':'')+'></div>';}
+function acqCounts(){
+  var today=atlDateStr();
+  var at=acq.acts.filter(function(a){return a.kind==='attempt';});
+  var uniq={};at.forEach(function(a){if(a.contactId){uniq[a.contactId]=1;}});
+  var overdue=acq.opps.filter(function(o){return o.status==='open'&&!acqOppSuppressed(o)&&o.nextAction&&o.nextAction.date<today;}).length;
+  return {companies:acqLiveCos().length,contacts:Object.keys(uniq).length,attempts:at.length,replies:at.filter(function(a){return a.outcome&&a.outcome!=='no_response';}).length,qualified:at.filter(function(a){return a.qualified;}).length,overdue:overdue};
+}
+function acqCountsHtml(){
+  var c=acqCounts();
+  var t=[['Companies added',c.companies],['Unique contacts attempted',c.contacts],['Total attempts',c.attempts],['Replies',c.replies],['Qualified conversations',c.qualified],['Overdue actions',c.overdue]];
+  return '<div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:6px;" data-acq-counts="1">'+t.map(function(x){return '<div style="flex:1;min-width:120px;border:1px solid var(--border);padding:10px;text-align:center;"><div style="font-family:var(--ff-display);font-size:var(--fs-2xl);color:var(--gold);">'+x[1]+'</div><div style="font-size:var(--fs-xs);color:var(--muted);">'+x[0]+'</div></div>';}).join('')+'</div>'+
+    '<div style="font-size:var(--fs-xs);color:var(--muted);margin-top:8px;">Reply means anyone answered other than no response. Qualified conversation (proposed definition, adjust as needed): you spoke with a relevant booking or approval contact, confirmed a transportation need, and recorded an agreed next step.</div>';
+}
+function acqContactLevel(c){var best=-1;var keys=acqKeys(ACQ_LEVELS);c.verif.forEach(function(v){var i=keys.indexOf(v.level);if(i>best){best=i;}});return best<0?'':keys[best];}
+function acqLevelBadge(c){var lv=acqContactLevel(c);var cls=lv==='booker'?'mb-green':lv==='contact'?'mb-blue':lv==='listed'?'mb-gold':'';return '<span class="mini-badge '+cls+'" style="'+(cls?'':'border:1px solid var(--border);color:var(--muted);')+'">'+(lv?acqLabel(ACQ_LEVELS,lv):'Unverified')+'</span>';}
+function acqOppOf(co){return acq.opps.filter(function(o){return o.companyId===co.id;});}
+function acqCtsOf(co){return acqLiveCts().filter(function(c){return c.companyId===co.id;});}
+
+// ---- Page shell ----
+function acqNoticeHtml(){
+  return '<div class="card" style="border-color:rgba(201,168,76,0.3);"><div class="sep-title"><span class="mini-badge mb-gold">Where this data lives</span></div>'+
+    '<div style="font-size:var(--fs-sm);line-height:1.6;">This browser is the source of truth for companies, contacts, opportunities and activity. They are saved on this device only, are <strong>not synced to the cloud</strong>, and are included in Export Full Backup. Use one browser for this work: a second browser or device would hold different records. Choosing Anthony as an owner is a label only. It does not give him access or share any data.</div>'+
+    '<div class="btns"><button class="btn btn-outline" style="padding:6px 12px;font-size:var(--fs-xs);" onclick="openBackupModal()">Data &amp; Backup</button></div></div>';
+}
+function acqSetupHtml(){
+  if(!acq.migratedAt){
+    return '<div class="card"><div class="sep-title"><span class="mini-badge mb-blue">Step 1: set up</span></div>'+
+      '<div style="font-size:var(--fs-sm);line-height:1.6;">Companies can import what you already have: saved research, Pipeline prospects and their assistants, Gatekeepers, and companies you added to the Radar watchlist. Nothing in your existing tabs is changed or removed. The button first downloads a backup file, then imports. It is safe to run more than once.</div>'+
+      '<div class="btns"><button class="btn btn-gold" onclick="acqSetupRun()">Download backup and import</button><button class="btn btn-outline" onclick="acqSetupSkip()">Start empty</button></div><div id="acq-setup-msg" role="status" style="font-size:var(--fs-xs);margin-top:10px;overflow-wrap:anywhere;"></div></div>';
+  }
+  return '<div style="font-size:var(--fs-xs);color:var(--muted);margin-bottom:12px;">Set up on '+acqE(acq.migratedAt)+'. <a href="#" style="color:var(--gold);" onclick="acqSetupRun();return false;">Download backup and import again</a> (safe to repeat) &middot; <a href="#" style="color:var(--gold);" onclick="exportFullBackup();return false;">Download backup</a><span id="acq-setup-msg" role="status" style="display:block;margin-top:6px;overflow-wrap:anywhere;"></span></div>';
+}
+function acqSetupMsg(t){var e=document.getElementById('acq-setup-msg');if(e){e.textContent=t;}}
+function acqSetupRun(){
+  try{exportFullBackup();}catch(e){acqSetupMsg('Could not download a backup, so nothing was imported.');return;}
+  try{snapshotCurrentApprovedKeys();}catch(e){}
+  var r=acqMigrate();
+  renderCompanies();
+  if(r.ok){acqSetupMsg('Done. A backup file was downloaded first. Added '+r.companies+' compan'+(r.companies===1?'y':'ies')+' and '+r.contacts+' contact'+(r.contacts===1?'':'s')+'. Your other tabs are unchanged.');}
+  else{acqSetupMsg('The import failed and nothing was changed: '+r.error+'. Your backup file was already downloaded and your existing data is untouched. You can download another backup from Data & Backup and try again.');}
+  if(typeof renderToday==='function'){renderToday();}
+}
+function acqSetupSkip(){acq.migratedAt=atlDateStr();acqSave();renderCompanies();}
+
+function renderCompanies(){
+  var top=document.getElementById('acq-top');if(!top||!acqReady){return;}
+  top.innerHTML=acqNoticeHtml()+acqSetupHtml()+'<div class="card"><div class="sep-title"><span class="mini-badge mb-green">Pilot counts</span></div>'+acqCountsHtml()+'</div>';
+  var sel=document.getElementById('acq-radar-pick');
+  if(sel&&typeof radarAllWatch==='function'){var cur=sel.value;sel.innerHTML='<option value="">Add from the Radar watchlist...</option>'+radarAllWatch().map(function(c,i){return '<option value="'+i+'">'+acqE(c.name)+'</option>';}).join('');sel.value=cur;}
+  acqRenderList();acqRenderDetail();acqRenderDups();
+}
+function acqRenderList(){
+  var el=document.getElementById('acq-list');if(!el){return;}
+  var f=acqNorm(acqFilter),today=atlDateStr();
+  var cos=acqLiveCos().filter(function(c){return !f||acqNorm(c.name).indexOf(f)!==-1;}).sort(function(a,b){return a.name.toLowerCase()<b.name.toLowerCase()?-1:1;});
+  if(!acqLiveCos().length){el.innerHTML='<div class="card"><div style="font-size:var(--fs-sm);color:var(--muted);">No companies yet. Add one above, run Company Research on the Radar tab, or import what you already have.</div></div>';return;}
+  el.innerHTML='<div class="card"><div style="font-size:var(--fs-xs);color:var(--muted);margin-bottom:6px;">'+cos.length+' compan'+(cos.length===1?'y':'ies')+(cos.length>50?' (showing 50, use the search box)':'')+'</div>'+cos.slice(0,50).map(function(c){
+    var opps=acqOppOf(c),open=opps.filter(function(o){return o.status==='open';}).length;
+    var od=opps.filter(function(o){return o.status==='open'&&!acqOppSuppressed(o)&&o.nextAction&&o.nextAction.date<today;}).length;
+    return '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);'+(c.id===acqSel?'border-left:3px solid var(--gold);padding-left:8px;':'')+'"><div style="min-width:160px;overflow-wrap:anywhere;"><strong style="font-size:var(--fs-sm);">'+acqE(c.name)+'</strong> '+
+      (c.dnc?'<span class="mini-badge" style="background:rgba(231,76,60,0.1);border:1px solid rgba(231,76,60,0.4);color:#e74c3c;">Do not contact</span> ':'')+
+      '<span style="font-size:var(--fs-xs);color:var(--muted);">'+acqCtsOf(c).length+' contact'+(acqCtsOf(c).length===1?'':'s')+' &middot; '+open+' open opportunit'+(open===1?'y':'ies')+(od?' &middot; <span style="color:#e74c3c;">'+od+' overdue</span>':'')+(c.researchedAt?'':' &middot; no research')+'</span></div>'+todayBtn('Open','acqOpenCo(\''+c.id+'\')',c.id===acqSel)+'</div>';
+  }).join('')+'</div>';
+}
+function acqOpenCo(id){var c=acqCo(id);if(!c||c.archivedInto){return;}acqSel=id;acqEditing=false;acqRefresh();var d=document.getElementById('acq-detail');if(d&&d.scrollIntoView){d.scrollIntoView({behavior:'smooth',block:'start'});}}
+function acqGoCo(id){todayGoTab('companies');if(id){acqOpenCo(id);}}
+function acqCloseCo(){acqSel='';renderCompanies();}
+
+function acqAddCompany(){
+  var name=acqText(acqVal('acq-new-name'),100),web=acqWebsite(acqVal('acq-new-web'));
+  if(!name){notify('Enter a company name');return;}
+  var dups=acqCompanyDups(name,web,'');
+  if(dups.length){acqPendingCreate={kind:'company',name:name,web:web};acqDupModal('company',dups);return;}
+  acqCreateCompany(name,web);
+}
+function acqCreateCompany(name,web){
+  var co=acqBlankCo(name);co.website=web||'';acq.companies.push(co);acqSel=co.id;acqSave();
+  document.getElementById('acq-new-name').value='';document.getElementById('acq-new-web').value='';
+  acqEditing=false;acqRefresh();notify('Company added. No research saved yet, so a research task was added to Today.');
+}
+function acqAddFromWatch(){
+  var sel=document.getElementById('acq-radar-pick');if(!sel||sel.value===''){notify('Pick a company from the watchlist');return;}
+  var c=radarAllWatch()[parseInt(sel.value,10)];if(!c){return;}
+  var dups=acqCompanyDups(c.name,'','');
+  var exact=dups.filter(function(d){return d.why==='Same name';})[0];
+  if(exact){acqOpenCo(exact.id);notify(c.name+' is already in Companies');return;}
+  var co=acqFromRadar(c.name,c.city||RADAR_AREA_CITY[c.area]||'',c.signal||'',null);
+  if(co){acqSel=co.id;acqEditing=false;acqRefresh();notify('Added from the Radar watchlist');}
+}
+function acqSetFilter(v){acqFilter=String(v||'').slice(0,100);acqRenderList();}
+
+// ---- Duplicates ----
+function acqCompanyDups(name,website,selfId){
+  var nk=acqNorm(name),dm=acqDomain(website||''),out=[];
+  acq.companies.forEach(function(c){
+    if(c.archivedInto||c.id===selfId){return;}
+    var ck=acqNorm(c.name),why='';
+    if(nk&&ck===nk){why='Same name';}
+    else if(dm&&acqDomain(c.website)===dm){why='Same website';}
+    else if(nk&&ck&&Math.min(nk.length,ck.length)>=4&&(ck.indexOf(nk+' ')===0||nk.indexOf(ck+' ')===0)){why='Similar name';}
+    if(why){out.push({id:c.id,why:why});}
+  });
+  return out;
+}
+function acqContactDups(p,selfId){
+  var nk=acqNorm(p.name),em=acqEmail(p.email),ph=acqPhoneKey(p.phone),out=[];
+  acq.contacts.forEach(function(c){
+    if(c.archivedInto||c.id===selfId){return;}
+    var why='';
+    if(em&&c.email&&c.email===em){why='Same email';}
+    else if(ph&&acqPhoneKey(c.phone)===ph){why='Same phone number';}
+    else if(nk&&acqNorm(c.name)===nk&&c.companyId===(p.companyId||'')){why='Same name at the same company';}
+    if(why){out.push({id:c.id,why:why});}
+  });
+  return out;
+}
+function acqDupModal(kind,matches){
+  var rows=matches.slice(0,5).map(function(m){
+    if(kind==='company'){var c=acqCo(m.id);return '<div style="padding:8px 0;border-bottom:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap;justify-content:space-between;"><div><strong>'+acqE(c.name)+'</strong><div style="font-size:var(--fs-xs);color:var(--muted);">'+m.why+(c.website?' &middot; '+acqE(acqDomain(c.website)):'')+' &middot; '+acqCtsOf(c).length+' contacts, '+acqOppOf(c).length+' opportunities</div></div>'+todayBtn('Open existing','acqDupOpen(\''+c.id+'\')',true)+'</div>';}
+    var c2=acqCt(m.id);return '<div style="padding:8px 0;border-bottom:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap;justify-content:space-between;"><div><strong>'+acqE(c2.name)+'</strong><div style="font-size:var(--fs-xs);color:var(--muted);">'+m.why+(c2.companyId?' &middot; '+acqE(acqCoName(c2.companyId)):'')+'</div></div>'+(c2.companyId?todayBtn('Open existing','acqDupOpen(\''+c2.companyId+'\')',true):'')+'</div>';
+  }).join('');
+  acqModal('Possible duplicate','<div style="font-size:var(--fs-sm);margin-bottom:10px;">This looks like a record you already have. Nothing is merged automatically.</div>'+rows+'<div class="btns"><button class="btn btn-outline" onclick="acqDupCreate()">It is different: create anyway</button><button class="btn btn-ghost" onclick="acqModalClose()">Cancel</button></div>');
+}
+function acqDupOpen(id){var p=acqPendingCreate;acqModalClose();acqOpenCo(id);if(p){notify('Opened the existing record');}}
+function acqDupCreate(){
+  var p=acqPendingCreate;acqPendingCreate=null;document.getElementById('acq-modal').classList.remove('open');if(!p){return;}
+  if(p.kind==='company'){acqCreateCompany(p.name,p.web);}
+  else if(p.kind==='contact'){acqCreateContact(p.c);}
+}
+function acqPairKey(a,b){return a<b?a+'|'+b:b+'|'+a;}
+function acqRenderDups(){
+  var el=document.getElementById('acq-dups');if(!el){return;}
+  var pairs=[],cos=acqLiveCos(),cts=acqLiveCts(),pos={};
+  cos.forEach(function(c,i){pos[c.id]=i;});cts.forEach(function(c,i){pos[c.id]=i;});
+  cos.forEach(function(c,i){
+    acqCompanyDups(c.name,c.website,c.id).forEach(function(m){
+      if(pos[m.id]>i&&acq.dismissed.indexOf(acqPairKey(c.id,m.id))===-1){pairs.push({kind:'co',a:c.id,b:m.id,why:m.why});}
+    });
+  });
+  cts.forEach(function(c,i){
+    acqContactDups(c,c.id).forEach(function(m){
+      if(pos[m.id]>i&&acq.dismissed.indexOf(acqPairKey(c.id,m.id))===-1){pairs.push({kind:'ct',a:c.id,b:m.id,why:m.why});}
+    });
+  });
+  if(!pairs.length){el.innerHTML='';return;}
+  el.innerHTML='<div class="card"><div class="sep-title"><span class="mini-badge mb-gold">Possible duplicates ('+pairs.length+')</span></div><div style="font-size:var(--fs-xs);color:var(--muted);margin-bottom:6px;">Review each pair. Merging keeps every contact, opportunity and activity and links them to the record you keep. Nothing is merged automatically.</div>'+
+    pairs.slice(0,8).map(function(p){
+      var an=p.kind==='co'?acqCoName(p.a):(acqCt(p.a)||{}).name,bn=p.kind==='co'?acqCoName(p.b):(acqCt(p.b)||{}).name;
+      return '<div style="padding:8px 0;border-bottom:1px solid var(--border);overflow-wrap:anywhere;"><div style="font-size:var(--fs-sm);"><strong>'+acqE(an)+'</strong> and <strong>'+acqE(bn)+'</strong> <span style="font-size:var(--fs-xs);color:var(--muted);">('+p.why+')</span></div><div class="btns" style="margin-top:6px;">'+
+        todayBtn('Keep first, merge second','acqMergeAsk(\''+p.kind+'\',\''+p.a+'\',\''+p.b+'\')')+todayBtn('Keep second, merge first','acqMergeAsk(\''+p.kind+'\',\''+p.b+'\',\''+p.a+'\')')+todayBtn('Not a duplicate','acqDismiss(\''+p.a+'\',\''+p.b+'\')')+'</div></div>';
+    }).join('')+'</div>';
+}
+function acqDismiss(a,b){var k=acqPairKey(a,b);if(acq.dismissed.indexOf(k)===-1){acq.dismissed.push(k);}acqSave();acqRenderDups();}
+function acqMergeAsk(kind,keepId,dropId){
+  var k=kind==='co'?acqCo(keepId):acqCt(keepId),d=kind==='co'?acqCo(dropId):acqCt(dropId);if(!k||!d){return;}
+  if(!window.confirm('Merge "'+d.name+'" into "'+k.name+'"? Every contact, opportunity and activity is kept and linked to "'+k.name+'". A do-not-contact restriction on either record is kept.')){return;}
+  if(kind==='co'){acqMergeCompanies(keepId,dropId);}else{acqMergeContacts(keepId,dropId);}
+  acqSave();acqRefresh();notify('Merged. Nothing was deleted.');
+}
+function acqLogAct(coId,note,extra){var a={id:acqNewId('ac'),at:atlDateStr(),companyId:coId||'',oppId:'',contactId:'',kind:'log',channel:'',outcome:'',note:acqText(note,400),spoke:false,need:false,qualified:false,createdAt:Date.now()};if(extra){Object.keys(extra).forEach(function(k){a[k]=extra[k];});}acq.acts.push(a);return a;}
+function acqMergeCompanies(keepId,dropId){
+  var k=acqCo(keepId),d=acqCo(dropId);if(!k||!d||k===d){return;}
+  acq.contacts.forEach(function(c){if(c.companyId===d.id){c.companyId=k.id;acqTouch(c);}});
+  acq.opps.forEach(function(o){if(o.companyId===d.id){o.companyId=k.id;acqTouch(o);}});
+  acq.acts.forEach(function(a){if(a.companyId===d.id){a.companyId=k.id;}});
+  ['website','address','phone','area'].forEach(function(f){if(!k[f]&&d[f]){k[f]=d[f];}});
+  if(d.notes&&d.notes!==k.notes){k.notes=acqText((k.notes?k.notes+' | ':'')+d.notes,500);}
+  d.sourceLinks.forEach(function(l){acqAddLink(k,l.url,l.label,l.date);});
+  if(d.research&&(!k.research||(d.researchedAt||'')>(k.researchedAt||''))){k.research=d.research;k.researchedAt=d.researchedAt;}
+  if(!k.dnc&&d.dnc){k.dnc=d.dnc;}
+  d.archivedInto=k.id;acqTouch(d);acqTouch(k);
+  acqLogAct(k.id,'Merged "'+d.name+'" into this company.');
+  if(acqSel===d.id){acqSel=k.id;}
+}
+function acqMergeContacts(keepId,dropId){
+  var k=acqCt(keepId),d=acqCt(dropId);if(!k||!d||k===d){return;}
+  acq.acts.forEach(function(a){if(a.contactId===d.id){a.contactId=k.id;}});
+  acq.opps.forEach(function(o){
+    var ch=false;
+    o.contactIds=o.contactIds.map(function(x){if(x===d.id){ch=true;return k.id;}return x;}).filter(function(x,i,arr){return arr.indexOf(x)===i;});
+    if(o.nextAction&&o.nextAction.contactId===d.id){o.nextAction.contactId=k.id;ch=true;}
+    if(ch){acqTouch(o);}
+  });
+  ['role','email','phone','source','sourceUrl'].forEach(function(f){if(!k[f]&&d[f]){k[f]=d[f];}});
+  d.verif.forEach(function(v){if(k.verif.length<10){k.verif.push(v);}});
+  if(!k.dnc&&d.dnc){k.dnc=d.dnc;}
+  if(!k.companyId&&d.companyId){k.companyId=d.companyId;}
+  d.archivedInto=k.id;acqTouch(d);acqTouch(k);
+  acqLogAct(k.companyId,'Merged contact "'+d.name+'" into "'+k.name+'".');
+}
+
+// ---- Company page ----
+function acqRenderDetail(){
+  var el=document.getElementById('acq-detail');if(!el){return;}
+  var co=acqCo(acqSel);
+  if(!co||co.archivedInto){acqSel='';el.innerHTML='';return;}
+  var h='';
+  h+='<div class="card"><div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:flex-start;"><div style="min-width:0;overflow-wrap:anywhere;"><div style="font-family:var(--ff-display);font-size:var(--fs-xl);">'+acqE(co.name)+'</div>'+
+    '<div style="font-size:var(--fs-xs);color:var(--muted);">'+[co.area,co.createdAt?'Added '+co.createdAt:'','Source: '+({research:'Company Research',radar:'Market Radar',pipeline:'Pipeline import',manual:'Added by hand'}[co.source]||'')].filter(Boolean).map(acqE).join(' &middot; ')+'</div></div>'+
+    '<div class="btns" style="margin:0;">'+todayBtn(acqEditing?'Cancel edit':'Edit details','acqToggleEdit()')+todayBtn('Close','acqCloseCo()')+'</div></div>';
+  if(co.dnc){h+='<div style="margin-top:12px;padding:10px;border:1px solid rgba(231,76,60,0.4);background:rgba(231,76,60,0.06);font-size:var(--fs-sm);overflow-wrap:anywhere;"><strong style="color:#e74c3c;">Do not contact</strong> since '+acqE(co.dnc.date||'')+(co.dnc.reason?': '+acqE(co.dnc.reason):'')+'. This applies to every contact and opportunity at this company. Their tasks do not appear in Today and attempts cannot be logged.<div class="btns" style="margin-top:8px;">'+todayBtn('Lift restriction','acqDncOpen(\'co\',\''+co.id+'\',true)')+'</div></div>';}
+  else{h+='<div class="btns" style="margin-top:10px;">'+todayBtn('Mark company do not contact','acqDncOpen(\'co\',\''+co.id+'\',false)')+'</div>';}
+  if(acqEditing){
+    h+='<div class="g2" style="margin-top:12px;">'+acqFieldHtml('Name','ce-name',co.name,100)+acqFieldHtml('Website','ce-web',co.website,200)+'</div><div class="g2">'+acqFieldHtml('Address','ce-addr',co.address,200)+acqFieldHtml('Main phone','ce-phone',co.phone,30)+'</div><div class="g2">'+acqFieldHtml('Area or city','ce-area',co.area,40)+acqFieldHtml('Notes','ce-notes',co.notes,500)+'</div><div class="btns">'+'<button class="btn btn-gold" onclick="acqSaveCo()">Save details</button></div>';
+  }else{
+    h+='<div style="margin-top:12px;font-size:var(--fs-sm);overflow-wrap:anywhere;">'+
+      [['Website',co.website?'<a href="'+acqE(co.website)+'" target="_blank" rel="noopener noreferrer" style="color:var(--gold);text-decoration:underline;">'+acqE(acqDomain(co.website))+'</a>':''],['Address',acqE(co.address)],['Main phone',acqE(co.phone)],['Notes',acqE(co.notes)]].map(function(r){return '<div style="margin-top:4px;"><span style="font-size:var(--fs-xs);color:var(--muted);">'+r[0]+':</span> '+(r[1]||'<span style="color:var(--muted);">Not recorded</span>')+'</div>';}).join('')+
+      (co.sourceLinks.length?'<div style="margin-top:4px;"><span style="font-size:var(--fs-xs);color:var(--muted);">Source links:</span> '+co.sourceLinks.map(function(l){return '<a href="'+acqE(l.url)+'" target="_blank" rel="noopener noreferrer" style="color:var(--gold);text-decoration:underline;">'+acqE(l.label||acqDomain(l.url))+'</a> <span style="font-size:var(--fs-xs);color:var(--muted);">'+acqE(l.date)+'</span>';}).join(' &middot; ')+'</div>':'')+'</div>';
+  }
+  h+='</div>';
+  h+=acqResearchHtml(co)+acqContactsHtml(co)+acqOppsHtml(co)+acqActivityHtml(co)+acqPipelineHtml(co);
+  el.innerHTML=h;
+}
+function acqToggleEdit(){acqEditing=!acqEditing;acqRenderDetail();}
+function acqSaveCo(){
+  var co=acqCo(acqSel);if(!co){return;}
+  var name=acqText(acqVal('ce-name'),100);if(!name){notify('A company needs a name');return;}
+  co.name=name;co.website=acqWebsite(acqVal('ce-web'));co.address=acqText(acqVal('ce-addr'),200);co.phone=acqText(acqVal('ce-phone'),30);co.area=acqText(acqVal('ce-area'),40);co.notes=acqText(acqVal('ce-notes'),500);
+  acqTouch(co);acqSave();acqEditing=false;acqRefresh();notify('Saved');
+}
+function acqResearchHtml(co){
+  var r=co.research,h='<div class="card"><div class="sep-title"><span class="mini-badge mb-blue">Research</span></div>';
+  if(!r){
+    return h+'<div style="font-size:var(--fs-sm);color:var(--muted);">No research saved for this company yet. Run Company Research, or add what you know by hand. Nothing here blocks the rest.</div><div class="btns">'+todayBtn('Research now','acqResearchNow(\''+co.id+'\')',true)+'</div></div>';
+  }
+  var none='<span style="color:var(--muted);">Not found in public sources.</span>';
+  function row(l,x){return '<div style="margin-top:6px;"><div style="font-size:var(--fs-xs);color:var(--muted);">'+l+'</div><div style="font-size:var(--fs-sm);overflow-wrap:anywhere;">'+x+'</div></div>';}
+  h+='<div style="font-size:var(--fs-xs);color:var(--muted);">Researched '+acqE(r.at||co.researchedAt)+'. Unverified: confirm before outreach.</div>'+(r.summary?'<div style="font-size:var(--fs-sm);margin-top:6px;overflow-wrap:anywhere;">'+acqE(r.summary)+'</div>':'');
+  h+=row('Website',r.website?rschLink(r.website.url,rschHost(r.website.url))+rschSrc(r.website.source):none);
+  h+=row('Address',r.address?acqE(r.address.text)+rschSrc(r.address.source):none);
+  h+=row('Main phone',r.phone?acqE(r.phone.text)+rschSrc(r.phone.source):none);
+  h+=row('Publicly named executives',r.people.length?'<ul style="margin:4px 0 0 18px;padding:0;">'+r.people.map(function(x,i){return '<li>'+acqE(x.name)+(x.title?', '+acqE(x.title):'')+rschSrc(x.source)+' '+todayBtn('Add as contact','acqAddPerson(\''+co.id+'\','+i+')')+'</li>';}).join('')+'</ul>':none);
+  h+=row('Recent news',r.news.length?'<ul style="margin:4px 0 0 18px;padding:0;">'+r.news.map(function(x){return '<li>'+rschLink(x.url,x.title)+'</li>';}).join('')+'</ul>':none);
+  return h+'<div class="btns">'+todayBtn('Research again','acqResearchNow(\''+co.id+'\')')+'</div></div>';
+}
+function acqResearchNow(id){
+  var co=acqCo(id);if(!co){return;}
+  todayGoTab('radar');rschStart(co.name,co.area||'Atlanta');
+}
+
+// ---- Contacts ----
+function acqContactsHtml(co){
+  var cts=acqCtsOf(co),restricted=!!(co.dnc&&co.dnc.on);
+  var h='<div class="card"><div class="sep-title"><span class="mini-badge mb-green">Contacts ('+cts.length+')</span></div>';
+  if(!cts.length){h+='<div style="font-size:var(--fs-sm);color:var(--muted);">No contacts yet. Add the person who books transportation, or use the call script below to find them.</div>';}
+  h+=cts.map(function(c){
+    var last=c.verif[c.verif.length-1];
+    return '<div style="padding:10px 0;border-bottom:1px solid var(--border);overflow-wrap:anywhere;"><div style="font-size:var(--fs-sm);"><strong>'+acqE(c.name)+'</strong>'+(c.role?' &middot; '+acqE(c.role):'')+' '+acqLevelBadge(c)+
+      (c.dnc?' <span class="mini-badge" style="background:rgba(231,76,60,0.1);border:1px solid rgba(231,76,60,0.4);color:#e74c3c;">Do not contact</span>':'')+'</div>'+
+      '<div style="font-size:var(--fs-xs);color:var(--muted);margin-top:2px;">'+([c.email?acqE(c.email):'',c.phone?acqE(c.phone):'',c.source?'Found via '+acqE(c.source):'',c.sourceUrl?'<a href="'+acqE(c.sourceUrl)+'" target="_blank" rel="noopener noreferrer" style="color:var(--gold);">source</a>':''].filter(Boolean).join(' &middot; ')||'No phone or email recorded')+'</div>'+
+      (last?'<div style="font-size:var(--fs-xs);color:var(--muted);margin-top:2px;">Last check: '+acqE(last.what)+' ('+acqE(last.how)+', '+acqE(last.by)+', '+acqE(last.at)+')</div>':'')+
+      (c.dnc?'<div style="font-size:var(--fs-xs);color:#e74c3c;margin-top:2px;">Asked not to be contacted'+(c.dnc.date?' on '+acqE(c.dnc.date):'')+(c.dnc.reason?': '+acqE(c.dnc.reason):'')+'</div>':'')+
+      '<div class="btns" style="margin-top:6px;">'+todayBtn('Verify','acqVerifyOpen(\''+c.id+'\')')+todayBtn('Edit','acqCtEditOpen(\''+c.id+'\')')+
+      (restricted?'':(c.dnc?todayBtn('Lift restriction','acqDncOpen(\'ct\',\''+c.id+'\',true)'):todayBtn('Do not contact','acqDncOpen(\'ct\',\''+c.id+'\',false)')+todayBtn('Log attempt','acqOutcomeOpen(\'\',\''+co.id+'\',\''+c.id+'\')',true)))+'</div></div>';
+  }).join('');
+  h+='<div style="margin-top:14px;font-size:var(--fs-xs);color:var(--muted);">Add a contact (only a name is required)</div><div class="g3" style="margin-top:6px;">'+acqFieldHtml('Name','acq-ct-name','',100)+acqFieldHtml('Role','acq-ct-role','',100,'text','Office manager, executive assistant...')+'<div><label for="acq-ct-src">How you found them</label><select id="acq-ct-src">'+acqOptions(ACQ_SOURCES,'','Not recorded')+'</select></div></div><div class="g2">'+acqFieldHtml('Email','acq-ct-email','',120,'email')+acqFieldHtml('Phone','acq-ct-phone','',30,'tel')+'</div><div class="btns"><button class="btn btn-gold" onclick="acqAddContact()">Add contact</button></div>';
+  h+='<details style="margin-top:14px;"><summary style="cursor:pointer;font-size:var(--fs-sm);color:var(--gold);">No contact found? Call the main line</summary><div style="margin-top:8px;font-size:var(--fs-xs);color:var(--muted);">Editable script. Say only what is true, and ask for a name instead of selling.</div><textarea id="acq-script" maxlength="1000" style="margin-top:6px;min-height:110px;" onchange="acqSetScript(this.value)">'+acqE(acq.script||ACQ_SCRIPT_DEFAULT)+'</textarea><div class="btns">'+(restricted?'<span style="font-size:var(--fs-xs);color:#e74c3c;">This company is marked do not contact.</span>':todayBtn('Log the call result','acqOutcomeOpen(\'\',\''+co.id+'\',\'\')',true))+todayBtn('Restore default wording','acqResetScript()')+'</div></details></div>';
+  return h;
+}
+function acqSetScript(v){acq.script=acqText(v,1000);acqSave();}
+function acqResetScript(){acq.script='';acqSave();var t=document.getElementById('acq-script');if(t){t.value=ACQ_SCRIPT_DEFAULT;}notify('Default wording restored');}
+function acqAddContact(){
+  var co=acqCo(acqSel);if(!co){return;}
+  var name=acqText(acqVal('acq-ct-name'),100);if(!name){notify('Enter the contact\'s name');return;}
+  var c={companyId:co.id,name:name,role:acqText(acqVal('acq-ct-role'),100),email:acqEmail(acqVal('acq-ct-email')),phone:acqText(acqVal('acq-ct-phone'),30),source:acqPick(acqVal('acq-ct-src'),ACQ_SOURCES,''),sourceUrl:'',verif:[]};
+  if(acqVal('acq-ct-email').trim()&&!c.email){notify('That email address does not look right');return;}
+  var dups=acqContactDups(c,'');
+  if(dups.length){acqPendingCreate={kind:'contact',c:c};acqDupModal('contact',dups);return;}
+  acqCreateContact(c);
+}
+function acqCreateContact(p){
+  var ct={id:acqNewId('ct'),companyId:p.companyId||'',name:p.name,role:p.role||'',email:p.email||'',phone:p.phone||'',source:p.source||'',sourceUrl:p.sourceUrl||'',verif:p.verif||[],dnc:null,notes:'',origin:'',archivedInto:'',createdAt:atlDateStr(),updatedAt:Date.now()};
+  acq.contacts.push(ct);acqSave();acqRefresh();notify('Contact added');
+}
+function acqAddPerson(coId,i){
+  var co=acqCo(coId),r=co&&co.research,x=r&&r.people[i];if(!x){return;}
+  var c={companyId:co.id,name:x.name,role:x.title||'',email:'',phone:'',source:'Company Research',sourceUrl:x.source,verif:[{level:'listed',what:'Listed on a public page',how:'Company Research ('+rschHost(x.source)+')',by:'Company Research tool',at:r.at||atlDateStr()}]};
+  var dups=acqContactDups(c,'');
+  if(dups.length){acqPendingCreate={kind:'contact',c:c};acqDupModal('contact',dups);return;}
+  acqCreateContact(c);
+}
+function acqCtEditOpen(id){
+  var c=acqCt(id);if(!c){return;}acqCtx={ctId:id};
+  acqModal('Edit contact','<div class="g2">'+acqFieldHtml('Name','ced-name',c.name,100)+acqFieldHtml('Role','ced-role',c.role,100)+'</div><div class="g2">'+acqFieldHtml('Email','ced-email',c.email,120,'email')+acqFieldHtml('Phone','ced-phone',c.phone,30,'tel')+'</div><div class="btns"><button class="btn btn-gold" onclick="acqCtEditSave()">Save</button><button class="btn btn-ghost" onclick="acqModalClose()">Cancel</button></div>');
+}
+function acqCtEditSave(){
+  var c=acqCtx&&acqCt(acqCtx.ctId);if(!c){return;}
+  var name=acqText(acqVal('ced-name'),100);if(!name){notify('A contact needs a name');return;}
+  if(acqVal('ced-email').trim()&&!acqEmail(acqVal('ced-email'))){notify('That email address does not look right');return;}
+  c.name=name;c.role=acqText(acqVal('ced-role'),100);c.email=acqEmail(acqVal('ced-email'));c.phone=acqText(acqVal('ced-phone'),30);acqTouch(c);acqSave();acqModalClose();acqRefresh();
+}
+// Verification records what was checked, how, by whom and when. A date alone never makes a contact verified.
+function acqVerifyOpen(id){
+  var c=acqCt(id);if(!c){return;}acqCtx={ctId:id};
+  acqModal('Verify '+c.name,'<div style="font-size:var(--fs-xs);color:var(--muted);margin-bottom:10px;">Record what you actually checked. A contact stays Unverified until a check is recorded here.</div>'+
+    '<label for="acq-v-level">What did you confirm?</label><select id="acq-v-level" onchange="acqVerifyDefaults()">'+acqOptions(ACQ_LEVELS,'listed')+'</select>'+
+    '<div style="margin-top:10px;">'+acqFieldHtml('Details of the check','acq-v-what','Listed on a public page',120)+'</div>'+
+    '<div class="g2" style="margin-top:10px;"><div><label for="acq-v-how">How</label><select id="acq-v-how">'+acqOptions(['Company website','LinkedIn','Phone call','Email reply','In person','Other'],'Company website')+'</select></div><div><label for="acq-v-by">Checked by</label><select id="acq-v-by">'+acqOptions(ACQ_OWNERS,'Kerry')+'</select></div></div>'+
+    '<div style="margin-top:10px;">'+acqFieldHtml('Date','acq-v-at',atlDateStr(),10,'date')+'</div><div class="btns"><button class="btn btn-gold" onclick="acqVerifySave()">Record check</button><button class="btn btn-ghost" onclick="acqModalClose()">Cancel</button></div>');
+}
+function acqVerifyDefaults(){var d={listed:'Listed on a public page',contact:'Reached this person and confirmed they work here',booker:'Confirmed they arrange or approve transportation'};var w=document.getElementById('acq-v-what');if(w){w.value=d[acqVal('acq-v-level')]||'';}}
+function acqVerifySave(){
+  var c=acqCtx&&acqCt(acqCtx.ctId);if(!c){return;}
+  var lv=acqPick(acqVal('acq-v-level'),acqKeys(ACQ_LEVELS),''),what=acqText(acqVal('acq-v-what'),120),how=acqText(acqVal('acq-v-how'),120),at=ptDate(acqVal('acq-v-at'));
+  if(!lv||!what||!how||!at){notify('Say what you checked, how, and the date');return;}
+  if(c.verif.length>=10){c.verif.shift();}
+  c.verif.push({level:lv,what:what,how:how,by:acqPick(acqVal('acq-v-by'),ACQ_OWNERS,'Kerry'),at:at});acqTouch(c);acqSave();acqModalClose();acqRefresh();notify('Check recorded');
+}
+
+// ---- Opportunities ----
+function acqNextText(o){
+  if(o.status==='closed'){return '<span style="color:var(--muted);">Closed ('+(o.closeReason==='declined'?'declined':'lost')+(o.closedAt?' on '+acqE(o.closedAt):'')+')</span>';}
+  if(o.status==='paused'){return '<span style="color:var(--muted);">Paused: '+acqE(o.pauseReason||'no reason recorded')+'</span>';}
+  var na=o.nextAction;if(!na){return '<span style="color:#e74c3c;">No next step. Set one or pause.</span>';}
+  var d=todayDaysBetween(na.date,atlDateStr()),ct=na.contactId?acqCt(na.contactId):null;
+  return (na.kind==='callback'?'Promised callback: ':'Next: ')+acqE(na.text||'Follow up')+(ct?' with '+acqE(ct.name):'')+' &middot; '+acqE(na.date)+(d>0?' <span style="color:#e74c3c;">('+d+' day'+(d===1?'':'s')+' overdue)</span>':d===0?' <span style="color:var(--gold);">(today)</span>':'');
+}
+function acqOppsHtml(co){
+  var opps=acqOppOf(co),restricted=!!(co.dnc&&co.dnc.on);
+  var h='<div class="card"><div class="sep-title"><span class="mini-badge mb-gold">Opportunities ('+opps.length+')</span></div>';
+  if(!opps.length){h+='<div style="font-size:var(--fs-sm);color:var(--muted);">None yet. One company can have several: for example an airport account and a separate summit, each with its own next step.</div>';}
+  h+=opps.map(function(o){
+    var sup=(o.status==='open')?acqOppSuppressed(o):'';
+    var cts=acqCtsOf(co).filter(function(c){return o.contactIds.indexOf(c.id)!==-1;}).map(function(c){return acqE(c.name);}).join(', ');
+    return '<div style="padding:12px 0;border-bottom:1px solid var(--border);overflow-wrap:anywhere;"><div style="font-size:var(--fs-sm);"><strong>'+acqE(o.title)+'</strong> <span class="mini-badge mb-blue">'+acqE(acqLabel(ACQ_TYPES,o.type))+'</span> <span class="mini-badge mb-gold">'+acqE(acqLabel(ACQ_STAGES,o.stage))+'</span> <span style="font-size:var(--fs-xs);color:var(--muted);">Owner: '+acqE(o.owner)+'</span></div>'+
+      '<div style="font-size:var(--fs-xs);margin-top:4px;">'+acqNextText(o)+(cts?' &middot; Contacts: '+cts:'')+'</div>'+
+      (sup&&o.status==='open'?'<div style="font-size:var(--fs-xs);color:#e74c3c;margin-top:2px;">No outreach tasks are created: '+acqE(sup)+'.</div>':'')+
+      '<div class="btns" style="margin-top:8px;">'+
+      (o.status==='open'&&!restricted?todayBtn('Log attempt','acqOutcomeOpen(\''+o.id+'\',\''+co.id+'\',\'\')',true)+todayBtn('Next step','acqNextOpen(\''+o.id+'\')'):'')+
+      (o.status!=='open'&&!restricted?todayBtn(o.status==='paused'?'Resume':'Reopen','acqReopenOpen(\''+o.id+'\')'):'')+
+      (o.status==='open'?todayBtn('Mark lost','acqLost(\''+o.id+'\')'):'')+'</div>'+
+      '<details style="margin-top:8px;"><summary style="cursor:pointer;font-size:var(--fs-xs);color:var(--gold);">Stage, owner and qualification</summary><div class="g2" style="margin-top:8px;"><div><label for="st-'+o.id+'">Stage</label><select id="st-'+o.id+'" onchange="acqSetStage(\''+o.id+'\',this.value)">'+acqOptions(ACQ_STAGES,o.stage)+'</select></div><div><label for="ow-'+o.id+'">Owner (a label only)</label><select id="ow-'+o.id+'" onchange="acqSetOwner(\''+o.id+'\',this.value)">'+acqOptions(ACQ_OWNERS,o.owner)+'</select></div></div>'+
+      '<div style="font-size:var(--fs-xs);color:var(--muted);margin:8px 0 4px;">Leave an answer blank until you know it. Blank means Unknown.</div><div class="g2">'+ACQ_QUAL.map(function(q){return '<div><label for="q-'+o.id+'-'+q[0]+'">'+q[1]+'</label><input type="text" id="q-'+o.id+'-'+q[0]+'" maxlength="200" value="'+acqE(o.qual[q[0]])+'" placeholder="Unknown" onchange="acqSetQual(\''+o.id+'\',\''+q[0]+'\',this.value)"></div>';}).join('')+'</div></details></div>';
+  }).join('');
+  var ctOpts=acqCtsOf(co).filter(function(c){return !(c.dnc&&c.dnc.on);});
+  h+='<div style="margin-top:14px;font-size:var(--fs-xs);color:var(--muted);">Add an opportunity. Every open opportunity needs an owner and a dated next step, or to be paused.</div><div class="g3" style="margin-top:6px;">'+acqFieldHtml('What is the need?','acq-op-title','Transportation need',120)+'<div><label for="acq-op-type">Type</label><select id="acq-op-type">'+acqOptions(ACQ_TYPES,'executive')+'</select></div><div><label for="acq-op-owner">Owner (a label only)</label><select id="acq-op-owner">'+acqOptions(ACQ_OWNERS,'Kerry')+'</select></div></div>'+
+    '<div class="g3">'+'<div><label for="acq-op-ct">Contact</label><select id="acq-op-ct">'+acqOptions(ctOpts.map(function(c){return [c.id,c.name];}),'','No contact yet')+'</select></div>'+acqFieldHtml('Next step','acq-op-nt','First contact',150)+acqFieldHtml('Date','acq-op-nd',todayAddDays(1),10,'date')+'</div>'+
+    '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px;"><label style="margin:0;display:flex;gap:6px;align-items:center;"><input type="checkbox" id="acq-op-pause" style="width:auto;"> Pause instead of scheduling</label><input type="text" id="acq-op-pr" maxlength="150" placeholder="Why paused" style="flex:1;min-width:140px;"></div>'+
+    '<div class="btns"><button class="btn btn-gold" onclick="acqAddOpp()">Add opportunity</button></div></div>';
+  return h;
+}
+function acqAddOpp(){
+  var co=acqCo(acqSel);if(!co){return;}
+  var title=acqText(acqVal('acq-op-title'),120);if(!title){notify('Say what the need is');return;}
+  var pause=acqChk('acq-op-pause'),nt=acqText(acqVal('acq-op-nt'),150),nd=ptDate(acqVal('acq-op-nd')),pr=acqText(acqVal('acq-op-pr'),150),ctId=acqVal('acq-op-ct');
+  var today=atlDateStr();
+  if(pause){if(!pr){notify('Say why this is paused');return;}}
+  else if(!(nt&&nd&&nd>=today)){notify('Set a next step with a date (today or later), or pause it');return;}
+  var ct=ctId?acqCt(ctId):null;if(ct&&(ct.companyId!==co.id||(ct.dnc&&ct.dnc.on))){ct=null;ctId='';}
+  var o={id:acqNewId('op'),companyId:co.id,contactIds:ct?[ct.id]:[],title:title,type:acqPick(acqVal('acq-op-type'),acqKeys(ACQ_TYPES),'other'),stage:'identified',status:pause?'paused':'open',owner:acqPick(acqVal('acq-op-owner'),ACQ_OWNERS,'Kerry'),
+    nextAction:pause?null:{text:nt,date:nd,kind:'outreach',contactId:ct?ct.id:''},pauseReason:pause?pr:'',closeReason:'',closedAt:'',qual:{},notes:'',createdAt:today,updatedAt:Date.now()};
+  ACQ_QUAL.forEach(function(q){o.qual[q[0]]='';});
+  acq.opps.push(o);acqSave();acqRefresh();notify('Opportunity added');
+}
+function acqSetStage(id,v){var o=acqOp(id);if(!o){return;}o.stage=acqPick(v,acqKeys(ACQ_STAGES),o.stage);acqTouch(o);acqSave();if(typeof renderToday==='function'){renderToday();}}
+function acqSetOwner(id,v){var o=acqOp(id);if(!o){return;}o.owner=acqPick(v,ACQ_OWNERS,o.owner);acqTouch(o);acqSave();if(typeof renderToday==='function'){renderToday();}}
+function acqSetQual(id,k,v){var o=acqOp(id);if(!o||acqKeys(ACQ_QUAL).indexOf(k)===-1){return;}o.qual[k]=acqText(v,200);acqTouch(o);acqSave();}
+function acqLost(id){
+  var o=acqOp(id);if(!o||!window.confirm('Mark "'+o.title+'" as lost? Its tasks stop. You can reopen it later with a recorded reason.')){return;}
+  o.status='closed';o.closeReason='lost';o.closedAt=atlDateStr();o.nextAction=null;o.pauseReason='';acqTouch(o);acqLogAct(o.companyId,'Opportunity "'+o.title+'" marked lost.',{oppId:o.id});acqSave();acqRefresh();
+}
+function acqAdvance(o,stage){var order=acqKeys(ACQ_STAGES);if(order.indexOf(stage)>order.indexOf(o.stage)){o.stage=stage;}}
+
+// ---- Next step / pause ----
+function acqQuick(n){var d=document.getElementById('acq-n-date');if(d){d.value=todayAddDays(n);}}
+function acqNextOpen(oppId){
+  var o=acqOp(oppId);if(!o||o.status==='closed'){return;}
+  var co=acqCo(o.companyId);if(co&&co.dnc&&co.dnc.on){notify('This company is marked do not contact');return;}
+  acqCtx={oppId:oppId};
+  var na=o.nextAction,cts=acqCtsOf(co||{id:''}).filter(function(c){return !(c.dnc&&c.dnc.on);});
+  acqModal('Next step: '+o.title,'<div class="g2">'+acqFieldHtml('What happens next','acq-n-text',na?na.text:'Follow up',150)+acqFieldHtml('Date','acq-n-date',na?na.date:todayAddDays(3),10,'date')+'</div>'+
+    '<div class="btns" style="margin-top:8px;">'+todayBtn('Tomorrow','acqQuick(1)')+todayBtn('In 3 days','acqQuick(3)')+todayBtn('In a week','acqQuick(7)')+todayBtn('In 2 weeks','acqQuick(14)')+'</div>'+
+    '<div style="margin-top:10px;"><label for="acq-n-ct">Contact</label><select id="acq-n-ct">'+acqOptions(cts.map(function(c){return [c.id,c.name];}),na?na.contactId:'','No contact')+'</select></div>'+
+    '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px;"><label style="margin:0;display:flex;gap:6px;align-items:center;"><input type="checkbox" id="acq-n-pause" style="width:auto;"> Pause instead</label><input type="text" id="acq-n-pr" maxlength="150" placeholder="Why paused" style="flex:1;min-width:140px;"></div>'+
+    '<div class="btns"><button class="btn btn-gold" onclick="acqNextSave()">Save</button><button class="btn btn-ghost" onclick="acqModalClose()">Cancel</button></div>');
+}
+function acqNextSave(){
+  var o=acqCtx&&acqOp(acqCtx.oppId);if(!o){return;}
+  var pause=acqChk('acq-n-pause'),text=acqText(acqVal('acq-n-text'),150),date=ptDate(acqVal('acq-n-date')),pr=acqText(acqVal('acq-n-pr'),150),ctId=acqVal('acq-n-ct'),today=atlDateStr();
+  if(pause){if(!pr){notify('Say why this is paused');return;}o.status='paused';o.pauseReason=pr;o.nextAction=null;}
+  else{
+    if(!(text&&date&&date>=today)){notify('Set what happens next and a date (today or later), or pause');return;}
+    var ct=ctId?acqCt(ctId):null;if(ct&&((ct.dnc&&ct.dnc.on)||ct.companyId!==o.companyId)){ct=null;}
+    o.status='open';o.pauseReason='';o.nextAction={text:text,date:date,kind:'outreach',contactId:ct?ct.id:''};
+  }
+  acqTouch(o);acqSave();acqModalClose();acqRefresh();notify(pause?'Paused':'Next step saved for '+date);
+}
+function acqReopenOpen(oppId){
+  var o=acqOp(oppId);if(!o||o.status==='open'){return;}
+  if(acqCoRestricted(o.companyId)){notify('Lift the company restriction first');return;}
+  acqCtx={oppId:oppId};
+  var wasClosed=o.status==='closed';
+  acqModal((wasClosed?'Reopen: ':'Resume: ')+o.title,(wasClosed?'<div style="font-size:var(--fs-xs);color:var(--muted);margin-bottom:10px;">This opportunity was '+(o.closeReason==='declined'?'declined':'marked lost')+'. Outreach resumes only with a recorded reason.</div><label for="acq-r-why">Why are you following up?</label><select id="acq-r-why">'+acqOptions([['invited','They invited us to follow up'],['chosen','I am choosing to follow up']],'invited')+'</select><div style="margin-top:10px;">'+acqFieldHtml('What happened (required)','acq-r-note','',300)+'</div>':'')+
+    '<div class="g2" style="margin-top:10px;">'+acqFieldHtml('Next step','acq-r-text','Follow up',150)+acqFieldHtml('Date','acq-r-date',todayAddDays(3),10,'date')+'</div><div class="btns"><button class="btn btn-gold" onclick="acqReopenSave()">'+(wasClosed?'Reopen':'Resume')+'</button><button class="btn btn-ghost" onclick="acqModalClose()">Cancel</button></div>');
+}
+function acqReopenSave(){
+  var o=acqCtx&&acqOp(acqCtx.oppId);if(!o){return;}
+  var wasClosed=o.status==='closed',today=atlDateStr();
+  var note=acqText(acqVal('acq-r-note'),300),why=acqVal('acq-r-why')==='invited'?'They invited us to follow up':'Deliberate follow-up chosen by us';
+  var text=acqText(acqVal('acq-r-text'),150),date=ptDate(acqVal('acq-r-date'));
+  if(wasClosed&&!note){notify('Record what happened before reopening');return;}
+  if(!(text&&date&&date>=today)){notify('Set a next step and a date (today or later)');return;}
+  o.status='open';o.closeReason='';o.closedAt='';o.pauseReason='';o.nextAction={text:text,date:date,kind:'outreach',contactId:''};acqTouch(o);
+  if(wasClosed){acqLogAct(o.companyId,'Reopened "'+o.title+'". '+why+': '+note,{oppId:o.id});}
+  acqSave();acqModalClose();acqRefresh();notify('Reopened');
+}
+
+// ---- Do not contact ----
+function acqDncOpen(kind,id,lift){
+  var r=kind==='co'?acqCo(id):acqCt(id);if(!r){return;}acqCtx={dncKind:kind,dncId:id,lift:lift};
+  var scope=kind==='co'?'Applies to every contact and opportunity at this company. Their tasks stop appearing in Today and attempts cannot be logged.':'Applies to this contact only. Tasks aimed at them stop appearing in Today.';
+  acqModal((lift?'Lift restriction: ':'Do not contact: ')+r.name,'<div style="font-size:var(--fs-xs);color:var(--muted);margin-bottom:10px;">'+(lift?'Only lift this if the person or company has told you it is OK to contact them again.':scope)+'</div>'+acqFieldHtml(lift?'Who said it is OK, and when (required)':'Reason (optional)','acq-d-note','',200)+'<div class="btns"><button class="btn btn-gold" onclick="acqDncSave()">'+(lift?'Lift restriction':'Mark do not contact')+'</button><button class="btn btn-ghost" onclick="acqModalClose()">Cancel</button></div>');
+}
+function acqDncSave(){
+  var x=acqCtx;if(!x||!x.dncKind){return;}
+  var r=x.dncKind==='co'?acqCo(x.dncId):acqCt(x.dncId);if(!r){return;}
+  var note=acqText(acqVal('acq-d-note'),200),today=atlDateStr(),coId=x.dncKind==='co'?r.id:r.companyId;
+  if(x.lift){
+    if(!note){notify('Record who said it is OK to contact them again');return;}
+    r.dnc=null;acqLogAct(coId,'Do-not-contact lifted for "'+r.name+'". '+note);
+  }else{
+    r.dnc={on:true,date:today,reason:note};
+    if(x.dncKind==='ct'){acq.opps.forEach(function(o){if(o.nextAction&&o.nextAction.contactId===r.id){o.nextAction=null;acqTouch(o);}});}
+    acqLogAct(coId,'Marked do not contact: "'+r.name+'"'+(note?'. '+note:'.'));
+  }
+  acqTouch(r);acqSave();acqModalClose();acqRefresh();notify(x.lift?'Restriction lifted':'Marked do not contact');
+}
+
+// ---- Record an outcome (also the next step) ----
+var ACQ_NEXT_DAYS={no_response:3,existing_provider:30,future_need:30,conversation:2};
+function acqOutcomeOpen(oppId,coId,ctId){
+  var o=oppId?acqOp(oppId):null,co=acqCo(coId||(o&&o.companyId));
+  if(!co){notify('That company is no longer in the list');return;}
+  if(co.dnc&&co.dnc.on){notify('This company is marked do not contact. Lift the restriction first.');return;}
+  var cts=acqCtsOf(co).filter(function(c){return !(c.dnc&&c.dnc.on);});
+  var opps=acqOppOf(co).filter(function(x){return x.status==='open';});
+  var selCt=ctId||(o&&o.nextAction&&o.nextAction.contactId)||'';
+  if(selCt&&!cts.some(function(c){return c.id===selCt;})){selCt='';}
+  acqCtx={oppId:oppId||'',companyId:co.id};
+  acqModal('Record what happened: '+co.name,
+    '<div class="g2"><div><label for="acq-o-opp">Opportunity</label><select id="acq-o-opp">'+acqOptions(opps.map(function(x){return [x.id,x.title];}),oppId||'','No opportunity (company-level call)')+'</select></div>'+
+    '<div><label for="acq-o-ct">Who</label><select id="acq-o-ct">'+acqOptions(cts.map(function(c){return [c.id,c.name+(c.role?' ('+c.role+')':'')];}),selCt,'Main line or no named contact')+'</select></div></div>'+
+    '<div class="g2" style="margin-top:10px;"><div><label for="acq-o-ch">How</label><select id="acq-o-ch">'+acqOptions(ACQ_CHANNELS,'call')+'</select></div><div><label for="acq-o-oc">What happened</label><select id="acq-o-oc" onchange="acqOutcomeUI()">'+acqOptions(ACQ_OUTCOMES,'','Choose...')+'</select></div></div>'+
+    '<div style="margin-top:10px;"><label for="acq-o-note">Note</label><textarea id="acq-o-note" maxlength="400" style="min-height:60px;"></textarea></div>'+
+    '<div id="acq-o-q" style="display:none;margin-top:10px;"><label style="margin:0 0 6px;display:flex;gap:6px;align-items:center;text-transform:none;letter-spacing:0;"><input type="checkbox" id="acq-o-spoke" style="width:auto;" onchange="acqOutcomeUI()"> I spoke with a relevant booking or approval contact</label><label style="margin:0;display:flex;gap:6px;align-items:center;text-transform:none;letter-spacing:0;"><input type="checkbox" id="acq-o-need" style="width:auto;" onchange="acqOutcomeUI()"> A transportation need was confirmed</label></div>'+
+    '<div id="acq-o-cb" style="display:none;margin-top:10px;">'+acqFieldHtml('Callback date (promised)','acq-o-cbd',todayAddDays(3),10,'date')+'</div>'+
+    '<div id="acq-o-dnc" style="display:none;margin-top:10px;font-size:var(--fs-sm);"><div style="margin-bottom:6px;">Who should not be contacted?</div><label style="margin:0 0 4px;display:flex;gap:6px;align-items:center;text-transform:none;letter-spacing:0;"><input type="radio" name="acq-o-scope" value="contact" style="width:auto;" checked> This contact only</label><label style="margin:0;display:flex;gap:6px;align-items:center;text-transform:none;letter-spacing:0;"><input type="radio" name="acq-o-scope" value="company" style="width:auto;"> The whole company</label></div>'+
+    '<div id="acq-o-decl" style="display:none;margin-top:10px;font-size:var(--fs-xs);color:var(--muted);">Declining closes this opportunity and stops its follow-ups. It comes back only if you record an invitation or deliberately reopen it.</div>'+
+    '<div id="acq-o-next" style="display:none;margin-top:10px;"><div class="g2">'+acqFieldHtml('Next step','acq-o-nt','Follow up',150)+acqFieldHtml('Date (suggested, change if needed)','acq-o-nd','',10,'date')+'</div><div class="btns" style="margin-top:6px;">'+todayBtn('Tomorrow','acqQuickO(1)')+todayBtn('In 3 days','acqQuickO(3)')+todayBtn('In a week','acqQuickO(7)')+todayBtn('In 2 weeks','acqQuickO(14)')+'</div>'+
+    '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px;"><label style="margin:0;display:flex;gap:6px;align-items:center;"><input type="checkbox" id="acq-o-pause" style="width:auto;" onchange="acqOutcomeUI()"> Pause this opportunity instead</label><input type="text" id="acq-o-pr" maxlength="150" placeholder="Why paused" style="flex:1;min-width:140px;"></div></div>'+
+    '<div id="acq-o-qual" style="margin-top:10px;font-size:var(--fs-xs);color:var(--muted);"></div>'+
+    '<div class="btns"><button class="btn btn-gold" onclick="acqOutcomeSave()">Save</button><button class="btn btn-ghost" onclick="acqModalClose()">Cancel</button></div>');
+}
+function acqQuickO(n){var d=document.getElementById('acq-o-nd');if(d){d.value=todayAddDays(n);}}
+function acqOutcomeUI(){
+  var oc=acqVal('acq-o-oc');
+  function show(id,on){var e=document.getElementById(id);if(e){e.style.display=on?'block':'none';}}
+  show('acq-o-q',oc==='conversation');show('acq-o-cb',oc==='callback');show('acq-o-dnc',oc==='dnc');show('acq-o-decl',oc==='declined');
+  var needs=['no_response','existing_provider','future_need','conversation'].indexOf(oc)!==-1;
+  show('acq-o-next',needs);
+  var nd=document.getElementById('acq-o-nd');if(nd&&needs&&!nd.value){nd.value=todayAddDays(ACQ_NEXT_DAYS[oc]||3);}
+  var q=document.getElementById('acq-o-qual');
+  if(q){
+    if(oc==='conversation'){
+      var ok=acqChk('acq-o-spoke')&&acqChk('acq-o-need')&&!acqChk('acq-o-pause')&&!!(acqVal('acq-o-nt').trim()&&acqVal('acq-o-nd'));
+      q.textContent=ok?'This counts as a qualified conversation.':'Counts as a qualified conversation only when you spoke with a booking or approval contact, a need was confirmed, and a next step is recorded.';
+    }else{q.textContent='';}
+  }
+}
+function acqOutcomeSave(){
+  var ctx=acqCtx;if(!ctx||!ctx.companyId){return;}
+  var co=acqCo(ctx.companyId);if(!co){acqModalClose();return;}
+  if(co.dnc&&co.dnc.on){notify('This company is marked do not contact');return;}
+  var today=atlDateStr(),oppId=acqVal('acq-o-opp'),ctId=acqVal('acq-o-ct');
+  var o=oppId?acqOp(oppId):null;if(oppId&&(!o||o.companyId!==co.id)){notify('Pick an opportunity from this company');return;}
+  var ct=ctId?acqCt(ctId):null;if(ctId&&(!ct||ct.companyId!==co.id||(ct.dnc&&ct.dnc.on))){notify('That contact cannot be contacted');return;}
+  var oc=acqPick(acqVal('acq-o-oc'),acqKeys(ACQ_OUTCOMES),'');if(!oc){notify('Choose what happened');return;}
+  var ch=acqPick(acqVal('acq-o-ch'),acqKeys(ACQ_CHANNELS),'call'),note=acqText(acqVal('acq-o-note'),400);
+  var spoke=oc==='conversation'&&acqChk('acq-o-spoke'),need=oc==='conversation'&&acqChk('acq-o-need');
+  var nt=acqText(acqVal('acq-o-nt'),150),nd=ptDate(acqVal('acq-o-nd')),pause=acqChk('acq-o-pause'),pr=acqText(acqVal('acq-o-pr'),150),cb=ptDate(acqVal('acq-o-cbd'));
+  var scopeEl=document.querySelector('input[name="acq-o-scope"]:checked'),scope=scopeEl?scopeEl.value:'contact';
+  if(oc==='callback'&&!(cb&&cb>=today)){notify('Choose the callback date (today or later)');return;}
+  var needsNext=['no_response','existing_provider','future_need','conversation'].indexOf(oc)!==-1;
+  if(needsNext){
+    if(pause){if(!pr){notify('Say why you are pausing');return;}}
+    else if(!(nt&&nd&&nd>=today)){notify('Set the next step (what, and a date of today or later) or pause');return;}
+  }
+  if(oc==='dnc'&&scope==='contact'&&!ct){notify('Pick who asked, or choose the whole company');return;}
+  var qualified=oc==='conversation'&&spoke&&need&&!pause&&!!(nt&&nd);
+  var actNote=note;
+  if(oc==='conversation'&&!o&&nt&&nd){actNote=acqText((note?note+' ':'')+'Next step: '+nt+' ('+nd+').',400);}
+  if(o){
+    if(oc==='declined'){o.status='closed';o.closeReason='declined';o.closedAt=today;o.nextAction=null;o.pauseReason='';}
+    else if(oc==='dnc'){o.nextAction=null;}
+    else if(oc==='callback'){o.status='open';o.pauseReason='';o.nextAction={text:acqText('Callback promised'+(note?': '+note:''),150),date:cb,kind:'callback',contactId:ct?ct.id:''};}
+    else if(pause){o.status='paused';o.pauseReason=pr;o.nextAction=null;}
+    else{o.status='open';o.pauseReason='';o.nextAction={text:nt,date:nd,kind:'outreach',contactId:ct?ct.id:''};}
+    if(oc!=='declined'&&oc!=='dnc'){acqAdvance(o,qualified?'qualified':'contacted');}
+    if(qualified&&nt&&!o.qual.nextStep){o.qual.nextStep=nt;}
+    if(ct&&o.contactIds.indexOf(ct.id)===-1&&o.contactIds.length<10){o.contactIds.push(ct.id);}
+    acqTouch(o);
+  }
+  if(oc==='dnc'){
+    if(scope==='company'){co.dnc={on:true,date:today,reason:note||'Asked not to be contacted'};acqTouch(co);}
+    else if(ct){
+      ct.dnc={on:true,date:today,reason:note||'Asked not to be contacted'};acqTouch(ct);
+      acq.opps.forEach(function(x){if(x.nextAction&&x.nextAction.contactId===ct.id){x.nextAction=null;acqTouch(x);}});
+    }
+  }
+  acq.acts.push({id:acqNewId('ac'),at:today,companyId:co.id,oppId:o?o.id:'',contactId:ct?ct.id:'',kind:'attempt',channel:ch,outcome:oc,note:actNote,spoke:spoke,need:need,qualified:qualified,createdAt:Date.now()});
+  acqSave();acqModalClose();acqRefresh();
+  notify(oc==='declined'?'Logged. Follow-ups for this opportunity stopped.':oc==='dnc'?'Logged. Marked do not contact.':qualified?'Logged as a qualified conversation.':'Logged.'+(o&&o.nextAction?' Next step: '+o.nextAction.date+'.':''));
+}
+
+// ---- Activity and Pipeline link ----
+function acqActivityHtml(co){
+  var acts=acq.acts.filter(function(a){return a.companyId===co.id;}).sort(function(a,b){return (a.at<b.at?1:a.at>b.at?-1:(b.createdAt||0)-(a.createdAt||0));}).slice(0,10);
+  var h='<div class="card"><div class="sep-title"><span class="mini-badge mb-blue">Recent activity</span></div>';
+  if(!acts.length){return h+'<div style="font-size:var(--fs-sm);color:var(--muted);">Nothing recorded yet.</div></div>';}
+  return h+acts.map(function(a){
+    var ct=a.contactId?acqCt(a.contactId):null,op=a.oppId?acqOp(a.oppId):null;
+    var what=a.kind==='log'?'Note':(acqLabel(ACQ_CHANNELS,a.channel)+': '+acqLabel(ACQ_OUTCOMES,a.outcome));
+    return '<div style="padding:6px 0;border-bottom:1px solid var(--border);font-size:var(--fs-sm);overflow-wrap:anywhere;"><span style="font-size:var(--fs-xs);color:var(--muted);">'+acqE(a.at)+'</span> '+acqE(what)+(ct?' &middot; '+acqE(ct.name):'')+(op?' &middot; '+acqE(op.title):'')+(a.qualified?' <span class="mini-badge mb-green">Qualified</span>':'')+(a.note?'<div style="font-size:var(--fs-xs);color:var(--muted);">'+acqE(a.note)+'</div>':'')+'</div>';
+  }).join('')+'</div>';
+}
+function acqPipelineHtml(co){
+  var nk=acqNorm(co.name),ms=(Array.isArray(pipeline)?pipeline:[]).filter(function(p){return p&&nk&&acqNorm(p.company)===nk;});
+  if(!ms.length){return '';}
+  return '<div class="card"><div class="sep-title"><span class="mini-badge mb-gold">Also in Pipeline</span></div><div style="font-size:var(--fs-xs);color:var(--muted);margin-bottom:6px;">Read only. These prospects stay in the Pipeline tab.</div>'+ms.map(function(p){return '<div style="font-size:var(--fs-sm);padding:4px 0;overflow-wrap:anywhere;">'+acqE(p.name)+(p.title?', '+acqE(p.title):'')+' <span style="font-size:var(--fs-xs);color:var(--muted);">'+acqE(getStageLabel(p.stage))+'</span></div>';}).join('')+'<div class="btns">'+todayBtn('Open Pipeline','todayGoTab(\'pipeline\')')+'</div></div>';
+}
+
+// ---- Today ----
+function acqTodayBlock(today){
+  if(!acqReady){return {html:'',count:0};}
+  var rows=[];
+  acq.opps.forEach(function(o){
+    if(o.status!=='open'||acqOppSuppressed(o)){return;}
+    var co=acqCo(o.companyId),who=acqE((co?co.name:'No company')+' · '+o.title),na=o.nextAction;
+    var openBtn=co?todayBtn('Open company','acqGoCo(\''+co.id+'\')'):'';
+    if(!na){rows.push({r:3,h:todayItem('high',who,'No next step and not paused. Set a dated next step or pause it.',[todayBtn('Set next step','acqNextOpen(\''+o.id+'\')',true),openBtn])});return;}
+    var d=todayDaysBetween(na.date,today),ct=na.contactId?acqCt(na.contactId):null;
+    var sub=acqE(na.text||'Follow up')+(ct?' with '+acqE(ct.name):'')+' · owner '+acqE(o.owner);
+    var done=todayBtn('Done: record outcome','acqOutcomeOpen(\''+o.id+'\')',true);
+    if(na.kind==='callback'&&d>=0){rows.push({r:0-Math.min(d,100)/1000,h:todayItem('crit',who,'Promised callback '+(d>0?d+' day'+(d===1?'':'s')+' overdue':'due today')+'. '+sub,[done,openBtn])});}
+    else if(d>0){rows.push({r:1-Math.min(d,100)/1000,h:todayItem('high',who,'Overdue by '+d+' day'+(d===1?'':'s')+'. '+sub,[done,openBtn])});}
+    else if(d===0){rows.push({r:2,h:todayItem('med',who,'Due today. '+sub,[done,openBtn])});}
+    else if(d>=-7){rows.push({r:4+(-d)/100,h:todayItem('low',who,(na.kind==='callback'?'Callback promised for ':'Coming up on ')+acqE(na.date)+'. '+sub,[done,openBtn])});}
+  });
+  var overdueCount=rows.filter(function(r){return r.r<3;}).length;
+  var noRes=acqLiveCos().filter(function(c){return !c.researchedAt&&!(c.dnc&&c.dnc.on);}).slice(0,3);
+  noRes.forEach(function(c){rows.push({r:5,h:todayItem('low','Research '+acqE(c.name),'No research saved for this company yet.',[todayBtn('Research now','acqResearchNow(\''+c.id+'\')',true),todayBtn('Open company','acqGoCo(\''+c.id+'\')')])});});
+  rows.sort(function(a,b){return a.r-b.r;});
+  var html=rows.slice(0,10).map(function(x){return x.h;}).join('')+(rows.length>10?'<div style="font-size:var(--fs-xs);color:var(--muted);padding-top:8px;">+ '+(rows.length-10)+' more. Open Companies to see them all.</div>':'');
+  if(!acq.companies.length){html='<div style="font-size:var(--fs-sm);color:var(--muted);">No companies yet. Add one, or run Company Research on the Radar tab.</div><div class="btns">'+todayBtn('Open Companies','todayGoTab(\'companies\')',true)+'</div>';}
+  else if(!rows.length){html='<div style="font-size:var(--fs-sm);color:var(--muted);">No acquisition actions are due.</div>';}
+  html+=acqCountsHtml();
+  return {html:html,count:rows.length};
+}
+
+acqReady=true;
+if(typeof renderToday==='function'){renderToday();}
 </script>
 </body>
 </html>
