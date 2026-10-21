@@ -90,7 +90,7 @@ with sync_playwright() as p:
     r3 = ev(pg, "acqMigrate()")
     t('running the import twice more adds nothing', r2['ok'] and r3['ok'] and r2['companies'] == 0 and r2['contacts'] == 0 and ev(pg, "JSON.stringify(acq)") == snap1)
     t('integrity check passes and all ids are unique', ev(pg, "acqCheck(acq)") == '' and ev(pg, "var ids=[].concat(acq.companies,acq.contacts,acq.opps,acq.acts).map(function(x){return x.id});ids.length===new Set(ids).size"))
-    t('Today shows a pipeline item before any restriction', 'Jane Roe' in today_text(pg) or True)
+    open_tab(pg, 'today'); t('Today shows the Pipeline reminder before any restriction', 'Jane Roe' in today_text(pg))
     pg.context.close()
 
     # failure keeps everything and is recoverable

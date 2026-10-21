@@ -1907,9 +1907,11 @@ textarea{resize:vertical;min-height:75px;}
       <div style="font-size:var(--fs-xs);color:var(--muted);line-height:1.6;margin-bottom:14px;">
         <p style="margin-bottom:6px;"><strong style="color:var(--text);">No login for the app.</strong> Anyone who opens the site address sees the screens, but the screens hold no data. Your records are saved inside this browser, on this device.</p>
         <p style="margin-bottom:6px;"><strong style="color:var(--text);">Cloud Sync is separate and optional.</strong> It is a sign-in to a Supabase account. Synced rows are stored per signed-in user, and the project is set up so each user can read and change only their own rows (row-level security, defined in supabase/001_ob_store.sql in the repository). Whether that setup is applied on the live project, and whether public sign-ups are turned off, cannot be checked from this app. Confirm both in Supabase.</p>
-        <p style="margin-bottom:6px;"><strong style="color:var(--text);">Companies, contacts, opportunities and activity are not synced.</strong> They stay in this browser and are included only in Export Full Backup. Keep a backup. A second browser or device would hold different records.</p>
+        <p style="margin-bottom:6px;"><strong style="color:var(--text);">Companies, contacts, opportunities, quotes, bookings and activity are not synced.</strong> They stay in this browser and are included only in Export Full Backup. Keep a backup. A second browser or device would hold different records.</p>
         <p><strong style="color:var(--text);">Costs and profit are not stored in the app.</strong></p>
       </div>
+      <div class="sep-title"><span class="mini-badge mb-green">What Full Backup contains</span></div>
+      <div id="backup-info" style="font-size:var(--fs-xs);color:var(--muted);line-height:1.6;margin-bottom:14px;"></div>
       <div class="sep-title"><span class="mini-badge mb-green">Cloud Sync</span></div>
       <div id="cloud-signed-out" style="margin-bottom:12px;">
         <div class="sec-d" style="margin-bottom:10px;">Sign in to keep a copy of your data in the cloud so it survives a cleared browser or a new device. The app still works without it.</div>
@@ -1932,7 +1934,15 @@ textarea{resize:vertical;min-height:75px;}
         <button class="btn btn-outline" onclick="exportAllContactsCSV()">Export All Contacts CSV</button>
       </div>
 
-      <div class="sep-title"><span class="mini-badge" style="background:rgba(52,152,219,0.1);border:1px solid rgba(52,152,219,0.3);color:var(--blue);">Restore</span></div>
+      <div class="sep-title"><span class="mini-badge" style="background:rgba(52,152,219,0.1);border:1px solid rgba(52,152,219,0.3);color:var(--blue);">Restore from a backup file</span></div>
+      <div style="font-size:var(--fs-xs);color:var(--muted);line-height:1.6;margin-bottom:10px;"><strong style="color:var(--text);">Restore is not the same as Import.</strong> Restore puts back (Replace) or combines (Merge) data from a backup file you downloaded earlier. Import, on the Companies tab, copies your existing Pipeline, Gatekeeper, Research and Radar records into Companies without using a file. Choosing a file below only previews it and changes nothing until you press Restore.</div>
+      <details style="margin-bottom:12px;"><summary style="cursor:pointer;font-size:var(--fs-xs);color:var(--gold);">Safe way to test a restore on the live site</summary><ol style="font-size:var(--fs-xs);color:var(--muted);line-height:1.6;margin:8px 0 0 18px;">
+        <li>In your working browser, note the Companies fingerprint and counts above, then press Export Full Backup. Save the file as your original and do not edit it.</li>
+        <li>On the Companies tab, press Check import (changes nothing). It reports what an import would add.</li>
+        <li>Make a copy of the backup file. Use the copy for the test.</li>
+        <li>Open the live site in a separate browser profile or a private window (it starts empty). Do not sign in to Cloud Sync there.</li>
+        <li>Choose the copy under Choose Backup File and read the preview. Press Restore (Replace), let the page reload, and open Data &amp; Backup. The fingerprint and counts must equal step 1. Open a company and check its contacts, quote, booking and Pipeline links.</li>
+        <li>Only if every check matches, trust the backup. Never restore into the working browser unless you need to, and export a fresh backup first. A snapshot is taken automatically before each restore.</li></ol></details>
       <label>Choose Backup File</label>
       <input type="file" id="backup-file-input" accept="application/json" onchange="previewBackupFile(this.files[0])" style="margin-bottom:10px;">
       <div id="backup-preview" style="display:none;">
@@ -2134,6 +2144,7 @@ function exportAllContactsCSV(){
 function openBackupModal(){
   document.getElementById('backup-modal').classList.add('open');
   renderSnapshotsList();
+  if(typeof renderBackupInfo==='function'&&acqReady){renderBackupInfo();}
 }
 function closeBackupModal(){
   document.getElementById('backup-modal').classList.remove('open');
@@ -2183,7 +2194,9 @@ function exportFullBackup(){
   });
   var backup={
     app:'odyssey-black-executive-acquisition-suite',
-    schemaVersion:1,
+    schemaVersion:2,
+    appRelease:(typeof ACQ_RELEASE!=='undefined'?ACQ_RELEASE:''),
+    companiesFingerprint:(typeof acqFingerprint==='function'&&acqReady?acqFingerprint(keys['ob-acq']):''),
     exportedAt:new Date().toISOString(),
     exportedAtlDate:atlDateStr(),
     recordCounts:recordCounts,
@@ -2195,6 +2208,9 @@ function exportFullBackup(){
   a.href=url;a.download='odyssey-black-backup-'+atlDateStr()+'.json';
   document.body.appendChild(a);a.click();document.body.removeChild(a);
   URL.revokeObjectURL(url);
+  try{localStorage.setItem('ob-last-export',JSON.stringify({at:backup.exportedAt,schema:backup.schemaVersion,release:backup.appRelease,fp:backup.companiesFingerprint}));}catch(e){}
+  if(typeof renderBackupInfo==='function'&&acqReady){renderBackupInfo();}
+  var lb=document.getElementById('acq-last-backup');if(lb&&typeof acqLastBackupText==='function'){lb.textContent=acqLastBackupText();}
   notify('Backup downloaded');
 }
 
@@ -2237,7 +2253,11 @@ function previewBackupFile(file){
       summaryLines.push('Rejected (not an approved key, or unreadable): '+rejectedKeys.join(', '));
     }
     summaryLines.push('');
-    summaryLines.push('Backup date: '+(parsed.exportedAtlDate||parsed.exportedAt||'unknown'));
+    var madeAt='unknown';try{if(parsed.exportedAt){madeAt=new Date(parsed.exportedAt).toLocaleString();}else if(parsed.exportedAtlDate){madeAt=parsed.exportedAtlDate;}}catch(e){}
+    summaryLines.push('Backup created: '+madeAt);
+    summaryLines.push('Format: schema '+parsed.schemaVersion+', app release '+(parsed.appRelease||'before release 1b'));
+    if(accepted['ob-acq']!==undefined){var fpFile=acqFingerprint(accepted['ob-acq']),fpNow=acqFingerprint(localStorage.getItem('ob-acq'));summaryLines.push('Companies fingerprint in this file: '+fpFile+(fpFile===fpNow?' (same as this browser now)':' (this browser now: '+fpNow+')'));}
+    else{summaryLines.push('This file has no Companies data. Replace would leave the current Companies data as it is.');}
     summaryLines.push('This preview does NOT change any data yet.');
 
     document.getElementById('backup-preview').style.display='block';
@@ -5354,7 +5374,7 @@ function renderToday(){
   var total=0;
   // 1. Pipeline
   var rows=[];
-  var open=pipeline.filter(function(p){return TODAY_INACTIVE_STAGES.indexOf(p.stage)===-1&&!acqNameRestricted(p.company,p.name);});
+  var open=pipeline.filter(function(p){return TODAY_INACTIVE_STAGES.indexOf(p.stage)===-1&&!acqNameRestricted(p.company,p.name)&&!acqProspectLinked(p.id);});
   open.filter(function(p){return p.stage==='trial-done';}).forEach(function(p){
     rows.push({r:0,h:todayItem('crit',escapeHTML(p.name)+' &middot; '+escapeHTML(p.company||''),'Trial ride done. Close within 48 hours.',[todayBtn('Open Pipeline','todayGoTab(\'pipeline\')',true),todayBtn('Log touch','todayLogTouch('+p.id+')')])});
   });
@@ -5402,7 +5422,7 @@ function renderToday(){
   });
   // 3b. Partners
   var ptList=(typeof partners!=='undefined'&&Array.isArray(partners))?partners:[];
-  var ptDue=ptList.filter(function(p){return p.status!=='dormant'&&p.nextFollow&&p.nextFollow<=today;}).sort(function(a,b){return a.nextFollow<b.nextFollow?-1:1;});
+  var ptDue=ptList.filter(function(p){return p.status!=='dormant'&&p.nextFollow&&p.nextFollow<=today&&!acqNameRestricted(p.org,p.name);}).sort(function(a,b){return a.nextFollow<b.nextFollow?-1:1;});
   total+=ptDue.length;
   var ptHtml=ptDue.slice(0,6).map(function(p){
     var d=todayDaysBetween(p.nextFollow,today);
@@ -5410,7 +5430,9 @@ function renderToday(){
   }).join('');
   // 3c. Quotes
   var qtList=(typeof qtState!=='undefined'&&qtState&&Array.isArray(qtState.log))?qtState.log:[];
-  var qtDue=qtList.filter(function(q){return q.status==='sent'&&q.follow&&q.follow<=today;}).sort(function(a,b){return a.follow<b.follow?-1:1;});
+  var qtAll=qtList.filter(function(q){return q.status==='sent'&&q.follow&&q.follow<=today;}).sort(function(a,b){return a.follow<b.follow?-1:1;});
+  var qtHeld=[],qtDue=[];
+  qtAll.forEach(function(q){var why=acqQuoteHold(q);if(why){qtHeld.push({q:q,why:why});}else{qtDue.push(q);}});
   total+=qtDue.length;
   var qtHtml=qtDue.slice(0,6).map(function(q){
     var d=todayDaysBetween(q.follow,today);
@@ -5435,7 +5457,7 @@ function renderToday(){
     todaySection('Gatekeepers','mb-blue',gkHtml,'No gatekeeper follow-ups are due.')+
     todaySection('Market Radar','mb-green',rh,'Nothing new from the Radar today.')+
     (ptList.length?todaySection('Partners','mb-blue',ptHtml,'No partner follow-ups are due.'):'')+
-    (qtList.length?todaySection('Quotes','mb-gold',qtHtml,'No quote follow-ups are due.'):'')+
+    (qtList.length?todaySection('Quotes','mb-gold',(qtHtml||(qtHeld.length?'<div style="font-size:var(--fs-sm);color:var(--muted);">No quote follow-ups are due.</div>':''))+acqHeldQuotesHtml(qtHeld),'No quote follow-ups are due.'):'')+
     todaySection('Sprint','mb-gold',sh,'All of this week\'s sprint tasks are done.')+
     todaySection('Weekly digest','mb-blue',(typeof TODAY_INACTIVE_STAGES!=='undefined'?digestHTML():''),'');
   var sm=document.getElementById('today-summary');
@@ -6261,7 +6283,7 @@ function renderQuoteLog(){
       '<div style="font-size:var(--fs-sm);margin-top:4px;">Sedan '+(q.sedan===null?'-':qtMoney(q.sedan))+' &middot; SUV '+(q.suv===null?'-':qtMoney(q.suv))+(q.peak==='yes'?' <span style="color:var(--muted);">(peak)</span>':'')+'</div>'+
       '<div class="g2" style="margin-top:8px;"><div><label>Status</label><select onchange="qtSet(\''+q.id+'\',\'status\',this.value)">'+opts+'</select></div>'+
       '<div><label>Follow-up'+(overdue?' (overdue)':'')+'</label><input type="date" value="'+escapeHTML(q.follow)+'" onchange="qtSet(\''+q.id+'\',\'follow\',this.value)"></div></div>'+
-      '<div class="btns" style="margin-top:6px;">'+todayBtn(qtConfirm===q.id?'Click again to delete':'Delete','qtDelete(\''+q.id+'\')')+'</div></div>';
+      acqQuoteLinkHtml(q)+'<div class="btns" style="margin-top:6px;">'+todayBtn(qtConfirm===q.id?'Click again to delete':'Delete','qtDelete(\''+q.id+'\')')+'</div></div>';
   }).join('');
   if(L.length>50){h+='<div style="font-size:var(--fs-xs);color:var(--muted);padding-top:8px;">Showing the newest 50 of '+L.length+'.</div>';}
   el.innerHTML=h;
@@ -6455,7 +6477,7 @@ function acqPhoneKey(p){var d=String(p==null?'':p).replace(/\D/g,'');return d.le
 function acqNewId(p){return p+'-'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
 
 function acqClean(raw){
-  var out={v:1,migratedAt:'',script:'',companies:[],contacts:[],opps:[],acts:[],dismissed:[]};
+  var out={v:1,migratedAt:'',script:'',companies:[],contacts:[],opps:[],acts:[],quotes:[],bookings:[],plinks:[],dismissed:[]};
   if(!raw||typeof raw!=='object'||Array.isArray(raw)){return out;}
   out.migratedAt=ptDate(raw.migratedAt);
   out.script=acqText(raw.script,1000);
@@ -6463,6 +6485,7 @@ function acqClean(raw){
   function okId(id,p){return typeof id==='string'&&id.indexOf(p+'-')===0&&/^[a-z]{2}-[a-z0-9-]{2,90}$/.test(id)&&!ids[id];}
   function num(v){v=+v;return isFinite(v)&&v>0?v:0;}
   function dnc(d){return (d&&typeof d==='object'&&d.on===true)?{on:true,date:ptDate(d.date),reason:acqText(d.reason,200)}:null;}
+  function arch(a){return (a&&typeof a==='object'&&ptDate(a.at))?{at:ptDate(a.at),note:acqText(a.note,150)}:null;}
   (Array.isArray(raw.companies)?raw.companies:[]).slice(0,500).forEach(function(c){
     if(!c||typeof c!=='object'||!okId(c.id,'co')){return;}
     var name=acqText(c.name,100);if(!name){return;}
@@ -6477,7 +6500,7 @@ function acqClean(raw){
     }
     out.companies.push({id:c.id,name:name,website:acqWebsite(c.website),address:acqText(c.address,200),phone:acqText(c.phone,30),area:acqText(c.area,40),
       source:acqPick(c.source,['research','radar','pipeline','manual'],'manual'),sourceLinks:links,researchedAt:ptDate(c.researchedAt),research:r,notes:acqText(c.notes,500),
-      dnc:dnc(c.dnc),archivedInto:(typeof c.archivedInto==='string'&&/^co-[a-z0-9-]{2,90}$/.test(c.archivedInto))?c.archivedInto:'',createdAt:ptDate(c.createdAt),updatedAt:num(c.updatedAt)});
+      dnc:dnc(c.dnc),archivedInto:(typeof c.archivedInto==='string'&&/^co-[a-z0-9-]{2,90}$/.test(c.archivedInto))?c.archivedInto:'',createdAt:ptDate(c.createdAt),updatedAt:num(c.updatedAt),archived:arch(c.archived)});
   });
   var coIds={};out.companies.forEach(function(c){coIds[c.id]=1;});
   out.companies.forEach(function(c){if(c.archivedInto&&(!coIds[c.archivedInto]||c.archivedInto===c.id)){c.archivedInto='';}});
@@ -6488,7 +6511,7 @@ function acqClean(raw){
     var verif=(Array.isArray(c.verif)?c.verif:[]).slice(0,10).map(function(v){if(!v||typeof v!=='object'){return null;}var lv=acqPick(v.level,acqKeys(ACQ_LEVELS),'');var what=acqText(v.what,120),how=acqText(v.how,120);return (lv&&what&&how)?{level:lv,what:what,how:how,by:acqText(v.by,60),at:ptDate(v.at)}:null;}).filter(Boolean);
     out.contacts.push({id:c.id,companyId:(typeof c.companyId==='string'&&coIds[c.companyId])?c.companyId:'',name:name,role:acqText(c.role,100),email:acqEmail(c.email),phone:acqText(c.phone,30),
       source:acqText(c.source,60),sourceUrl:acqUrl(c.sourceUrl),verif:verif,dnc:dnc(c.dnc),notes:acqText(c.notes,300),origin:acqText(c.origin,40),
-      archivedInto:(typeof c.archivedInto==='string'&&/^ct-[a-z0-9-]{2,90}$/.test(c.archivedInto)&&c.archivedInto!==c.id)?c.archivedInto:'',createdAt:ptDate(c.createdAt),updatedAt:num(c.updatedAt)});
+      archivedInto:(typeof c.archivedInto==='string'&&/^ct-[a-z0-9-]{2,90}$/.test(c.archivedInto)&&c.archivedInto!==c.id)?c.archivedInto:'',createdAt:ptDate(c.createdAt),updatedAt:num(c.updatedAt),archived:arch(c.archived)});
   });
   var ctIds={};out.contacts.forEach(function(c){ctIds[c.id]=1;});
   out.contacts.forEach(function(c){if(c.archivedInto&&!ctIds[c.archivedInto]){c.archivedInto='';}});
@@ -6505,7 +6528,7 @@ function acqClean(raw){
       contactIds:(Array.isArray(o.contactIds)?o.contactIds:[]).filter(function(x){return typeof x==='string'&&ctIds[x];}).slice(0,10),
       title:acqText(o.title,120)||'Transportation need',type:acqPick(o.type,acqKeys(ACQ_TYPES),'other'),stage:acqPick(o.stage,acqKeys(ACQ_STAGES),'identified'),status:status,
       owner:acqPick(o.owner,ACQ_OWNERS,'Kerry'),nextAction:na,pauseReason:acqText(o.pauseReason,150),closeReason:acqPick(o.closeReason,['declined','lost'],''),closedAt:ptDate(o.closedAt),
-      qual:q,notes:acqText(o.notes,300),createdAt:ptDate(o.createdAt),updatedAt:num(o.updatedAt)});
+      qual:q,notes:acqText(o.notes,300),createdAt:ptDate(o.createdAt),updatedAt:num(o.updatedAt),projected:acqMoney(o.projected,10000000),archived:arch(o.archived)});
   });
   var opIds={};out.opps.forEach(function(o){opIds[o.id]=1;});
   (Array.isArray(raw.acts)?raw.acts:[]).slice(0,5000).forEach(function(a){
@@ -6518,30 +6541,79 @@ function acqClean(raw){
       contactId:(typeof a.contactId==='string'&&ctIds[a.contactId])?a.contactId:'',kind:kind,channel:acqPick(a.channel,acqKeys(ACQ_CHANNELS),''),outcome:oc,note:acqText(a.note,400),
       spoke:spoke,need:need,qualified:(kind==='attempt'&&oc==='conversation'&&spoke&&need&&a.qualified===true),createdAt:num(a.createdAt)});
   });
+  var qIds={};
+  (Array.isArray(raw.quotes)?raw.quotes:[]).slice(0,1000).forEach(function(q){
+    if(!q||typeof q!=='object'||!okId(q.id,'qq')){return;}
+    var seenN={},vs=[];
+    (Array.isArray(q.versions)?q.versions:[]).slice(0,30).forEach(function(v){
+      if(!v||typeof v!=='object'){return;}
+      var n=Math.floor(+v.n);if(!(n>=1&&n<=999)||seenN[n]){return;}
+      var amt=acqMoney(v.amount,100000);if(amt===null){return;}
+      seenN[n]=1;
+      var stt=['sent','accepted','superseded'].indexOf(v.status)!==-1?v.status:'sent',acc=ptDate(v.acceptedAt);
+      if(stt==='accepted'&&!acc){stt='sent';}
+      vs.push({n:n,at:ptDate(v.at),vehicle:['sedan','suv','other'].indexOf(v.vehicle)!==-1?v.vehicle:'other',amount:amt,from:acqText(v.from,200),to:acqText(v.to,200),miles:acqMoney(v.miles,2000)||0,date:ptDate(v.date),time:/^([01]\d|2[0-3]):[0-5]\d$/.test(String(v.time||''))?v.time:'',note:acqText(v.note,200),status:stt,acceptedAt:acc});
+    });
+    if(!vs.length){return;}
+    vs.sort(function(a,b){return a.n-b.n;});
+    vs.filter(function(v){return v.status==='accepted';}).slice(0,-1).forEach(function(v){v.status='superseded';});
+    ids[q.id]=1;qIds[q.id]=1;
+    out.quotes.push({id:q.id,companyId:(typeof q.companyId==='string'&&coIds[q.companyId])?q.companyId:'',contactId:(typeof q.contactId==='string'&&ctIds[q.contactId])?q.contactId:'',oppId:(typeof q.oppId==='string'&&opIds[q.oppId])?q.oppId:'',
+      legacyId:(typeof q.legacyId==='string'&&/^qt-\d{6,}$/.test(q.legacyId))?q.legacyId:'',label:acqText(q.label,120),versions:vs,createdAt:ptDate(q.createdAt),updatedAt:num(q.updatedAt)});
+  });
+  (Array.isArray(raw.bookings)?raw.bookings:[]).slice(0,3000).forEach(function(b){
+    if(!b||typeof b!=='object'||!okId(b.id,'bk')){return;}
+    ids[b.id]=1;
+    var stt=['scheduled','completed','cancelled'].indexOf(b.status)!==-1?b.status:'scheduled';
+    var av=b.avail==='confirmed'?'confirmed':'unconfirmed';
+    out.bookings.push({id:b.id,companyId:(typeof b.companyId==='string'&&coIds[b.companyId])?b.companyId:'',oppId:(typeof b.oppId==='string'&&opIds[b.oppId])?b.oppId:'',contactId:(typeof b.contactId==='string'&&ctIds[b.contactId])?b.contactId:'',
+      quoteId:(typeof b.quoteId==='string'&&qIds[b.quoteId])?b.quoteId:'',quoteVersion:(typeof b.quoteId==='string'&&qIds[b.quoteId])?Math.max(0,Math.min(999,Math.floor(+b.quoteVersion)||0)):0,
+      serviceDate:ptDate(b.serviceDate),time:/^([01]\d|2[0-3]):[0-5]\d$/.test(String(b.time||''))?b.time:'',from:acqText(b.from,200),to:acqText(b.to,200),vehicle:['sedan','suv','other'].indexOf(b.vehicle)!==-1?b.vehicle:'other',
+      amount:acqMoney(b.amount,100000),status:stt,opsRef:acqText(b.opsRef,60),avail:av,availAt:ptDate(b.availAt),series:acqText(b.series,40),note:acqText(b.note,200),
+      completedAt:stt==='completed'?ptDate(b.completedAt):'',cancelledAt:stt==='cancelled'?ptDate(b.cancelledAt):'',cancelReason:stt==='cancelled'?acqText(b.cancelReason,150):'',createdAt:ptDate(b.createdAt),updatedAt:num(b.updatedAt)});
+  });
+  var plSeen={};
+  (Array.isArray(raw.plinks)?raw.plinks:[]).slice(0,1000).forEach(function(l){
+    if(!l||typeof l!=='object'){return;}
+    var pid=String(l.pid==null?'':l.pid);if(!/^[0-9a-zA-Z._\-]{1,40}$/.test(pid)||plSeen[pid]){return;}
+    if(!(typeof l.companyId==='string'&&coIds[l.companyId])){return;}
+    plSeen[pid]=1;
+    out.plinks.push({pid:pid,companyId:l.companyId,contactId:(typeof l.contactId==='string'&&ctIds[l.contactId])?l.contactId:'',oppId:(typeof l.oppId==='string'&&opIds[l.oppId])?l.oppId:'',at:ptDate(l.at)});
+  });
   out.dismissed=(Array.isArray(raw.dismissed)?raw.dismissed:[]).filter(function(x){return typeof x==='string'&&/^[a-z]{2}-[a-z0-9-]{2,90}\|[a-z]{2}-[a-z0-9-]{2,90}$/.test(x);}).slice(0,300);
   return out;
 }
 // Restore (Merge) for ob-acq: union by id per collection; the newer record wins; nothing is dropped.
+// Quotes keep every version from both sides; Pipeline links are unioned by prospect id.
 function acqMergeRaw(curRaw,incRaw){
   var a=acqClean(curRaw),b=acqClean(incRaw);
-  ['companies','contacts','opps','acts'].forEach(function(k){
+  ['companies','contacts','opps','acts','bookings'].forEach(function(k){
     var m={};a[k].forEach(function(r){m[r.id]=r;});
     b[k].forEach(function(r){var e=m[r.id];if(!e||(r.updatedAt||r.createdAt||0)>=(e.updatedAt||e.createdAt||0)){m[r.id]=r;}});
     a[k]=Object.keys(m).map(function(i){return m[i];});
   });
+  var qm={};a.quotes.forEach(function(r){qm[r.id]=r;});
+  b.quotes.forEach(function(r){
+    var e=qm[r.id];if(!e){qm[r.id]=r;return;}
+    var newer=(r.updatedAt||0)>=(e.updatedAt||0)?r:e,older=newer===r?e:r;
+    older.versions.forEach(function(v){if(!newer.versions.some(function(x){return x.n===v.n;})){newer.versions.push(v);}});
+    newer.versions.sort(function(x,y){return x.n-y.n;});qm[r.id]=newer;
+  });
+  a.quotes=Object.keys(qm).map(function(i){return qm[i];});
+  b.plinks.forEach(function(l){if(!a.plinks.some(function(x){return x.pid===l.pid;})){a.plinks.push(l);}});
   b.dismissed.forEach(function(x){if(a.dismissed.indexOf(x)===-1){a.dismissed.push(x);}});
   a.migratedAt=a.migratedAt||b.migratedAt;a.script=a.script||b.script;
   return acqClean(a);
 }
-function acqBackupSummary(v){if(!v||typeof v!=='object'){return 'no companies (Replace will clear current companies, Merge keeps them)';}var s=acqClean(v);return s.companies.length+' companies, '+s.contacts.length+' contacts, '+s.opps.length+' opportunities, '+s.acts.length+' activities';}
+function acqBackupSummary(v){if(!v||typeof v!=='object'){return 'no companies (Replace will clear current companies, Merge keeps them)';}var s=acqClean(v);return s.companies.length+' companies, '+s.contacts.length+' contacts, '+s.opps.length+' opportunities, '+s.quotes.length+' quotes, '+s.bookings.length+' bookings, '+s.acts.length+' activities';}
 var acq=acqClean(loadJSON('ob-acq',null));
 function acqSave(){return saveJSON('ob-acq',acq);}
 function acqTouch(r){r.updatedAt=Date.now();return r;}
 function acqCo(id){for(var i=0;i<acq.companies.length;i++){if(acq.companies[i].id===id){return acq.companies[i];}}return null;}
 function acqCt(id){for(var i=0;i<acq.contacts.length;i++){if(acq.contacts[i].id===id){return acq.contacts[i];}}return null;}
 function acqOp(id){for(var i=0;i<acq.opps.length;i++){if(acq.opps[i].id===id){return acq.opps[i];}}return null;}
-function acqLiveCos(){return acq.companies.filter(function(c){return !c.archivedInto;});}
-function acqLiveCts(){return acq.contacts.filter(function(c){return !c.archivedInto;});}
+function acqLiveCos(){return acq.companies.filter(function(c){return !c.archivedInto&&!c.archived;});}
+function acqLiveCts(){return acq.contacts.filter(function(c){return !c.archivedInto&&!c.archived;});}
 function acqCoName(id){var c=acqCo(id);return c?c.name:'';}
 
 // ---- Do-not-contact ----
@@ -6549,9 +6621,11 @@ function acqCoRestricted(id){var c=acqCo(id);return !!(c&&c.dnc&&c.dnc.on);}
 function acqCtRestricted(c){return !!(c&&((c.dnc&&c.dnc.on)||acqCoRestricted(c.companyId)));}
 // Reason an open opportunity must not produce an outreach task ('' means it may).
 function acqOppSuppressed(o){
+  if(o.archived){return 'Archived';}
+  var co0=acqCo(o.companyId);if(co0&&co0.archived){return 'Company is archived';}
   if(acqCoRestricted(o.companyId)){return 'Company is marked do not contact';}
   var na=o.nextAction;
-  if(na&&na.contactId){var c=acqCt(na.contactId);if(c&&c.dnc&&c.dnc.on){return 'Contact is marked do not contact';}}
+  if(na&&na.contactId){var c=acqCt(na.contactId);if(c&&c.dnc&&c.dnc.on){return 'Contact is marked do not contact';}if(c&&c.archived){return 'Contact is archived';}}
   if(o.status==='closed'){return 'Closed';}
   if(o.status==='paused'){return 'Paused';}
   return '';
@@ -6569,7 +6643,7 @@ function acqNameRestricted(companyName,personName){
 }
 
 // ---- Records ----
-function acqBlankCo(name,id){return {id:id||acqNewId('co'),name:acqText(name,100),website:'',address:'',phone:'',area:'',source:'manual',sourceLinks:[],researchedAt:'',research:null,notes:'',dnc:null,archivedInto:'',createdAt:atlDateStr(),updatedAt:Date.now()};}
+function acqBlankCo(name,id){return {id:id||acqNewId('co'),name:acqText(name,100),website:'',address:'',phone:'',area:'',source:'manual',sourceLinks:[],researchedAt:'',research:null,notes:'',dnc:null,archivedInto:'',createdAt:atlDateStr(),updatedAt:Date.now(),archived:null};}
 function acqFindCo(st,name){
   var nk=acqNorm(name);if(!nk){return null;}
   for(var i=0;i<st.companies.length;i++){var c=st.companies[i];if(!c.archivedInto&&acqNorm(c.name)===nk){return c;}}
@@ -6624,14 +6698,29 @@ function acqFromRadar(name,area,note,link){
 function acqCheck(st){
   var seen={},bad='';
   function chk(id){if(seen[id]){bad='Duplicate record id '+id;}seen[id]=1;}
-  st.companies.forEach(function(c){chk(c.id);});st.contacts.forEach(function(c){chk(c.id);});st.opps.forEach(function(o){chk(o.id);});st.acts.forEach(function(a){chk(a.id);});
+  st.companies.forEach(function(c){chk(c.id);});st.contacts.forEach(function(c){chk(c.id);});st.opps.forEach(function(o){chk(o.id);});st.acts.forEach(function(a){chk(a.id);});(st.quotes||[]).forEach(function(q){chk(q.id);});(st.bookings||[]).forEach(function(b){chk(b.id);});
   if(bad){return bad;}
   var co={};st.companies.forEach(function(c){co[c.id]=1;});var ct={};st.contacts.forEach(function(c){ct[c.id]=1;});
   st.contacts.forEach(function(c){if(c.companyId&&!co[c.companyId]){bad='Contact '+c.id+' points to a missing company';}});
   st.opps.forEach(function(o){if(o.companyId&&!co[o.companyId]){bad='Opportunity '+o.id+' points to a missing company';}o.contactIds.forEach(function(x){if(!ct[x]){bad='Opportunity '+o.id+' points to a missing contact';}});});
+  var op={};st.opps.forEach(function(o){op[o.id]=o;});var qq={};(st.quotes||[]).forEach(function(q){qq[q.id]=q;});
+  (st.quotes||[]).forEach(function(q){
+    if(!q.companyId||!co[q.companyId]){bad='Quote '+q.id+' points to a missing company';}
+    else if(!q.oppId||!op[q.oppId]){bad='Quote '+q.id+' points to a missing opportunity';}
+    else if(op[q.oppId].companyId!==q.companyId){bad='Quote '+q.id+' links a different company than its opportunity';}
+    if(q.contactId&&!ct[q.contactId]){bad='Quote '+q.id+' points to a missing contact';}
+  });
+  (st.bookings||[]).forEach(function(b){
+    if(!b.companyId||!co[b.companyId]){bad='Booking '+b.id+' points to a missing company';}
+    else if(!b.oppId||!op[b.oppId]){bad='Booking '+b.id+' points to a missing opportunity';}
+    else if(op[b.oppId].companyId!==b.companyId){bad='Booking '+b.id+' links a different company than its opportunity';}
+    if(b.quoteId&&(!qq[b.quoteId]||qq[b.quoteId].oppId!==b.oppId)){bad='Booking '+b.id+' points to a missing quote';}
+    if(b.contactId&&!ct[b.contactId]){bad='Booking '+b.id+' points to a missing contact';}
+  });
+  (st.plinks||[]).forEach(function(l){if(!co[l.companyId]||(l.oppId&&!op[l.oppId])||(l.contactId&&!ct[l.contactId])){bad='Pipeline link '+l.pid+' points to a missing record';}});
   return bad;
 }
-function acqMigrate(){
+function acqMigrate(dry){
   var prevRaw=null;try{prevRaw=localStorage.getItem('ob-acq');}catch(e){}
   try{
     var st=acqClean(JSON.parse(JSON.stringify(acq)));
@@ -6653,7 +6742,7 @@ function acqMigrate(){
         if(!co){co=acqBlankCo(companyName,'co-m-'+(acqSlug(acqNorm(companyName))||acqNewId('x')));co.source='pipeline';st.companies.push(co);}
         coId=co.id;
       }
-      st.contacts.push({id:id,companyId:coId,name:name,role:acqText(role,100),email:acqEmail(extra&&extra.email),phone:acqText(extra&&extra.phone,30),source:acqText(extra&&extra.source,60),sourceUrl:'',verif:[],dnc:null,notes:acqText(extra&&extra.notes,300),origin:acqText(extra&&extra.origin,40),archivedInto:'',createdAt:atlDateStr(),updatedAt:Date.now()});
+      st.contacts.push({id:id,companyId:coId,name:name,role:acqText(role,100),email:acqEmail(extra&&extra.email),phone:acqText(extra&&extra.phone,30),source:acqText(extra&&extra.source,60),sourceUrl:'',verif:[],dnc:null,notes:acqText(extra&&extra.notes,300),origin:acqText(extra&&extra.origin,40),archivedInto:'',createdAt:atlDateStr(),updatedAt:Date.now(),archived:null});
     }
     (Array.isArray(pipeline)?pipeline:[]).forEach(function(p){
       if(!p||typeof p!=='object'){return;}
@@ -6669,6 +6758,7 @@ function acqMigrate(){
     st.companies.forEach(function(c){var pr=preSig[c.id];if(!pr){return;}var o=JSON.parse(JSON.stringify(c));delete o.updatedAt;if(JSON.stringify(o)===pr.sig){c.updatedAt=pr.u;}});
     st.migratedAt=atlDateStr();
     var bad=acqCheck(st);if(bad){throw new Error(bad);}
+    if(dry){return {ok:true,dry:true,companies:st.companies.length-c0,contacts:st.contacts.length-t0};}
     var json=JSON.stringify(st);
     localStorage.setItem('ob-acq',json);
     if(localStorage.getItem('ob-acq')!==json){throw new Error('The browser did not keep the saved copy');}
@@ -6687,7 +6777,7 @@ function acqModal(title,html){document.getElementById('acq-modal-title').textCon
 function acqModalClose(){var m=document.getElementById('acq-modal');if(m){m.classList.remove('open');}acqCtx=null;acqPendingCreate=null;}
 function acqVal(id){var e=document.getElementById(id);return e?e.value:'';}
 function acqChk(id){var e=document.getElementById(id);return !!(e&&e.checked);}
-function acqRefresh(){renderCompanies();if(typeof renderToday==='function'){renderToday();}}
+function acqRefresh(){renderCompanies();if(typeof renderToday==='function'){renderToday();}if(typeof renderQuoteLog==='function'&&acqReady){renderQuoteLog();}}
 function acqOptions(list,sel,blank){var h=blank?'<option value="">'+acqE(blank)+'</option>':'';list.forEach(function(x){var v=Array.isArray(x)?x[0]:x,l=Array.isArray(x)?x[1]:x;h+='<option value="'+acqE(v)+'"'+(v===sel?' selected':'')+'>'+acqE(l)+'</option>';});return h;}
 function acqFieldHtml(label,id,val,max,type,ph){return '<div><label for="'+id+'">'+label+'</label><input type="'+(type||'text')+'" id="'+id+'" maxlength="'+max+'" value="'+acqE(val||'')+'"'+(ph?' placeholder="'+acqE(ph)+'"':'')+'></div>';}
 function acqCounts(){
@@ -6695,32 +6785,36 @@ function acqCounts(){
   var at=acq.acts.filter(function(a){return a.kind==='attempt';});
   var uniq={};at.forEach(function(a){if(a.contactId){uniq[a.contactId]=1;}});
   var overdue=acq.opps.filter(function(o){return o.status==='open'&&!acqOppSuppressed(o)&&o.nextAction&&o.nextAction.date<today;}).length;
-  return {companies:acqLiveCos().length,contacts:Object.keys(uniq).length,attempts:at.length,replies:at.filter(function(a){return a.outcome&&a.outcome!=='no_response';}).length,qualified:at.filter(function(a){return a.qualified;}).length,overdue:overdue};
+  return {companies:acq.companies.filter(function(c){return !c.archivedInto;}).length,contacts:Object.keys(uniq).length,attempts:at.length,replies:at.filter(function(a){return a.outcome&&a.outcome!=='no_response';}).length,qualified:at.filter(function(a){return a.qualified;}).length,overdue:overdue};
 }
 function acqCountsHtml(){
-  var c=acqCounts();
+  var c=acqCounts(),v=acqValues();
+  function tile(l,n){return '<div style="flex:1;min-width:120px;border:1px solid var(--border);padding:10px;text-align:center;"><div style="font-family:var(--ff-display);font-size:var(--fs-2xl);color:var(--gold);">'+n+'</div><div style="font-size:var(--fs-xs);color:var(--muted);">'+l+'</div></div>';}
   var t=[['Companies added',c.companies],['Unique contacts attempted',c.contacts],['Total attempts',c.attempts],['Replies',c.replies],['Qualified conversations',c.qualified],['Overdue actions',c.overdue]];
-  return '<div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:6px;" data-acq-counts="1">'+t.map(function(x){return '<div style="flex:1;min-width:120px;border:1px solid var(--border);padding:10px;text-align:center;"><div style="font-family:var(--ff-display);font-size:var(--fs-2xl);color:var(--gold);">'+x[1]+'</div><div style="font-size:var(--fs-xs);color:var(--muted);">'+x[0]+'</div></div>';}).join('')+'</div>'+
-    '<div style="font-size:var(--fs-xs);color:var(--muted);margin-top:8px;">Reply means anyone answered other than no response. Qualified conversation (proposed definition, adjust as needed): you spoke with a relevant booking or approval contact, confirmed a transportation need, and recorded an agreed next step.</div>';
+  var u=[['Bookings scheduled',v.scheduled],['Bookings completed',v.done],['Bookings cancelled',v.cancelled],['Projected value (your estimates)',acqUsd(v.projected)],['Accepted quote value',acqUsd(v.accepted)],['Completed service value',acqUsd(v.completed)]];
+  return '<div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:6px;" data-acq-counts="1">'+t.map(function(x){return tile(x[0],x[1]);}).join('')+'</div>'+
+    '<div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;" data-acq-values="1">'+u.map(function(x){return tile(x[0],x[1]);}).join('')+'</div>'+
+    '<div style="font-size:var(--fs-xs);color:var(--muted);margin-top:8px;">Reply means anyone answered other than no response. Qualified conversation (proposed definition, adjust as needed): you spoke with a relevant booking or approval contact, confirmed a transportation need, and recorded an agreed next step. Projected value is your own estimate. Accepted quote value is what clients accepted. Completed service value adds up completed bookings only; scheduled and cancelled bookings are left out. It is not cash received. Payment tracking is not built yet.</div>';
 }
 function acqContactLevel(c){var best=-1;var keys=acqKeys(ACQ_LEVELS);c.verif.forEach(function(v){var i=keys.indexOf(v.level);if(i>best){best=i;}});return best<0?'':keys[best];}
 function acqLevelBadge(c){var lv=acqContactLevel(c);var cls=lv==='booker'?'mb-green':lv==='contact'?'mb-blue':lv==='listed'?'mb-gold':'';return '<span class="mini-badge '+cls+'" style="'+(cls?'':'border:1px solid var(--border);color:var(--muted);')+'">'+(lv?acqLabel(ACQ_LEVELS,lv):'Unverified')+'</span>';}
-function acqOppOf(co){return acq.opps.filter(function(o){return o.companyId===co.id;});}
+function acqOppOf(co){return acq.opps.filter(function(o){return o.companyId===co.id&&!o.archived;});}
 function acqCtsOf(co){return acqLiveCts().filter(function(c){return c.companyId===co.id;});}
 
 // ---- Page shell ----
 function acqNoticeHtml(){
   return '<div class="card" style="border-color:rgba(201,168,76,0.3);"><div class="sep-title"><span class="mini-badge mb-gold">Where this data lives</span></div>'+
-    '<div style="font-size:var(--fs-sm);line-height:1.6;">This browser is the source of truth for companies, contacts, opportunities and activity. They are saved on this device only, are <strong>not synced to the cloud</strong>, and are included in Export Full Backup. Use one browser for this work: a second browser or device would hold different records. Choosing Anthony as an owner is a label only. It does not give him access or share any data.</div>'+
+    '<div style="font-size:var(--fs-sm);line-height:1.6;">This browser is the source of truth for companies, contacts, opportunities and activity. They are saved on this device only, are <strong>not synced to the cloud</strong>, and are included in Export Full Backup. <strong>There is no automatic backup.</strong> Last backup downloaded in this browser: <span id="acq-last-backup">'+acqE(acqLastBackupText())+'</span>. For the pilot, use one designated working browser as the source of truth: a second browser or device would hold different, unmerged records. Choosing Anthony as an owner is a label only. It does not give him access or share any data.</div>'+
     '<div class="btns"><button class="btn btn-outline" style="padding:6px 12px;font-size:var(--fs-xs);" onclick="openBackupModal()">Data &amp; Backup</button></div></div>';
 }
+function acqLastBackupText(){var l=null;try{l=JSON.parse(localStorage.getItem('ob-last-export')||'null');}catch(e){}return (l&&l.at)?new Date(l.at).toLocaleString():'never';}
 function acqSetupHtml(){
   if(!acq.migratedAt){
     return '<div class="card"><div class="sep-title"><span class="mini-badge mb-blue">Step 1: set up</span></div>'+
       '<div style="font-size:var(--fs-sm);line-height:1.6;">Companies can import what you already have: saved research, Pipeline prospects and their assistants, Gatekeepers, and companies you added to the Radar watchlist. Nothing in your existing tabs is changed or removed. The button first downloads a backup file, then imports. It is safe to run more than once.</div>'+
-      '<div class="btns"><button class="btn btn-gold" onclick="acqSetupRun()">Download backup and import</button><button class="btn btn-outline" onclick="acqSetupSkip()">Start empty</button></div><div id="acq-setup-msg" role="status" style="font-size:var(--fs-xs);margin-top:10px;overflow-wrap:anywhere;"></div></div>';
+      '<div class="btns"><button class="btn btn-gold" onclick="acqSetupRun()">Download backup and import</button><button class="btn btn-outline" onclick="acqSetupCheck()">Check import (changes nothing)</button><button class="btn btn-outline" onclick="acqSetupSkip()">Start empty</button></div><div id="acq-setup-msg" role="status" style="font-size:var(--fs-xs);margin-top:10px;overflow-wrap:anywhere;"></div></div>';
   }
-  return '<div style="font-size:var(--fs-xs);color:var(--muted);margin-bottom:12px;">Set up on '+acqE(acq.migratedAt)+'. <a href="#" style="color:var(--gold);" onclick="acqSetupRun();return false;">Download backup and import again</a> (safe to repeat) &middot; <a href="#" style="color:var(--gold);" onclick="exportFullBackup();return false;">Download backup</a><span id="acq-setup-msg" role="status" style="display:block;margin-top:6px;overflow-wrap:anywhere;"></span></div>';
+  return '<div style="font-size:var(--fs-xs);color:var(--muted);margin-bottom:12px;">Set up on '+acqE(acq.migratedAt)+'. <a href="#" style="color:var(--gold);" onclick="acqSetupCheck();return false;">Check import (changes nothing)</a> &middot; <a href="#" style="color:var(--gold);" onclick="acqSetupRun();return false;">Download backup and import again</a> (safe to repeat) &middot; <a href="#" style="color:var(--gold);" onclick="exportFullBackup();return false;">Download backup</a><span id="acq-setup-msg" role="status" style="display:block;margin-top:6px;overflow-wrap:anywhere;"></span></div>';
 }
 function acqSetupMsg(t){var e=document.getElementById('acq-setup-msg');if(e){e.textContent=t;}}
 function acqSetupRun(){
@@ -6731,6 +6825,11 @@ function acqSetupRun(){
   if(r.ok){acqSetupMsg('Done. A backup file was downloaded first. Added '+r.companies+' compan'+(r.companies===1?'y':'ies')+' and '+r.contacts+' contact'+(r.contacts===1?'':'s')+'. Your other tabs are unchanged.');}
   else{acqSetupMsg('The import failed and nothing was changed: '+r.error+'. Your backup file was already downloaded and your existing data is untouched. You can download another backup from Data & Backup and try again.');}
   if(typeof renderToday==='function'){renderToday();}
+}
+function acqSetupCheck(){
+  var r=acqMigrate(true);
+  if(r.ok){acqSetupMsg('Check passed. Importing would add '+r.companies+' compan'+(r.companies===1?'y':'ies')+' and '+r.contacts+' contact'+(r.contacts===1?'':'s')+'. Nothing was changed and no file was downloaded.');}
+  else{acqSetupMsg('Check failed: '+r.error+'. Nothing was changed.');}
 }
 function acqSetupSkip(){acq.migratedAt=atlDateStr();acqSave();renderCompanies();}
 
@@ -6745,14 +6844,21 @@ function acqRenderList(){
   var el=document.getElementById('acq-list');if(!el){return;}
   var f=acqNorm(acqFilter),today=atlDateStr();
   var cos=acqLiveCos().filter(function(c){return !f||acqNorm(c.name).indexOf(f)!==-1;}).sort(function(a,b){return a.name.toLowerCase()<b.name.toLowerCase()?-1:1;});
-  if(!acqLiveCos().length){el.innerHTML='<div class="card"><div style="font-size:var(--fs-sm);color:var(--muted);">No companies yet. Add one above, run Company Research on the Radar tab, or import what you already have.</div></div>';return;}
+  if(!acqLiveCos().length){el.innerHTML='<div class="card"><div style="font-size:var(--fs-sm);color:var(--muted);">'+(acq.companies.some(function(c){return !c.archivedInto;})?'No active companies.':'No companies yet. Add one above, run Company Research on the Radar tab, or import what you already have.')+'</div>'+acqArchivedListHtml()+'</div>';return;}
   el.innerHTML='<div class="card"><div style="font-size:var(--fs-xs);color:var(--muted);margin-bottom:6px;">'+cos.length+' compan'+(cos.length===1?'y':'ies')+(cos.length>50?' (showing 50, use the search box)':'')+'</div>'+cos.slice(0,50).map(function(c){
     var opps=acqOppOf(c),open=opps.filter(function(o){return o.status==='open';}).length;
     var od=opps.filter(function(o){return o.status==='open'&&!acqOppSuppressed(o)&&o.nextAction&&o.nextAction.date<today;}).length;
     return '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);'+(c.id===acqSel?'border-left:3px solid var(--gold);padding-left:8px;':'')+'"><div style="min-width:160px;overflow-wrap:anywhere;"><strong style="font-size:var(--fs-sm);">'+acqE(c.name)+'</strong> '+
       (c.dnc?'<span class="mini-badge" style="background:rgba(231,76,60,0.1);border:1px solid rgba(231,76,60,0.4);color:#e74c3c;">Do not contact</span> ':'')+
       '<span style="font-size:var(--fs-xs);color:var(--muted);">'+acqCtsOf(c).length+' contact'+(acqCtsOf(c).length===1?'':'s')+' &middot; '+open+' open opportunit'+(open===1?'y':'ies')+(od?' &middot; <span style="color:#e74c3c;">'+od+' overdue</span>':'')+(c.researchedAt?'':' &middot; no research')+'</span></div>'+todayBtn('Open','acqOpenCo(\''+c.id+'\')',c.id===acqSel)+'</div>';
-  }).join('')+'</div>';
+  }).join('')+acqArchivedListHtml()+'</div>';
+}
+function acqArchivedListHtml(){
+  var arch=acq.companies.filter(function(c){return c.archived&&!c.archivedInto;});
+  if(!arch.length){return '';}
+  var h='<div style="margin-top:10px;"><a href="#" style="font-size:var(--fs-xs);color:var(--gold);" onclick="acqToggleArch();return false;">'+(acqShowArch?'Hide':'Show')+' archived companies ('+arch.length+')</a></div>';
+  if(acqShowArch){h+=arch.map(function(c){return '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);"><div style="overflow-wrap:anywhere;font-size:var(--fs-sm);">'+acqE(c.name)+' <span class="mini-badge" style="border:1px solid var(--border);color:var(--muted);">Archived '+acqE(c.archived.at)+'</span></div><div class="btns" style="margin:0;">'+todayBtn('Open','acqOpenCo(\''+c.id+'\')')+todayBtn('Restore','acqRestore(\'co\',\''+c.id+'\')',true)+'</div></div>';}).join('');}
+  return h;
 }
 function acqOpenCo(id){var c=acqCo(id);if(!c||c.archivedInto){return;}acqSel=id;acqEditing=false;acqRefresh();var d=document.getElementById('acq-detail');if(d&&d.scrollIntoView){d.scrollIntoView({behavior:'smooth',block:'start'});}}
 function acqGoCo(id){todayGoTab('companies');if(id){acqOpenCo(id);}}
@@ -6835,7 +6941,7 @@ function acqRenderDups(){
     });
   });
   if(!pairs.length){el.innerHTML='';return;}
-  el.innerHTML='<div class="card"><div class="sep-title"><span class="mini-badge mb-gold">Possible duplicates ('+pairs.length+')</span></div><div style="font-size:var(--fs-xs);color:var(--muted);margin-bottom:6px;">Review each pair. Merging keeps every contact, opportunity and activity and links them to the record you keep. Nothing is merged automatically.</div>'+
+  el.innerHTML='<div class="card"><div class="sep-title"><span class="mini-badge mb-gold">Possible duplicates ('+pairs.length+')</span></div><div style="font-size:var(--fs-xs);color:var(--muted);margin-bottom:6px;">Review each pair. Merge only if both are the same company or person. It keeps every contact, opportunity, quote, booking and activity and links them to the record you keep. Nothing is merged automatically. If a record is not a duplicate but is no longer worked, archive it instead.</div>'+
     pairs.slice(0,8).map(function(p){
       var an=p.kind==='co'?acqCoName(p.a):(acqCt(p.a)||{}).name,bn=p.kind==='co'?acqCoName(p.b):(acqCt(p.b)||{}).name;
       return '<div style="padding:8px 0;border-bottom:1px solid var(--border);overflow-wrap:anywhere;"><div style="font-size:var(--fs-sm);"><strong>'+acqE(an)+'</strong> and <strong>'+acqE(bn)+'</strong> <span style="font-size:var(--fs-xs);color:var(--muted);">('+p.why+')</span></div><div class="btns" style="margin-top:6px;">'+
@@ -6845,7 +6951,7 @@ function acqRenderDups(){
 function acqDismiss(a,b){var k=acqPairKey(a,b);if(acq.dismissed.indexOf(k)===-1){acq.dismissed.push(k);}acqSave();acqRenderDups();}
 function acqMergeAsk(kind,keepId,dropId){
   var k=kind==='co'?acqCo(keepId):acqCt(keepId),d=kind==='co'?acqCo(dropId):acqCt(dropId);if(!k||!d){return;}
-  if(!window.confirm('Merge "'+d.name+'" into "'+k.name+'"? Every contact, opportunity and activity is kept and linked to "'+k.name+'". A do-not-contact restriction on either record is kept.')){return;}
+  if(!window.confirm('Merge "'+d.name+'" into "'+k.name+'"? Every contact, opportunity, quote, booking and activity is kept and linked to "'+k.name+'". A do-not-contact restriction on either record is kept. Merge only when both records are the same company or person; to retire a record that is not a duplicate, archive it instead.')){return;}
   if(kind==='co'){acqMergeCompanies(keepId,dropId);}else{acqMergeContacts(keepId,dropId);}
   acqSave();acqRefresh();notify('Merged. Nothing was deleted.');
 }
@@ -6855,6 +6961,9 @@ function acqMergeCompanies(keepId,dropId){
   acq.contacts.forEach(function(c){if(c.companyId===d.id){c.companyId=k.id;acqTouch(c);}});
   acq.opps.forEach(function(o){if(o.companyId===d.id){o.companyId=k.id;acqTouch(o);}});
   acq.acts.forEach(function(a){if(a.companyId===d.id){a.companyId=k.id;}});
+  acq.quotes.forEach(function(q){if(q.companyId===d.id){q.companyId=k.id;acqTouch(q);}});
+  acq.bookings.forEach(function(b){if(b.companyId===d.id){b.companyId=k.id;acqTouch(b);}});
+  acq.plinks.forEach(function(l){if(l.companyId===d.id){l.companyId=k.id;}});
   ['website','address','phone','area'].forEach(function(f){if(!k[f]&&d[f]){k[f]=d[f];}});
   if(d.notes&&d.notes!==k.notes){k.notes=acqText((k.notes?k.notes+' | ':'')+d.notes,500);}
   d.sourceLinks.forEach(function(l){acqAddLink(k,l.url,l.label,l.date);});
@@ -6867,6 +6976,9 @@ function acqMergeCompanies(keepId,dropId){
 function acqMergeContacts(keepId,dropId){
   var k=acqCt(keepId),d=acqCt(dropId);if(!k||!d||k===d){return;}
   acq.acts.forEach(function(a){if(a.contactId===d.id){a.contactId=k.id;}});
+  acq.quotes.forEach(function(q){if(q.contactId===d.id){q.contactId=k.id;acqTouch(q);}});
+  acq.bookings.forEach(function(b){if(b.contactId===d.id){b.contactId=k.id;acqTouch(b);}});
+  acq.plinks.forEach(function(l){if(l.contactId===d.id){l.contactId=k.id;}});
   acq.opps.forEach(function(o){
     var ch=false;
     o.contactIds=o.contactIds.map(function(x){if(x===d.id){ch=true;return k.id;}return x;}).filter(function(x,i,arr){return arr.indexOf(x)===i;});
@@ -6889,7 +7001,7 @@ function acqRenderDetail(){
   var h='';
   h+='<div class="card"><div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:flex-start;"><div style="min-width:0;overflow-wrap:anywhere;"><div style="font-family:var(--ff-display);font-size:var(--fs-xl);">'+acqE(co.name)+'</div>'+
     '<div style="font-size:var(--fs-xs);color:var(--muted);">'+[co.area,co.createdAt?'Added '+co.createdAt:'','Source: '+({research:'Company Research',radar:'Market Radar',pipeline:'Pipeline import',manual:'Added by hand'}[co.source]||'')].filter(Boolean).map(acqE).join(' &middot; ')+'</div></div>'+
-    '<div class="btns" style="margin:0;">'+todayBtn(acqEditing?'Cancel edit':'Edit details','acqToggleEdit()')+todayBtn('Close','acqCloseCo()')+'</div></div>';
+    '<div class="btns" style="margin:0;">'+todayBtn(acqEditing?'Cancel edit':'Edit details','acqToggleEdit()')+(co.archived?'':todayBtn('Archive','acqArchOpen(\'co\',\''+co.id+'\')'))+todayBtn('Close','acqCloseCo()')+'</div></div>';
   if(co.dnc){h+='<div style="margin-top:12px;padding:10px;border:1px solid rgba(231,76,60,0.4);background:rgba(231,76,60,0.06);font-size:var(--fs-sm);overflow-wrap:anywhere;"><strong style="color:#e74c3c;">Do not contact</strong> since '+acqE(co.dnc.date||'')+(co.dnc.reason?': '+acqE(co.dnc.reason):'')+'. This applies to every contact and opportunity at this company. Their tasks do not appear in Today and attempts cannot be logged.<div class="btns" style="margin-top:8px;">'+todayBtn('Lift restriction','acqDncOpen(\'co\',\''+co.id+'\',true)')+'</div></div>';}
   else{h+='<div class="btns" style="margin-top:10px;">'+todayBtn('Mark company do not contact','acqDncOpen(\'co\',\''+co.id+'\',false)')+'</div>';}
   if(acqEditing){
@@ -6900,6 +7012,7 @@ function acqRenderDetail(){
       (co.sourceLinks.length?'<div style="margin-top:4px;"><span style="font-size:var(--fs-xs);color:var(--muted);">Source links:</span> '+co.sourceLinks.map(function(l){return '<a href="'+acqE(l.url)+'" target="_blank" rel="noopener noreferrer" style="color:var(--gold);text-decoration:underline;">'+acqE(l.label||acqDomain(l.url))+'</a> <span style="font-size:var(--fs-xs);color:var(--muted);">'+acqE(l.date)+'</span>';}).join(' &middot; ')+'</div>':'')+'</div>';
   }
   h+='</div>';
+  if(co.archived){h+='<div class="card"><div style="font-size:var(--fs-sm);overflow-wrap:anywhere;"><strong>Archived</strong> on '+acqE(co.archived.at)+(co.archived.note?': '+acqE(co.archived.note):'')+'. Contacts, opportunities, quotes, bookings and history are kept and linked. It is out of the active list, Today and open counts.</div><div class="btns" style="margin-top:8px;">'+todayBtn('Restore','acqRestore(\'co\',\''+co.id+'\')',true)+'</div></div>'+acqActivityHtml(co);el.innerHTML=h;return;}
   h+=acqResearchHtml(co)+acqContactsHtml(co)+acqOppsHtml(co)+acqActivityHtml(co)+acqPipelineHtml(co);
   el.innerHTML=h;
 }
@@ -6942,11 +7055,11 @@ function acqContactsHtml(co){
       '<div style="font-size:var(--fs-xs);color:var(--muted);margin-top:2px;">'+([c.email?acqE(c.email):'',c.phone?acqE(c.phone):'',c.source?'Found via '+acqE(c.source):'',c.sourceUrl?'<a href="'+acqE(c.sourceUrl)+'" target="_blank" rel="noopener noreferrer" style="color:var(--gold);">source</a>':''].filter(Boolean).join(' &middot; ')||'No phone or email recorded')+'</div>'+
       (last?'<div style="font-size:var(--fs-xs);color:var(--muted);margin-top:2px;">Last check: '+acqE(last.what)+' ('+acqE(last.how)+', '+acqE(last.by)+', '+acqE(last.at)+')</div>':'')+
       (c.dnc?'<div style="font-size:var(--fs-xs);color:#e74c3c;margin-top:2px;">Asked not to be contacted'+(c.dnc.date?' on '+acqE(c.dnc.date):'')+(c.dnc.reason?': '+acqE(c.dnc.reason):'')+'</div>':'')+
-      '<div class="btns" style="margin-top:6px;">'+todayBtn('Verify','acqVerifyOpen(\''+c.id+'\')')+todayBtn('Edit','acqCtEditOpen(\''+c.id+'\')')+
+      '<div class="btns" style="margin-top:6px;">'+todayBtn('Verify','acqVerifyOpen(\''+c.id+'\')')+todayBtn('Edit','acqCtEditOpen(\''+c.id+'\')')+todayBtn('Archive','acqArchOpen(\'ct\',\''+c.id+'\')')+
       (restricted?'':(c.dnc?todayBtn('Lift restriction','acqDncOpen(\'ct\',\''+c.id+'\',true)'):todayBtn('Do not contact','acqDncOpen(\'ct\',\''+c.id+'\',false)')+todayBtn('Log attempt','acqOutcomeOpen(\'\',\''+co.id+'\',\''+c.id+'\')',true)))+'</div></div>';
   }).join('');
   h+='<div style="margin-top:14px;font-size:var(--fs-xs);color:var(--muted);">Add a contact (only a name is required)</div><div class="g3" style="margin-top:6px;">'+acqFieldHtml('Name','acq-ct-name','',100)+acqFieldHtml('Role','acq-ct-role','',100,'text','Office manager, executive assistant...')+'<div><label for="acq-ct-src">How you found them</label><select id="acq-ct-src">'+acqOptions(ACQ_SOURCES,'','Not recorded')+'</select></div></div><div class="g2">'+acqFieldHtml('Email','acq-ct-email','',120,'email')+acqFieldHtml('Phone','acq-ct-phone','',30,'tel')+'</div><div class="btns"><button class="btn btn-gold" onclick="acqAddContact()">Add contact</button></div>';
-  h+='<details style="margin-top:14px;"><summary style="cursor:pointer;font-size:var(--fs-sm);color:var(--gold);">No contact found? Call the main line</summary><div style="margin-top:8px;font-size:var(--fs-xs);color:var(--muted);">Editable script. Say only what is true, and ask for a name instead of selling.</div><textarea id="acq-script" maxlength="1000" style="margin-top:6px;min-height:110px;" onchange="acqSetScript(this.value)">'+acqE(acq.script||ACQ_SCRIPT_DEFAULT)+'</textarea><div class="btns">'+(restricted?'<span style="font-size:var(--fs-xs);color:#e74c3c;">This company is marked do not contact.</span>':todayBtn('Log the call result','acqOutcomeOpen(\'\',\''+co.id+'\',\'\')',true))+todayBtn('Restore default wording','acqResetScript()')+'</div></details></div>';
+  h+='<details style="margin-top:14px;"><summary style="cursor:pointer;font-size:var(--fs-sm);color:var(--gold);">No contact found? Call the main line</summary><div style="margin-top:8px;font-size:var(--fs-xs);color:var(--muted);">Editable script. Say only what is true, and ask for a name instead of selling.</div><textarea id="acq-script" maxlength="1000" style="margin-top:6px;min-height:110px;" onchange="acqSetScript(this.value)">'+acqE(acq.script||ACQ_SCRIPT_DEFAULT)+'</textarea><div class="btns">'+(restricted?'<span style="font-size:var(--fs-xs);color:#e74c3c;">This company is marked do not contact.</span>':todayBtn('Log the call result','acqOutcomeOpen(\'\',\''+co.id+'\',\'\')',true))+todayBtn('Restore default wording','acqResetScript()')+'</div></details>'+acqArchCtsHtml(co)+'</div>';
   return h;
 }
 function acqSetScript(v){acq.script=acqText(v,1000);acqSave();}
@@ -6961,7 +7074,7 @@ function acqAddContact(){
   acqCreateContact(c);
 }
 function acqCreateContact(p){
-  var ct={id:acqNewId('ct'),companyId:p.companyId||'',name:p.name,role:p.role||'',email:p.email||'',phone:p.phone||'',source:p.source||'',sourceUrl:p.sourceUrl||'',verif:p.verif||[],dnc:null,notes:'',origin:'',archivedInto:'',createdAt:atlDateStr(),updatedAt:Date.now()};
+  var ct={id:acqNewId('ct'),companyId:p.companyId||'',name:p.name,role:p.role||'',email:p.email||'',phone:p.phone||'',source:p.source||'',sourceUrl:p.sourceUrl||'',verif:p.verif||[],dnc:null,notes:'',origin:'',archivedInto:'',createdAt:atlDateStr(),updatedAt:Date.now(),archived:null};
   acq.contacts.push(ct);acqSave();acqRefresh();notify('Contact added');
 }
 function acqAddPerson(coId,i){
@@ -7020,7 +7133,7 @@ function acqOppsHtml(co){
       '<div class="btns" style="margin-top:8px;">'+
       (o.status==='open'&&!restricted?todayBtn('Log attempt','acqOutcomeOpen(\''+o.id+'\',\''+co.id+'\',\'\')',true)+todayBtn('Next step','acqNextOpen(\''+o.id+'\')'):'')+
       (o.status!=='open'&&!restricted?todayBtn(o.status==='paused'?'Resume':'Reopen','acqReopenOpen(\''+o.id+'\')'):'')+
-      (o.status==='open'?todayBtn('Mark lost','acqLost(\''+o.id+'\')'):'')+'</div>'+
+      (o.status==='open'?todayBtn('Mark lost','acqLost(\''+o.id+'\')'):'')+todayBtn('Archive','acqArchOpen(\'op\',\''+o.id+'\')')+'</div>'+acqOppExtraHtml(o,co)+
       '<details style="margin-top:8px;"><summary style="cursor:pointer;font-size:var(--fs-xs);color:var(--gold);">Stage, owner and qualification</summary><div class="g2" style="margin-top:8px;"><div><label for="st-'+o.id+'">Stage</label><select id="st-'+o.id+'" onchange="acqSetStage(\''+o.id+'\',this.value)">'+acqOptions(ACQ_STAGES,o.stage)+'</select></div><div><label for="ow-'+o.id+'">Owner (a label only)</label><select id="ow-'+o.id+'" onchange="acqSetOwner(\''+o.id+'\',this.value)">'+acqOptions(ACQ_OWNERS,o.owner)+'</select></div></div>'+
       '<div style="font-size:var(--fs-xs);color:var(--muted);margin:8px 0 4px;">Leave an answer blank until you know it. Blank means Unknown.</div><div class="g2">'+ACQ_QUAL.map(function(q){return '<div><label for="q-'+o.id+'-'+q[0]+'">'+q[1]+'</label><input type="text" id="q-'+o.id+'-'+q[0]+'" maxlength="200" value="'+acqE(o.qual[q[0]])+'" placeholder="Unknown" onchange="acqSetQual(\''+o.id+'\',\''+q[0]+'\',this.value)"></div>';}).join('')+'</div></details></div>';
   }).join('');
@@ -7029,6 +7142,7 @@ function acqOppsHtml(co){
     '<div class="g3">'+'<div><label for="acq-op-ct">Contact</label><select id="acq-op-ct">'+acqOptions(ctOpts.map(function(c){return [c.id,c.name];}),'','No contact yet')+'</select></div>'+acqFieldHtml('Next step','acq-op-nt','First contact',150)+acqFieldHtml('Date','acq-op-nd',todayAddDays(1),10,'date')+'</div>'+
     '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px;"><label style="margin:0;display:flex;gap:6px;align-items:center;"><input type="checkbox" id="acq-op-pause" style="width:auto;"> Pause instead of scheduling</label><input type="text" id="acq-op-pr" maxlength="150" placeholder="Why paused" style="flex:1;min-width:140px;"></div>'+
     '<div class="btns"><button class="btn btn-gold" onclick="acqAddOpp()">Add opportunity</button></div></div>';
+  h+=acqArchOppsHtml(co);
   return h;
 }
 function acqAddOpp(){
@@ -7040,7 +7154,7 @@ function acqAddOpp(){
   else if(!(nt&&nd&&nd>=today)){notify('Set a next step with a date (today or later), or pause it');return;}
   var ct=ctId?acqCt(ctId):null;if(ct&&(ct.companyId!==co.id||(ct.dnc&&ct.dnc.on))){ct=null;ctId='';}
   var o={id:acqNewId('op'),companyId:co.id,contactIds:ct?[ct.id]:[],title:title,type:acqPick(acqVal('acq-op-type'),acqKeys(ACQ_TYPES),'other'),stage:'identified',status:pause?'paused':'open',owner:acqPick(acqVal('acq-op-owner'),ACQ_OWNERS,'Kerry'),
-    nextAction:pause?null:{text:nt,date:nd,kind:'outreach',contactId:ct?ct.id:''},pauseReason:pause?pr:'',closeReason:'',closedAt:'',qual:{},notes:'',createdAt:today,updatedAt:Date.now()};
+    nextAction:pause?null:{text:nt,date:nd,kind:'outreach',contactId:ct?ct.id:''},pauseReason:pause?pr:'',closeReason:'',closedAt:'',qual:{},notes:'',createdAt:today,updatedAt:Date.now(),projected:null,archived:null};
   ACQ_QUAL.forEach(function(q){o.qual[q[0]]='';});
   acq.opps.push(o);acqSave();acqRefresh();notify('Opportunity added');
 }
@@ -7215,12 +7329,6 @@ function acqActivityHtml(co){
     return '<div style="padding:6px 0;border-bottom:1px solid var(--border);font-size:var(--fs-sm);overflow-wrap:anywhere;"><span style="font-size:var(--fs-xs);color:var(--muted);">'+acqE(a.at)+'</span> '+acqE(what)+(ct?' &middot; '+acqE(ct.name):'')+(op?' &middot; '+acqE(op.title):'')+(a.qualified?' <span class="mini-badge mb-green">Qualified</span>':'')+(a.note?'<div style="font-size:var(--fs-xs);color:var(--muted);">'+acqE(a.note)+'</div>':'')+'</div>';
   }).join('')+'</div>';
 }
-function acqPipelineHtml(co){
-  var nk=acqNorm(co.name),ms=(Array.isArray(pipeline)?pipeline:[]).filter(function(p){return p&&nk&&acqNorm(p.company)===nk;});
-  if(!ms.length){return '';}
-  return '<div class="card"><div class="sep-title"><span class="mini-badge mb-gold">Also in Pipeline</span></div><div style="font-size:var(--fs-xs);color:var(--muted);margin-bottom:6px;">Read only. These prospects stay in the Pipeline tab.</div>'+ms.map(function(p){return '<div style="font-size:var(--fs-sm);padding:4px 0;overflow-wrap:anywhere;">'+acqE(p.name)+(p.title?', '+acqE(p.title):'')+' <span style="font-size:var(--fs-xs);color:var(--muted);">'+acqE(getStageLabel(p.stage))+'</span></div>';}).join('')+'<div class="btns">'+todayBtn('Open Pipeline','todayGoTab(\'pipeline\')')+'</div></div>';
-}
-
 // ---- Today ----
 function acqTodayBlock(today){
   if(!acqReady){return {html:'',count:0};}
@@ -7238,7 +7346,7 @@ function acqTodayBlock(today){
     else if(d===0){rows.push({r:2,h:todayItem('med',who,'Due today. '+sub,[done,openBtn])});}
     else if(d>=-7){rows.push({r:4+(-d)/100,h:todayItem('low',who,(na.kind==='callback'?'Callback promised for ':'Coming up on ')+acqE(na.date)+'. '+sub,[done,openBtn])});}
   });
-  var overdueCount=rows.filter(function(r){return r.r<3;}).length;
+  acqBookingRows(today,rows);
   var noRes=acqLiveCos().filter(function(c){return !c.researchedAt&&!(c.dnc&&c.dnc.on);}).slice(0,3);
   noRes.forEach(function(c){rows.push({r:5,h:todayItem('low','Research '+acqE(c.name),'No research saved for this company yet.',[todayBtn('Research now','acqResearchNow(\''+c.id+'\')',true),todayBtn('Open company','acqGoCo(\''+c.id+'\')')])});});
   rows.sort(function(a,b){return a.r-b.r;});
@@ -7249,8 +7357,489 @@ function acqTodayBlock(today){
   return {html:html,count:rows.length};
 }
 
+// =====================================================================
+// Release 1b: archive, quotes, revisions, bookings, value, Pipeline link, backup clarity
+// =====================================================================
+function acqMoney(v,max){var n=parseFloat(v);return (isFinite(n)&&n>=0&&n<=max)?Math.round(n*100)/100:null;}
+function acqUsd(n){return (n===null||n===undefined||!isFinite(n))?'-':'$'+Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});}
+var ACQ_VEH=[['sedan','Sedan'],['suv','SUV'],['other','Other vehicle']];
+function acqAddDays(ds,n){var d=new Date(ds+'T12:00:00');d.setDate(d.getDate()+n);return atlDateStr(d);}
+function acqFingerprint(raw){if(raw===null||raw===undefined||raw==='null'){return 'none';}var s=String(raw),h=5381;for(var i=0;i<s.length;i++){h=((h<<5)+h+s.charCodeAt(i))>>>0;}return ('00000000'+h.toString(16)).slice(-8);}
+function acqQt(id){for(var i=0;i<acq.quotes.length;i++){if(acq.quotes[i].id===id){return acq.quotes[i];}}return null;}
+function acqBk(id){for(var i=0;i<acq.bookings.length;i++){if(acq.bookings[i].id===id){return acq.bookings[i];}}return null;}
+function acqQuoteByLegacy(lid){for(var i=0;i<acq.quotes.length;i++){if(acq.quotes[i].legacyId&&acq.quotes[i].legacyId===lid){return acq.quotes[i];}}return null;}
+function acqAcceptedVer(q){for(var i=0;i<q.versions.length;i++){if(q.versions[i].status==='accepted'){return q.versions[i];}}return null;}
+function acqVer(q,n){for(var i=0;i<q.versions.length;i++){if(q.versions[i].n===n){return q.versions[i];}}return null;}
+function acqQuotesOf(o){return acq.quotes.filter(function(q){return q.oppId===o.id;});}
+function acqBooksOf(o){return acq.bookings.filter(function(b){return b.oppId===o.id;}).sort(function(a,b){return a.serviceDate<b.serviceDate?-1:a.serviceDate>b.serviceDate?1:0;});}
+function acqBkSig(b){return (b.quoteId?b.quoteId+'|'+b.quoteVersion:'o:'+b.oppId+'|'+acqNorm(b.from).slice(0,30))+'|'+b.serviceDate+'|'+(b.time||'');}
+function acqBkDup(sig,exceptId){for(var i=0;i<acq.bookings.length;i++){var b=acq.bookings[i];if(b.id!==exceptId&&b.status!=='cancelled'&&acqBkSig(b)===sig){return b;}}return null;}
+function acqProspectLinked(pid){if(!acqReady){return false;}pid=String(pid);return acq.plinks.some(function(l){return l.pid===pid;});}
+
+// ---- Values: three separate numbers ----
+function acqValueOf(opps){
+  var ids={};opps.forEach(function(o){ids[o.id]=1;});
+  var v={projected:0,accepted:0,completed:0,scheduled:0,done:0,cancelled:0};
+  opps.forEach(function(o){if(!o.archived&&o.status!=='closed'&&o.projected){v.projected+=o.projected;}});
+  acq.quotes.forEach(function(q){if(!ids[q.oppId]){return;}var a=acqAcceptedVer(q);if(a){v.accepted+=a.amount;}});
+  acq.bookings.forEach(function(b){
+    if(!ids[b.oppId]){return;}
+    if(b.status==='completed'){v.done++;v.completed+=b.amount||0;}else if(b.status==='scheduled'){v.scheduled++;}else{v.cancelled++;}
+  });
+  v.projected=Math.round(v.projected*100)/100;v.accepted=Math.round(v.accepted*100)/100;v.completed=Math.round(v.completed*100)/100;
+  return v;
+}
+function acqValues(){return acqValueOf(acq.opps);}
+function acqSetProjected(id,val){var o=acqOp(id);if(!o){return;}var s=String(val||'').trim();o.projected=s===''?null:acqMoney(s,10000000);if(s!==''&&o.projected===null){notify('Enter a dollar amount, or leave it blank');}acqTouch(o);acqSave();acqRefresh();}
+
+// ---- Archive (reversible; keeps history and links) ----
+function acqArchOpen(kind,id){
+  var r=kind==='co'?acqCo(id):kind==='ct'?acqCt(id):acqOp(id);if(!r||r.archived||r.archivedInto){return;}
+  var sched=acq.bookings.filter(function(b){return b.status==='scheduled'&&(kind==='co'?b.companyId===id:kind==='op'?b.oppId===id:false);}).length;
+  if(sched){notify('Complete or cancel the '+sched+' scheduled booking'+(sched===1?'':'s')+' first');return;}
+  var name=kind==='op'?r.title:r.name;
+  var what=kind==='co'?'Its contacts, opportunities, quotes, bookings and history stay on file and stay linked. It leaves the active list and Today.':kind==='ct'?'Their history and links stay on file. They leave contact lists and pickers, and any next step aimed at them is cleared so you can choose another contact or pause.':'Its quotes, bookings and history stay on file and stay linked. It leaves Today and open counts.';
+  acqCtx={kind:'arch',ak:kind,id:id};
+  acqModal('Archive '+name,'<div style="font-size:var(--fs-sm);margin-bottom:10px;">'+acqE(what)+' You can restore it at any time. Use Archive for records that are not duplicates. Merge is only for two records that are the same company or person.</div>'+acqFieldHtml('Why (optional)','acq-ar-note','',150)+'<div class="btns"><button class="btn btn-gold" onclick="acqArchSave()">Archive</button><button class="btn btn-ghost" onclick="acqModalClose()">Cancel</button></div>');
+}
+function acqArchSave(){
+  var x=acqCtx;if(!x||x.kind!=='arch'){return;}
+  var r=x.ak==='co'?acqCo(x.id):x.ak==='ct'?acqCt(x.id):acqOp(x.id);if(!r||r.archived){return;}
+  var note=acqText(acqVal('acq-ar-note'),150);acqCtx=null;
+  r.archived={at:atlDateStr(),note:note};
+  var coId=x.ak==='co'?r.id:r.companyId,nm=x.ak==='op'?r.title:r.name;
+  if(x.ak==='ct'){acq.opps.forEach(function(o){if(o.nextAction&&o.nextAction.contactId===r.id){acqLogAct(o.companyId,'Next step "'+o.nextAction.text+'" ('+o.nextAction.date+') cleared because contact "'+r.name+'" was archived.',{oppId:o.id});o.nextAction=null;acqTouch(o);}});}
+  acqTouch(r);acqLogAct(coId,'Archived '+({co:'company',ct:'contact',op:'opportunity'}[x.ak])+' "'+nm+'"'+(note?': '+note:'.'),x.ak==='op'?{oppId:r.id}:null);
+  if(x.ak==='co'&&acqSel===r.id){acqSel='';}
+  acqSave();acqModalClose();acqRefresh();notify('Archived. Nothing was deleted.');
+}
+function acqRestore(kind,id){
+  var r=kind==='co'?acqCo(id):kind==='ct'?acqCt(id):acqOp(id);if(!r||!r.archived){return;}
+  r.archived=null;acqTouch(r);acqLogAct(kind==='co'?r.id:r.companyId,'Restored '+({co:'company',ct:'contact',op:'opportunity'}[kind])+' "'+(kind==='op'?r.title:r.name)+'".',kind==='op'?{oppId:r.id}:null);
+  acqSave();acqRefresh();notify('Restored');
+}
+var acqShowArch=false;
+function acqToggleArch(){acqShowArch=!acqShowArch;acqRenderList();}
+function acqArchOppsHtml(co){
+  var list=acq.opps.filter(function(o){return o.companyId===co.id&&o.archived;});
+  if(!list.length){return '';}
+  return '<div class="card"><details><summary style="cursor:pointer;font-size:var(--fs-sm);color:var(--gold);">Archived opportunities ('+list.length+')</summary>'+list.map(function(o){
+    return '<div style="padding:8px 0;border-bottom:1px solid var(--border);overflow-wrap:anywhere;font-size:var(--fs-sm);">'+acqE(o.title)+' <span style="font-size:var(--fs-xs);color:var(--muted);">archived '+acqE(o.archived.at)+(o.archived.note?': '+acqE(o.archived.note):'')+' &middot; '+acqQuotesOf(o).length+' quote(s), '+acqBooksOf(o).length+' booking(s) kept</span><div class="btns" style="margin-top:6px;">'+todayBtn('Restore','acqRestore(\'op\',\''+o.id+'\')')+'</div></div>';
+  }).join('')+'</details></div>';
+}
+function acqArchCtsHtml(co){
+  var list=acq.contacts.filter(function(c){return c.companyId===co.id&&c.archived&&!c.archivedInto;});
+  if(!list.length){return '';}
+  return '<details style="margin-top:12px;"><summary style="cursor:pointer;font-size:var(--fs-xs);color:var(--gold);">Archived contacts ('+list.length+')</summary>'+list.map(function(c){
+    return '<div style="padding:6px 0;border-bottom:1px solid var(--border);font-size:var(--fs-sm);overflow-wrap:anywhere;">'+acqE(c.name)+' <span style="font-size:var(--fs-xs);color:var(--muted);">archived '+acqE(c.archived.at)+'</span><div class="btns" style="margin-top:4px;">'+todayBtn('Restore','acqRestore(\'ct\',\''+c.id+'\')')+'</div></div>';
+  }).join('')+'</details>';
+}
+
+// ---- Quotes: link, revise, accept ----
+function acqQuoteOpen(oppId,legacyId){
+  var o=acqOp(oppId);if(!o||o.archived){return;}
+  var co=acqCo(o.companyId);if(!co){return;}
+  var linked={};acq.quotes.forEach(function(q){if(q.legacyId){linked[q.legacyId]=1;}});
+  var L=(typeof qtState!=='undefined'&&qtState&&Array.isArray(qtState.log)?qtState.log:[]).filter(function(q){return !linked[q.id];}).slice(0,50);
+  var ck=acqNorm(co.name);
+  var srcOpts=L.map(function(q){return [q.id,(q.client||'No name')+' · '+(q.at||'')+' · Sedan '+(q.sedan===null?'-':qtMoney(q.sedan))+' / SUV '+(q.suv===null?'-':qtMoney(q.suv))+(ck&&acqNorm(q.client)===ck?' (same name as this company, your call)':'')];});
+  var cts=acqCtsOf(co);
+  acqCtx={kind:'qadd',oppId:oppId};
+  acqModal('Add or link a quote: '+o.title,
+    '<div style="font-size:var(--fs-xs);color:var(--muted);margin-bottom:10px;">A quote is linked only when you choose it here. Names are never matched automatically. The Quotes tab entry is not changed by linking.</div>'+
+    '<label for="acq-q-src">Quote</label><select id="acq-q-src" onchange="acqQuoteSrc()">'+acqOptions(srcOpts,legacyId||'','Enter a quote by hand')+'</select>'+
+    '<div class="g2" style="margin-top:10px;"><div><label for="acq-q-veh">Vehicle</label><select id="acq-q-veh" onchange="acqQuoteVeh()">'+acqOptions(ACQ_VEH,'sedan')+'</select></div>'+acqFieldHtml('Quoted amount (USD)','acq-q-amt','',12,'number')+'</div>'+
+    '<div class="g2">'+acqFieldHtml('From','acq-q-from','',200)+acqFieldHtml('To','acq-q-to','',200)+'</div>'+
+    '<div class="g2">'+acqFieldHtml('Service date (if known)','acq-q-date','',10,'date')+acqFieldHtml('Time (if known)','acq-q-time','',5,'time')+'</div>'+
+    '<div style="margin-top:10px;"><label for="acq-q-ct">Contact (optional)</label><select id="acq-q-ct">'+acqOptions(cts.map(function(c){return [c.id,c.name+(c.dnc&&c.dnc.on?' (do not contact)':'')];}),'','No contact')+'</select></div>'+
+    '<div class="btns"><button class="btn btn-gold" onclick="acqQuoteSave()">Save quote</button><button class="btn btn-ghost" onclick="acqModalClose()">Cancel</button></div>');
+  if(legacyId){acqQuoteSrc();}
+}
+function acqQuoteSrc(){
+  var lid=acqVal('acq-q-src'),q=lid&&typeof qtFind==='function'?qtFind(lid):null;if(!q){return;}
+  var set=function(id,v){var e=document.getElementById(id);if(e){e.value=v;}};
+  set('acq-q-from',q.from||'');set('acq-q-to',q.to||'');set('acq-q-date',q.date||'');set('acq-q-time',q.time||'');
+  set('acq-q-veh',q.sedan!==null?'sedan':(q.suv!==null?'suv':'other'));acqQuoteVeh();
+}
+function acqQuoteVeh(){
+  var lid=acqVal('acq-q-src'),q=lid&&typeof qtFind==='function'?qtFind(lid):null;if(!q){return;}
+  var v=acqVal('acq-q-veh'),amt=v==='sedan'?q.sedan:v==='suv'?q.suv:null;
+  var e=document.getElementById('acq-q-amt');if(e&&amt!==null&&amt!==undefined){e.value=amt;}
+}
+function acqVerFromForm(n){
+  return {n:n,at:atlDateStr(),vehicle:acqPick(acqVal('acq-q-veh'),acqKeys(ACQ_VEH),'other'),amount:acqMoney(acqVal('acq-q-amt'),100000),from:acqText(acqVal('acq-q-from'),200),to:acqText(acqVal('acq-q-to'),200),miles:0,date:ptDate(acqVal('acq-q-date')),time:qtTime(acqVal('acq-q-time'),''),note:acqText(acqVal('acq-q-note'),200),status:'sent',acceptedAt:''};
+}
+function acqQuoteSave(){
+  var x=acqCtx;if(!x||x.kind!=='qadd'){return;}
+  var o=acqOp(x.oppId);if(!o||o.archived){return;}
+  var v=acqVerFromForm(1);
+  if(!v.amount){notify('Enter the quoted amount');return;}
+  var lid=acqVal('acq-q-src'),lq=lid&&typeof qtFind==='function'?qtFind(lid):null;
+  if(lid&&!lq){notify('That Quotes tab entry no longer exists');return;}
+  if(lq&&acqQuoteByLegacy(lq.id)){notify('That quote is already linked');return;}
+  if(lq){v.at=lq.at||v.at;v.miles=lq.miles||0;}
+  var ctId=acqVal('acq-q-ct'),ct=ctId?acqCt(ctId):null;if(ct&&ct.companyId!==o.companyId){ct=null;}
+  acqCtx=null;
+  var q={id:acqNewId('qq'),companyId:o.companyId,contactId:ct?ct.id:'',oppId:o.id,legacyId:lq?lq.id:'',label:lq?acqText(lq.client,120):'',versions:[v],createdAt:atlDateStr(),updatedAt:Date.now()};
+  acq.quotes.push(q);acqAdvance(o,'quoted');acqTouch(o);
+  acqLogAct(o.companyId,'Quote v1 '+acqUsd(v.amount)+' ('+acqLabel(ACQ_VEH,v.vehicle)+') '+(lq?'linked from the Quotes tab':'added')+' on "'+o.title+'".',{oppId:o.id,contactId:q.contactId});
+  acqSave();acqModalClose();acqRefresh();notify('Quote saved and linked');
+}
+function acqQuoteUnlink(qid){
+  var q=acqQt(qid);if(!q){return;}
+  if(acqAcceptedVer(q)||q.versions.some(function(v){return v.acceptedAt;})||acq.bookings.some(function(b){return b.quoteId===q.id;})){notify('An accepted or booked quote cannot be unlinked. Archive the opportunity instead.');return;}
+  if(!window.confirm('Remove this quote link? The Quotes tab entry (if any) is not changed.')){return;}
+  acq.quotes=acq.quotes.filter(function(x){return x.id!==qid;});
+  acqLogAct(q.companyId,'Quote link removed from "'+((acqOp(q.oppId)||{}).title||'opportunity')+'".',{oppId:q.oppId});
+  acqSave();acqRefresh();notify('Link removed');
+}
+function acqQuoteAcceptOpen(qid,n){
+  var q=acqQt(qid),v=q&&acqVer(q,n);if(!q||!v||v.status!=='sent'){return;}
+  var prev=acqAcceptedVer(q);
+  acqCtx={kind:'qacc',qid:qid,n:n};
+  acqModal('Client accepted version '+n+' ('+acqUsd(v.amount)+')','<div style="font-size:var(--fs-xs);color:var(--muted);margin-bottom:10px;">Accepting freezes this version, its amount and the acceptance date. Later revisions never change it and never change a booking already made from it.'+(prev?' Version '+prev.n+' was accepted earlier; it stays on record as replaced.':'')+' Accepting does not confirm that a vehicle is available.</div>'+acqFieldHtml('Date the client accepted (required)','acq-qa-date',atlDateStr(),10,'date')+'<div class="btns"><button class="btn btn-gold" onclick="acqQuoteAcceptSave()">Record acceptance</button><button class="btn btn-ghost" onclick="acqModalClose()">Cancel</button></div>');
+}
+function acqQuoteAcceptSave(){
+  var x=acqCtx;if(!x||x.kind!=='qacc'){return;}
+  var q=acqQt(x.qid),v=q&&acqVer(q,x.n);if(!q||!v||v.status!=='sent'){return;}
+  var d=ptDate(acqVal('acq-qa-date'));
+  if(!d){notify('Enter the date the client accepted');return;}
+  if(d>atlDateStr()){notify('The acceptance date cannot be in the future');return;}
+  acqCtx=null;
+  q.versions.forEach(function(w){if(w.status==='accepted'){w.status='superseded';}});
+  v.status='accepted';v.acceptedAt=d;
+  acqTouch(q);
+  var o=acqOp(q.oppId);if(o){acqTouch(o);}
+  if(q.legacyId&&typeof qtFind==='function'&&qtFind(q.legacyId)){qtSet(q.legacyId,'status','won');}
+  acqLogAct(q.companyId,'Client accepted quote v'+v.n+' ('+acqUsd(v.amount)+') on '+d+'.',{oppId:q.oppId,contactId:q.contactId});
+  acqSave();acqModalClose();acqRefresh();notify('Acceptance recorded');
+}
+function acqQuoteReviseOpen(qid){
+  var q=acqQt(qid);if(!q){return;}
+  var last=q.versions[q.versions.length-1];
+  acqCtx={kind:'qrev',qid:qid};
+  acqModal('Revise quote (new version '+(last.n+1)+')','<div style="font-size:var(--fs-xs);color:var(--muted);margin-bottom:10px;">A revision is a new version. Earlier versions, including any the client accepted, stay exactly as they were, and no booking changes.</div>'+
+    '<div class="g2"><div><label for="acq-q-veh">Vehicle</label><select id="acq-q-veh">'+acqOptions(ACQ_VEH,last.vehicle)+'</select></div>'+acqFieldHtml('New amount (USD)','acq-q-amt',last.amount,12,'number')+'</div>'+
+    '<div class="g2">'+acqFieldHtml('From','acq-q-from',last.from,200)+acqFieldHtml('To','acq-q-to',last.to,200)+'</div>'+
+    '<div class="g2">'+acqFieldHtml('Service date','acq-q-date',last.date,10,'date')+acqFieldHtml('Time','acq-q-time',last.time,5,'time')+'</div>'+
+    '<div style="margin-top:10px;">'+acqFieldHtml('What changed','acq-q-note','',200)+'</div>'+
+    '<div class="btns"><button class="btn btn-gold" onclick="acqQuoteReviseSave()">Save revision</button><button class="btn btn-ghost" onclick="acqModalClose()">Cancel</button></div>');
+}
+function acqQuoteReviseSave(){
+  var x=acqCtx;if(!x||x.kind!=='qrev'){return;}
+  var q=acqQt(x.qid);if(!q){return;}
+  var n=q.versions.reduce(function(m,v){return Math.max(m,v.n);},0)+1;
+  var v=acqVerFromForm(n);
+  if(!v.amount){notify('Enter the new amount');return;}
+  if(n>999||q.versions.length>=30){notify('This quote has too many versions');return;}
+  acqCtx=null;
+  q.versions.forEach(function(w){if(w.status==='sent'){w.status='superseded';}});
+  q.versions.push(v);acqTouch(q);
+  acqLogAct(q.companyId,'Quote revised: v'+n+' '+acqUsd(v.amount)+(v.note?' ('+v.note+')':'')+'.',{oppId:q.oppId,contactId:q.contactId});
+  acqSave();acqModalClose();acqRefresh();notify('Revision saved as version '+n);
+}
+
+// ---- Bookings ----
+function acqBookingOpen(oppId,qid){
+  var o=acqOp(oppId);if(!o||o.archived){return;}
+  var q=qid?acqQt(qid):null,v=q?acqAcceptedVer(q):null;
+  if(qid&&(!q||!v)){notify('Only an accepted quote can create a booking');return;}
+  acqCtx={kind:'bk',oppId:oppId,qid:qid||'',ver:v?v.n:0};
+  acqModal(q?'Create booking from accepted quote v'+v.n:'Add a booking without a quote',
+    '<div style="font-size:var(--fs-xs);color:var(--muted);margin-bottom:10px;">'+(q?'Prefilled from quote v'+v.n+' (accepted '+acqE(v.acceptedAt)+', '+acqE(acqUsd(v.amount))+'). The booking keeps its own copy of these details. ':'')+'A booking is scheduled work. It does not change the sales stage, and it does not mean a vehicle is confirmed until you mark it so.</div>'+
+    '<div class="g2">'+acqFieldHtml('Service date (required)','acq-b-date',v?v.date:'',10,'date')+acqFieldHtml('Pickup time','acq-b-time',v?v.time:'',5,'time')+'</div>'+
+    '<div class="g2">'+acqFieldHtml('From','acq-b-from',v?v.from:'',200)+acqFieldHtml('To','acq-b-to',v?v.to:'',200)+'</div>'+
+    '<div class="g2"><div><label for="acq-b-veh">Vehicle</label><select id="acq-b-veh">'+acqOptions(ACQ_VEH,v?v.vehicle:'sedan')+'</select></div>'+acqFieldHtml('Booking value (USD)','acq-b-amt',v?v.amount:'',12,'number')+'</div>'+
+    '<div class="g2">'+acqFieldHtml('Operational booking reference (optional)','acq-b-ops','',60)+'<div><label for="acq-b-av">Vehicle availability</label><select id="acq-b-av">'+acqOptions([['unconfirmed','Not confirmed yet'],['confirmed','Confirmed']],'unconfirmed')+'</select></div></div>'+
+    '<div class="g2">'+acqFieldHtml('Repeat weekly for this many more weeks (recurring, optional)','acq-b-rep','0',2,'number')+acqFieldHtml('Note','acq-b-note','',200)+'</div>'+
+    '<div class="btns"><button class="btn btn-gold" onclick="acqBookingSave()">Create booking</button><button class="btn btn-ghost" onclick="acqModalClose()">Cancel</button></div>');
+}
+function acqBookingFromForm(){
+  return {date:ptDate(acqVal('acq-b-date')),time:qtTime(acqVal('acq-b-time'),''),from:acqText(acqVal('acq-b-from'),200),to:acqText(acqVal('acq-b-to'),200),veh:acqPick(acqVal('acq-b-veh'),acqKeys(ACQ_VEH),'other'),amtRaw:String(acqVal('acq-b-amt')).trim(),ops:acqText(acqVal('acq-b-ops'),60),av:acqPick(acqVal('acq-b-av'),['unconfirmed','confirmed'],'unconfirmed'),note:acqText(acqVal('acq-b-note'),200)};
+}
+function acqBookingSave(){
+  var x=acqCtx;if(!x||x.kind!=='bk'){return;}
+  var o=acqOp(x.oppId);if(!o||o.archived){return;}
+  var q=x.qid?acqQt(x.qid):null,qv=q?acqVer(q,x.ver):null;if(x.qid&&(!q||!qv)){return;}
+  var f=acqBookingFromForm();
+  if(!f.date){notify('Enter the service date');return;}
+  var amt=f.amtRaw===''?(qv?qv.amount:null):acqMoney(f.amtRaw,100000);
+  if(f.amtRaw!==''&&amt===null){notify('Enter the booking value as a dollar amount, or leave it blank');return;}
+  var rep=parseInt(acqVal('acq-b-rep'),10);if(!(rep>=0))rep=0;if(rep>25){notify('Repeat at most 25 more weeks at a time');return;}
+  acqCtx=null; // a second click on Create does nothing
+  var made=0,skipped=0,series=rep>0?acqNewId('sr'):'';
+  for(var i=0;i<=rep;i++){
+    var b={id:acqNewId('bk'),companyId:o.companyId,oppId:o.id,contactId:q?q.contactId:'',quoteId:q?q.id:'',quoteVersion:qv?qv.n:0,serviceDate:acqAddDays(f.date,7*i),time:f.time,from:f.from,to:f.to,vehicle:f.veh,amount:amt,status:'scheduled',opsRef:f.ops,avail:f.av,availAt:f.av==='confirmed'?atlDateStr():'',series:series,note:f.note,completedAt:'',cancelledAt:'',cancelReason:'',createdAt:atlDateStr(),updatedAt:Date.now()};
+    if(acqBkDup(acqBkSig(b),'')){skipped++;continue;}
+    acq.bookings.push(b);made++;
+  }
+  if(!made){acqModalClose();notify('Not created: a booking already exists for that quote version, date and time');return;}
+  acqTouch(o);
+  acqLogAct(o.companyId,'Booking'+(made>1?'s':'')+' created on "'+o.title+'": '+made+' scheduled from '+f.date+(q?' (quote v'+qv.n+')':' (no quote)')+'.',{oppId:o.id});
+  acqSave();acqModalClose();acqRefresh();notify(made+' booking'+(made===1?'':'s')+' created'+(skipped?' ('+skipped+' already existed)':''));
+}
+function acqBookingDone(id){
+  var b=acqBk(id);if(!b||b.status!=='scheduled'){return;}
+  if(b.serviceDate>atlDateStr()){notify('The service date is in the future. Edit the date if the trip moved.');return;}
+  b.status='completed';b.completedAt=atlDateStr();acqTouch(b);
+  acqLogAct(b.companyId,'Service completed for booking on '+b.serviceDate+'.',{oppId:b.oppId});
+  acqSave();acqRefresh();notify('Marked completed');
+}
+function acqBookingCancelOpen(id){
+  var b=acqBk(id);if(!b||b.status!=='scheduled'){return;}
+  acqCtx={kind:'bkc',id:id};
+  acqModal('Cancel booking on '+b.serviceDate,'<div style="font-size:var(--fs-xs);color:var(--muted);margin-bottom:10px;">A cancelled booking stays on record and is left out of completed-service totals.</div>'+acqFieldHtml('Reason (optional)','acq-bc-note','',150)+'<div class="btns"><button class="btn btn-gold" onclick="acqBookingCancelSave()">Cancel booking</button><button class="btn btn-ghost" onclick="acqModalClose()">Keep it</button></div>');
+}
+function acqBookingCancelSave(){
+  var x=acqCtx;if(!x||x.kind!=='bkc'){return;}
+  var b=acqBk(x.id);if(!b||b.status!=='scheduled'){return;}
+  var note=acqText(acqVal('acq-bc-note'),150);acqCtx=null;
+  b.status='cancelled';b.cancelledAt=atlDateStr();b.cancelReason=note;acqTouch(b);
+  acqLogAct(b.companyId,'Booking on '+b.serviceDate+' cancelled'+(note?': '+note:'.'),{oppId:b.oppId});
+  acqSave();acqModalClose();acqRefresh();notify('Booking cancelled');
+}
+function acqBookingBack(id){
+  var b=acqBk(id);if(!b||b.status==='scheduled'){return;}
+  if(acqBkDup(acqBkSig(b),id)){notify('Another active booking already has that quote version, date and time');return;}
+  if(!window.confirm('Set this booking back to scheduled?')){return;}
+  b.status='scheduled';b.completedAt='';b.cancelledAt='';b.cancelReason='';acqTouch(b);acqSave();acqRefresh();
+}
+function acqBookingAvail(id,val){var b=acqBk(id);if(!b||b.status!=='scheduled'){return;}b.avail=val==='confirmed'?'confirmed':'unconfirmed';b.availAt=b.avail==='confirmed'?atlDateStr():'';acqTouch(b);acqSave();acqRefresh();}
+function acqBookingEditOpen(id){
+  var b=acqBk(id);if(!b){return;}
+  acqCtx={kind:'bke',id:id};
+  acqModal('Edit booking','<div class="g2">'+acqFieldHtml('Service date','acq-b-date',b.serviceDate,10,'date')+acqFieldHtml('Pickup time','acq-b-time',b.time,5,'time')+'</div>'+
+    '<div class="g2">'+acqFieldHtml('From','acq-b-from',b.from,200)+acqFieldHtml('To','acq-b-to',b.to,200)+'</div>'+
+    '<div class="g2"><div><label for="acq-b-veh">Vehicle</label><select id="acq-b-veh">'+acqOptions(ACQ_VEH,b.vehicle)+'</select></div>'+acqFieldHtml('Booking value (USD)','acq-b-amt',b.amount===null?'':b.amount,12,'number')+'</div>'+
+    '<div class="g2">'+acqFieldHtml('Operational booking reference','acq-b-ops',b.opsRef,60)+'<div><label for="acq-b-av">Vehicle availability</label><select id="acq-b-av">'+acqOptions([['unconfirmed','Not confirmed yet'],['confirmed','Confirmed']],b.avail)+'</select></div></div>'+
+    '<div style="margin-top:10px;">'+acqFieldHtml('Note','acq-b-note',b.note,200)+'</div><div class="btns"><button class="btn btn-gold" onclick="acqBookingEditSave()">Save</button><button class="btn btn-ghost" onclick="acqModalClose()">Cancel</button></div>');
+}
+function acqBookingEditSave(){
+  var x=acqCtx;if(!x||x.kind!=='bke'){return;}
+  var b=acqBk(x.id);if(!b){return;}
+  var f=acqBookingFromForm();
+  if(!f.date){notify('Enter the service date');return;}
+  var amt=f.amtRaw===''?null:acqMoney(f.amtRaw,100000);if(f.amtRaw!==''&&amt===null){notify('Enter the booking value as a dollar amount, or leave it blank');return;}
+  var t={quoteId:b.quoteId,quoteVersion:b.quoteVersion,oppId:b.oppId,from:f.from,serviceDate:f.date,time:f.time};
+  if(b.status!=='cancelled'&&acqBkDup(acqBkSig(t),b.id)){notify('Another active booking already has that quote version, date and time');return;}
+  acqCtx=null;
+  b.serviceDate=f.date;b.time=f.time;b.from=f.from;b.to=f.to;b.vehicle=f.veh;b.amount=amt;b.opsRef=f.ops;b.note=f.note;
+  if(f.av!==b.avail){b.avail=f.av;b.availAt=f.av==='confirmed'?atlDateStr():'';}
+  acqTouch(b);acqSave();acqModalClose();acqRefresh();notify('Booking saved');
+}
+
+// ---- Quote and booking cards on the opportunity ----
+function acqValTile(label,val,sub){return '<div style="flex:1;min-width:130px;border:1px solid var(--border);padding:8px;"><div style="font-size:var(--fs-xs);color:var(--muted);">'+label+'</div><div style="font-size:var(--fs-lg);color:var(--gold);">'+val+'</div>'+(sub?'<div style="font-size:10px;color:var(--muted);">'+sub+'</div>':'')+'</div>';}
+function acqQuoteHtml(q,o){
+  var acc=acqAcceptedVer(q),lq=q.legacyId&&typeof qtFind==='function'?qtFind(q.legacyId):null;
+  var h='<div style="margin-top:10px;padding:8px;border:1px solid var(--border);overflow-wrap:anywhere;"><div style="font-size:var(--fs-sm);"><strong>Quote</strong>'+(q.label?' &middot; '+acqE(q.label):'')+' <span class="mini-badge '+(acc?'mb-green':'mb-gold')+'">'+(acc?'Accepted':'Waiting for client')+'</span>'+(q.legacyId?' <span style="font-size:var(--fs-xs);color:var(--muted);">'+(lq?'linked to the Quotes tab':'Quotes tab entry removed, details kept here')+'</span>':'')+'</div>';
+  q.versions.slice().reverse().forEach(function(v){
+    var st=v.status==='accepted'?'<strong style="color:#2ecc71;">Accepted '+acqE(v.acceptedAt)+'</strong>':v.status==='superseded'?'<span style="color:var(--muted);">'+(v.acceptedAt?'Was accepted '+acqE(v.acceptedAt)+', replaced by a later accepted version':'Replaced by a newer version')+'</span>':'Waiting';
+    h+='<div style="margin-top:6px;font-size:var(--fs-xs);"><strong>v'+v.n+'</strong> '+acqE(acqUsd(v.amount))+' '+acqE(acqLabel(ACQ_VEH,v.vehicle))+(v.from||v.to?' &middot; '+acqE(v.from)+(v.to?' to '+acqE(v.to):''):'')+(v.date?' &middot; '+acqE(v.date):'')+' &middot; sent '+acqE(v.at)+' &middot; '+st+(v.note?' <span style="color:var(--muted);">('+acqE(v.note)+')</span>':'')+
+      (v.status==='sent'?' '+todayBtn('Client accepted','acqQuoteAcceptOpen(\''+q.id+'\','+v.n+')',true):'')+'</div>';
+  });
+  h+='<div class="btns" style="margin-top:6px;">'+todayBtn('Revise','acqQuoteReviseOpen(\''+q.id+'\')')+(acc?todayBtn('Create booking from v'+acc.n,'acqBookingOpen(\''+o.id+'\',\''+q.id+'\')',true):'')+todayBtn('Unlink','acqQuoteUnlink(\''+q.id+'\')')+'</div></div>';
+  return h;
+}
+function acqBookingHtml(b){
+  var q=b.quoteId?acqQt(b.quoteId):null,v=q?acqVer(q,b.quoteVersion):null;
+  var cls=b.status==='completed'?'mb-green':b.status==='cancelled'?'':'mb-blue';
+  var h='<div style="margin-top:8px;padding:8px;border:1px solid var(--border);overflow-wrap:anywhere;font-size:var(--fs-sm);"><span class="mini-badge '+cls+'" style="'+(cls?'':'border:1px solid var(--border);color:var(--muted);')+'">'+({scheduled:'Scheduled',completed:'Completed',cancelled:'Cancelled'}[b.status])+'</span> <strong>'+acqE(b.serviceDate)+'</strong>'+(b.time?' '+acqE(b.time):'')+(b.from||b.to?' &middot; '+acqE(b.from)+(b.to?' to '+acqE(b.to):''):'')+' &middot; '+acqE(acqLabel(ACQ_VEH,b.vehicle))+' &middot; '+acqE(acqUsd(b.amount))+
+    '<div style="font-size:var(--fs-xs);color:var(--muted);margin-top:2px;">'+(q?'From quote v'+b.quoteVersion+(v&&v.acceptedAt?' (accepted '+acqE(v.acceptedAt)+')':''):'No quote')+(b.opsRef?' &middot; Operations ref: '+acqE(b.opsRef):' &middot; No operations reference')+(b.series?' &middot; Recurring series':'')+
+    (b.status==='scheduled'?' &middot; Vehicle '+(b.avail==='confirmed'?'confirmed'+(b.availAt?' '+acqE(b.availAt):''):'<strong style="color:var(--gold);">not confirmed</strong>'):'')+(b.status==='completed'?' &middot; Completed '+acqE(b.completedAt):'')+(b.status==='cancelled'?' &middot; Cancelled '+acqE(b.cancelledAt)+(b.cancelReason?': '+acqE(b.cancelReason):''):'')+(b.note?' &middot; '+acqE(b.note):'')+'</div><div class="btns" style="margin-top:6px;">';
+  if(b.status==='scheduled'){h+=todayBtn('Mark completed','acqBookingDone(\''+b.id+'\')',true)+(b.avail==='confirmed'?todayBtn('Vehicle not confirmed','acqBookingAvail(\''+b.id+'\',\'unconfirmed\')'):todayBtn('Vehicle confirmed','acqBookingAvail(\''+b.id+'\',\'confirmed\')'))+todayBtn('Cancel','acqBookingCancelOpen(\''+b.id+'\')');}
+  else{h+=todayBtn('Set back to scheduled','acqBookingBack(\''+b.id+'\')');}
+  return h+todayBtn('Edit','acqBookingEditOpen(\''+b.id+'\')')+'</div></div>';
+}
+function acqOppExtraHtml(o,co){
+  var qs=acqQuotesOf(o),bs=acqBooksOf(o),v=acqValueOf([o]);
+  var h='<details style="margin-top:8px;"'+((qs.length||bs.length||o.projected)?' open':'')+'><summary style="cursor:pointer;font-size:var(--fs-xs);color:var(--gold);">Quotes, bookings and value</summary><div style="margin-top:8px;">'+
+    '<div style="display:flex;gap:8px;flex-wrap:wrap;"><div style="flex:1;min-width:130px;"><label for="pj-'+o.id+'">Projected value (your estimate)</label><input type="number" min="0" step="0.01" id="pj-'+o.id+'" value="'+(o.projected===null?'':o.projected)+'" placeholder="Optional" onchange="acqSetProjected(\''+o.id+'\',this.value)"></div>'+
+    acqValTile('Accepted quote value',acqE(acqUsd(v.accepted)),'What the client accepted')+acqValTile('Completed service value',acqE(acqUsd(v.completed)),'Completed bookings only. Not cash received.')+'</div>';
+  h+=qs.map(function(q){return acqQuoteHtml(q,o);}).join('');
+  if(bs.length){h+='<div style="margin-top:10px;font-size:var(--fs-xs);color:var(--muted);">Bookings ('+bs.length+'): '+v.scheduled+' scheduled, '+v.done+' completed, '+v.cancelled+' cancelled</div>'+bs.map(acqBookingHtml).join('');}
+  h+='<div class="btns" style="margin-top:10px;">'+todayBtn('Add or link a quote','acqQuoteOpen(\''+o.id+'\')')+todayBtn('Add booking without a quote','acqBookingOpen(\''+o.id+'\')')+'</div></div></details>';
+  return h;
+}
+
+// ---- Quotes tab: manual link from a saved quote ----
+function acqQuoteLinkHtml(q){
+  if(!acqReady){return '';}
+  var aq=acqQuoteByLegacy(q.id);
+  if(aq){var co=acqCo(aq.companyId),o=acqOp(aq.oppId),acc=acqAcceptedVer(aq);return '<div style="font-size:var(--fs-xs);margin-top:6px;overflow-wrap:anywhere;">Linked to <strong>'+acqE(co?co.name:'?')+'</strong> &middot; '+acqE(o?o.title:'?')+(acc?' &middot; accepted '+acqE(acc.acceptedAt):'')+' '+(co?todayBtn('Open company','acqGoCo(\''+co.id+'\')'):'')+'</div>';}
+  return '<div class="btns" style="margin-top:6px;">'+todayBtn('Link to a company and opportunity','acqQuoteLinkPick(\''+q.id+'\')')+'</div>';
+}
+function acqQuoteLinkPick(lid){
+  var cos=acqLiveCos().sort(function(a,b){return a.name.toLowerCase()<b.name.toLowerCase()?-1:1;});
+  if(!cos.length){notify('Add a company in the Companies tab first');return;}
+  acqCtx={kind:'qlink',lid:lid};
+  acqModal('Link this quote','<div style="font-size:var(--fs-xs);color:var(--muted);margin-bottom:10px;">Choose the company and the opportunity this quote belongs to. Nothing is linked by name.</div><label for="acq-ql-co">Company</label><select id="acq-ql-co" onchange="acqQuoteLinkOpps()">'+acqOptions(cos.map(function(c){return [c.id,c.name];}),'','Choose a company...')+'</select><div style="margin-top:10px;"><label for="acq-ql-op">Opportunity</label><select id="acq-ql-op"><option value="">Choose a company first</option></select></div><div class="btns"><button class="btn btn-gold" onclick="acqQuoteLinkGo()">Continue</button><button class="btn btn-ghost" onclick="acqModalClose()">Cancel</button></div>');
+}
+function acqQuoteLinkOpps(){
+  var co=acqCo(acqVal('acq-ql-co')),el=document.getElementById('acq-ql-op');if(!el){return;}
+  var ops=co?acqOppOf(co):[];
+  el.innerHTML=ops.length?acqOptions(ops.map(function(o){return [o.id,o.title];}),'','Choose an opportunity...'):'<option value="">No opportunities yet. Add one on the company page.</option>';
+}
+function acqQuoteLinkGo(){
+  var x=acqCtx;if(!x||x.kind!=='qlink'){return;}
+  var oid=acqVal('acq-ql-op');if(!oid||!acqOp(oid)){notify('Choose a company and an opportunity');return;}
+  acqModalClose();acqQuoteOpen(oid,x.lid);
+}
+
+// ---- Quote reminders and restrictions ----
+function acqQuoteHold(q){
+  if(!acqReady){return '';}
+  var aq=acqQuoteByLegacy(q.id);
+  if(aq){
+    var co=acqCo(aq.companyId),o=acqOp(aq.oppId),c=aq.contactId?acqCt(aq.contactId):null;
+    if(co&&co.dnc&&co.dnc.on){return 'Company is marked do not contact';}
+    if(c&&c.dnc&&c.dnc.on){return 'Contact is marked do not contact';}
+    if(co&&co.archived){return 'Company is archived';}
+    if(o&&o.archived){return 'Opportunity is archived';}
+    return '';
+  }
+  if(acqNameRestricted(q.client,'')||acqNameRestricted('',q.client)){return 'A company or contact with this name is marked do not contact';}
+  return '';
+}
+function acqHeldQuotesHtml(list){
+  if(!list.length){return '';}
+  return '<div style="margin-top:12px;padding:10px;border:1px dashed var(--border);"><div style="font-size:var(--fs-xs);color:var(--muted);margin-bottom:6px;"><strong>Held for review ('+list.length+')</strong>. These reminders are kept but are not outreach tasks. Existing bookings are handled under Acquisition.</div>'+
+    list.map(function(x){return '<div style="font-size:var(--fs-sm);padding:4px 0;overflow-wrap:anywhere;">'+escapeHTML(x.q.client||'Quote')+' <span style="font-size:var(--fs-xs);color:var(--muted);">'+escapeHTML(x.why)+' &middot; reminder date '+escapeHTML(x.q.follow)+'</span></div>';}).join('')+'<div class="btns" style="margin-top:6px;">'+todayBtn('Open Quotes','todayGoTab(\'quotes\')')+'</div></div>';
+}
+
+// ---- Legacy Pipeline prospects: explicit link or convert ----
+function acqProspect(pid){var a=Array.isArray(pipeline)?pipeline:[];for(var i=0;i<a.length;i++){if(a[i]&&String(a[i].id)===String(pid)){return a[i];}}return null;}
+function acqStageFromPipeline(s){return ({identified:'identified',contacted:'contacted',assistant:'contacted','trial-sched':'qualified','trial-done':'qualified',active:'booked',recurring:'booked',corporate:'booked'})[s]||'identified';}
+function acqPipelineHtml(co){
+  var all=Array.isArray(pipeline)?pipeline:[],nk=acqNorm(co.name);
+  var links=acq.plinks.filter(function(l){return l.companyId===co.id;});
+  var free=all.filter(function(p){return p&&!acqProspectLinked(p.id);});
+  if(!links.length&&!free.length){return '';}
+  var h='<div class="card"><div class="sep-title"><span class="mini-badge mb-gold">Pipeline prospects</span></div>';
+  if(links.length){
+    h+=links.map(function(l){
+      var p=acqProspect(l.pid),o=acqOp(l.oppId),c=acqCt(l.contactId);
+      return '<div style="padding:8px 0;border-bottom:1px solid var(--border);overflow-wrap:anywhere;font-size:var(--fs-sm);"><strong>'+acqE(p?p.name:'Prospect removed from Pipeline')+'</strong>'+(p&&p.title?', '+acqE(p.title):'')+' <span class="mini-badge mb-green">Linked</span><div style="font-size:var(--fs-xs);color:var(--muted);">Contact: '+acqE(c?c.name:'-')+' &middot; Opportunity: '+acqE(o?o.title:'-')+' &middot; Pipeline stage: '+acqE(p?getStageLabel(p.stage):'-')+' &middot; linked '+acqE(l.at)+'. Its Pipeline reminders no longer appear in Today; the Companies next step replaces them.</div>'+
+        (p&&p.notes?'<details style="margin-top:4px;"><summary style="cursor:pointer;font-size:var(--fs-xs);color:var(--gold);">Pipeline notes (kept in Pipeline)</summary><div style="font-size:var(--fs-xs);white-space:pre-wrap;">'+acqE(String(p.notes).slice(0,2000))+'</div></details>':'')+
+        '<div class="btns" style="margin-top:4px;">'+todayBtn('Undo link','acqProspectUnlink(\''+acqE(l.pid)+'\')')+'</div></div>';
+    }).join('');
+  }
+  if(free.length){
+    free=free.slice().sort(function(a,b){var am=acqNorm(a.company)===nk?0:1,bm=acqNorm(b.company)===nk?0:1;return am-bm;});
+    h+='<div style="margin-top:10px;font-size:var(--fs-xs);color:var(--muted);">Link a Pipeline prospect to this company. Same-name prospects are listed first, but you choose. The prospect stays in Pipeline unchanged.</div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;"><select id="acq-pl-pick" aria-label="Pipeline prospect to link" style="flex:1;min-width:200px;">'+acqOptions(free.slice(0,100).map(function(p){return [String(p.id),p.name+(p.company?' ('+p.company+')':'')+(acqNorm(p.company)===nk?' - same company name':'')];}),'','Choose a prospect...')+'</select><button class="btn btn-outline" onclick="acqProspectOpen(\''+co.id+'\')">Link or convert</button></div>';
+  }
+  return h+'</div>';
+}
+function acqProspectOpen(coId){
+  var co=acqCo(coId),pid=acqVal('acq-pl-pick'),p=pid?acqProspect(pid):null;
+  if(!co){return;}if(!p){notify('Choose a prospect first');return;}
+  if(acqProspectLinked(p.id)){notify('That prospect is already linked');return;}
+  var cts=acqCtsOf(co),key=acqSlug(p.id)||acqSlug((p.name||'')+'-'+(p.company||'')),pre='ct-m-p-'+key;
+  var same=cts.filter(function(c){return c.id===pre||acqNorm(c.name)===acqNorm(p.name);})[0];
+  var orphan=!same&&acqCt(pre)&&!acqCt(pre).companyId&&!acqCt(pre).archived?acqCt(pre):null;
+  var neg=p.responseStatus==='negative';
+  var ops=acqOppOf(co);
+  acqCtx={kind:'plink',coId:co.id,pid:String(p.id)};
+  acqModal('Link Pipeline prospect: '+p.name,
+    '<div style="font-size:var(--fs-xs);color:var(--muted);margin-bottom:10px;overflow-wrap:anywhere;">'+acqE(p.name)+(p.title?', '+acqE(p.title):'')+(p.company?' at '+acqE(p.company):'')+' &middot; Pipeline stage '+acqE(getStageLabel(p.stage))+(p.followUp?' &middot; follow-up '+acqE(p.followUp):'')+(p.lastContact?' &middot; last contact '+acqE(p.lastContact):'')+'. Nothing is deleted from Pipeline. Once linked, Today uses the Companies next step instead of this prospect\'s Pipeline reminders, so you do not get two.</div>'+
+    '<label for="acq-pl-ct">Contact</label><select id="acq-pl-ct">'+acqOptions([['new','Create a contact from this prospect']].concat(cts.map(function(c){return [c.id,c.name];})).concat(orphan?[[orphan.id,orphan.name+' (imported, not yet at a company)']]:[]),same?same.id:(orphan?orphan.id:'new'))+'</select>'+
+    '<div style="margin-top:10px;"><label for="acq-pl-op">Opportunity</label><select id="acq-pl-op">'+acqOptions([['new','Create a new opportunity']].concat(ops.map(function(o){return [o.id,'Use existing: '+o.title];})),'new')+'</select></div>'+
+    '<div class="g2" style="margin-top:10px;">'+acqFieldHtml('New opportunity: what is the need?','acq-pl-title',(p.title?p.title+' - ':'')+'Transportation need',120)+'<div><label for="acq-pl-type">Type</label><select id="acq-pl-type">'+acqOptions(ACQ_TYPES,'executive')+'</select></div></div>'+
+    '<div style="margin-top:10px;"><label style="margin:0;display:flex;gap:6px;align-items:center;text-transform:none;letter-spacing:0;"><input type="checkbox" id="acq-pl-neg" style="width:auto;"'+(neg?' checked':'')+'> Pipeline shows they declined: create it closed, with no tasks</label></div>'+
+    '<div class="g2" style="margin-top:10px;">'+acqFieldHtml('Next step (new opportunity)','acq-pl-nt','Follow up (from Pipeline)',150)+acqFieldHtml('Date (an overdue date is kept as overdue)','acq-pl-nd',ptDate(p.followUp)||todayAddDays(1),10,'date')+'</div>'+
+    '<div class="btns"><button class="btn btn-gold" onclick="acqProspectSave()">Link prospect</button><button class="btn btn-ghost" onclick="acqModalClose()">Cancel</button></div>');
+}
+function acqProspectSave(){
+  var x=acqCtx;if(!x||x.kind!=='plink'){return;}
+  var co=acqCo(x.coId),p=acqProspect(x.pid);if(!co||!p){return;}
+  if(acqProspectLinked(p.id)){notify('That prospect is already linked');return;}
+  var ctSel=acqVal('acq-pl-ct'),opSel=acqVal('acq-pl-op'),today=atlDateStr();
+  var title=acqText(acqVal('acq-pl-title'),120),nt=acqText(acqVal('acq-pl-nt'),150),nd=ptDate(acqVal('acq-pl-nd')),neg=acqChk('acq-pl-neg');
+  var existing=opSel!=='new'?acqOp(opSel):null;
+  if(!existing&&!neg&&!(title&&nt&&nd)){notify('Give the opportunity a name, a next step and a date, or mark it declined');return;}
+  acqCtx=null;
+  var ct=ctSel!=='new'?acqCt(ctSel):null;
+  if(ct&&!ct.companyId){ct.companyId=co.id;acqTouch(ct);}
+  if(!ct){
+    ct={id:acqNewId('ct'),companyId:co.id,name:acqText(p.name,100)||'Unnamed',role:acqText(p.title,100),email:'',phone:'',source:'Imported from Pipeline',sourceUrl:'',verif:[],dnc:null,notes:'',origin:'pipeline',archivedInto:'',createdAt:today,updatedAt:Date.now(),archived:null};
+    acq.contacts.push(ct);
+  }
+  var o=existing;
+  if(!o){
+    o={id:acqNewId('op'),companyId:co.id,contactIds:[ct.id],title:title||'Transportation need',type:acqPick(acqVal('acq-pl-type'),acqKeys(ACQ_TYPES),'other'),stage:acqStageFromPipeline(p.stage),status:neg?'closed':'open',owner:'Kerry',
+      nextAction:neg?null:{text:nt,date:nd,kind:'outreach',contactId:(ct.dnc&&ct.dnc.on)?'':ct.id},pauseReason:'',closeReason:neg?'declined':'',closedAt:neg?today:'',qual:{},notes:'',createdAt:today,updatedAt:Date.now(),projected:null,archived:null};
+    ACQ_QUAL.forEach(function(q){o.qual[q[0]]='';});
+    acq.opps.push(o);
+  }else if(o.contactIds.indexOf(ct.id)===-1&&o.contactIds.length<10){o.contactIds.push(ct.id);acqTouch(o);}
+  acq.plinks.push({pid:String(p.id),companyId:co.id,contactId:ct.id,oppId:o.id,at:today});
+  acqLogAct(co.id,'Linked Pipeline prospect "'+p.name+'" ('+getStageLabel(p.stage)+'). Pipeline notes and history stay in Pipeline and are shown here.',{oppId:o.id,contactId:ct.id});
+  if(p.lastContact&&ptDate(p.lastContact)){var a=acqLogAct(co.id,'Last contact recorded in Pipeline.',{oppId:o.id,contactId:ct.id});a.at=ptDate(p.lastContact);}
+  acqSave();acqModalClose();acqRefresh();notify('Prospect linked. Its Pipeline reminders are replaced by the Companies next step.');
+}
+function acqProspectUnlink(pid){
+  var l=acq.plinks.filter(function(x){return x.pid===String(pid);})[0];if(!l){return;}
+  if(!window.confirm('Undo this link? The contact and opportunity stay in Companies. The Pipeline reminders for this prospect come back in Today.')){return;}
+  acq.plinks=acq.plinks.filter(function(x){return x.pid!==String(pid);});
+  acqLogAct(l.companyId,'Pipeline link undone for prospect '+((acqProspect(pid)||{}).name||pid)+'.',{oppId:l.oppId});
+  acqSave();acqRefresh();
+}
+
+// ---- Today: bookings and accepted quotes ----
+function acqBookingRows(today,rows){
+  acq.quotes.forEach(function(q){
+    var o=acqOp(q.oppId),co=acqCo(q.companyId);if(!o||!co||o.archived||co.archived){return;}
+    var av=acqAcceptedVer(q);if(!av){return;}
+    if(acq.bookings.some(function(b){return b.quoteId===q.id&&b.status!=='cancelled';})){return;}
+    rows.push({r:2.5,h:todayItem('med',acqE(co.name+' · '+o.title),'Accepted quote v'+av.n+' ('+acqE(acqUsd(av.amount))+', accepted '+acqE(av.acceptedAt)+') has no booking yet. Accepted does not mean a vehicle is confirmed.',[todayBtn('Create booking','acqBookingOpen(\''+o.id+'\',\''+q.id+'\')',true),todayBtn('Open company','acqGoCo(\''+co.id+'\')')])});
+  });
+  acq.bookings.forEach(function(b){
+    if(b.status!=='scheduled'){return;}
+    var co=acqCo(b.companyId),o=acqOp(b.oppId);if(!co){return;}
+    var d=todayDaysBetween(b.serviceDate,today),ct=b.contactId?acqCt(b.contactId):null;
+    var restricted=acqCoRestricted(co.id)||!!(ct&&ct.dnc&&ct.dnc.on);
+    var who=acqE(co.name+' · '+(o?o.title:'')+' · booking'),conf=b.avail==='confirmed';
+    var tail=(restricted?' This company or contact is marked do not contact for sales outreach. Contact them only about this booking.':'');
+    if(d>0){rows.push({r:0.9,h:todayItem('crit',who,'Service date '+acqE(b.serviceDate)+' passed '+d+' day'+(d===1?'':'s')+' ago. Mark it completed or cancelled.'+tail,[todayBtn('Mark completed','acqBookingDone(\''+b.id+'\')',true),todayBtn('Cancel','acqBookingCancelOpen(\''+b.id+'\')'),todayBtn('Open company','acqGoCo(\''+co.id+'\')')])});}
+    else if(d>=-7){
+      var when=d===0?'Service today':'Service on '+acqE(b.serviceDate)+(b.time?' '+acqE(b.time):'');
+      var bt=[];if(!conf){bt.push(todayBtn('Vehicle confirmed','acqBookingAvail(\''+b.id+'\',\'confirmed\')',true));}if(d===0){bt.push(todayBtn('Mark completed','acqBookingDone(\''+b.id+'\')'));}bt.push(todayBtn('Open company','acqGoCo(\''+co.id+'\')'));
+      rows.push({r:d===0?1.5:3.5+(-d)/100,h:todayItem(d===0?'high':(conf?'low':'med'),who,when+'. Vehicle availability '+(conf?'confirmed':'<strong>not confirmed</strong>')+'.'+tail,bt)});
+    }
+  });
+}
+
+// ---- Data & Backup: what Full Backup contains, version, last export ----
+var ACQ_RELEASE='1b';
+function acqKeyLabel(k){return ({'ob-acq':'Companies, contacts, opportunities, quotes, bookings and activity','ob-pipeline':'Pipeline prospects','ob-gatekeepers':'Gatekeepers','ob-messages':'Saved messages','ob-research':'Company Research results','ob-radar':'Market Radar watchlist and settings','ob-quotes':'Quote log and rate settings'})[k]||(typeof cloudKeyLabel==='function'?cloudKeyLabel(k):k);}
+function acqKeyCount(k){
+  var raw=null;try{raw=localStorage.getItem(k);}catch(e){}
+  if(raw===null||raw===undefined){return 'empty';}
+  try{
+    var v=JSON.parse(raw);
+    if(k==='ob-acq'){var s=acqClean(v);return s.companies.length+' companies, '+s.contacts.length+' contacts, '+s.opps.length+' opportunities, '+s.quotes.length+' quotes, '+s.bookings.length+' bookings, '+s.acts.length+' activities';}
+    if(Array.isArray(v)){return v.length+' records';}
+    if(v&&typeof v==='object'){return 'settings and records';}
+    return v===null?'empty':'1 value';
+  }catch(e){return 'unreadable';}
+}
+function renderBackupInfo(){
+  var el=document.getElementById('backup-info');if(!el){return;}
+  var last=null;try{last=JSON.parse(localStorage.getItem('ob-last-export')||'null');}catch(e){}
+  var fp='none';try{fp=acqFingerprint(localStorage.getItem('ob-acq'));}catch(e){}
+  var rows=APPROVED_BACKUP_KEYS.map(function(k){
+    var synced=CLOUD_KEYS.indexOf(k)!==-1;
+    return '<tr><td style="padding:3px 8px 3px 0;vertical-align:top;color:var(--text);">'+escapeHTML(acqKeyLabel(k))+'</td><td style="padding:3px 8px 3px 0;vertical-align:top;">'+escapeHTML(acqKeyCount(k))+'</td><td style="padding:3px 0;vertical-align:top;">'+(synced?'Cloud Sync if signed in':'<strong style="color:var(--gold);">this browser only</strong>')+'</td></tr>';
+  }).join('');
+  el.innerHTML='<div style="margin-bottom:6px;"><strong style="color:var(--text);">Backup format:</strong> schema 2, app release '+ACQ_RELEASE+'. Older backups (schema 1) can still be restored.</div>'+
+    '<div style="margin-bottom:6px;"><strong style="color:var(--text);">Last backup downloaded in this browser:</strong> '+(last&&last.at?escapeHTML(new Date(last.at).toLocaleString())+' (release '+escapeHTML(String(last.release||'?'))+')':'<strong style="color:#e74c3c;">never</strong>')+'</div>'+
+    '<div style="margin-bottom:6px;"><strong style="color:var(--text);">There is no automatic backup.</strong> The app only backs up when you press Export Full Backup. Cloud Sync, if you use it, does not include Companies data. Download a backup after any work session you would hate to lose.</div>'+
+    '<div style="margin-bottom:6px;"><strong style="color:var(--text);">Companies data fingerprint:</strong> <code>'+escapeHTML(fp)+'</code> (compare after a test restore)</div>'+
+    '<div style="overflow-x:auto;"><table style="border-collapse:collapse;font-size:var(--fs-xs);color:var(--muted);">'+rows+'</table></div>';
+}
+
 acqReady=true;
 if(typeof renderToday==='function'){renderToday();}
+if(typeof renderQuoteLog==='function'){renderQuoteLog();}
 </script>
 </body>
 </html>
