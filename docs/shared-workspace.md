@@ -29,3 +29,16 @@ Status: **not built. Not part of the pilot.** For the pilot, one designated work
 | Offline edits | Queued and replayed. Replays that conflict are shown for review, not applied silently. |
 
 Backups remain necessary. A shared store does not replace a tested restore.
+
+## Release 1c: what restore does when two copies disagree
+
+This is the conflict handling the app has today. It applies to Restore (Merge) from a backup file; it is not a shared workspace.
+
+- Records are matched by id. For an ordinary record the newer one wins, as before.
+- **Accepted quote terms are protected.** If two copies of the same quote version differ in amount, vehicle, route, date, time or scope, and either copy was ever accepted, the accepted (or current) copy stays active. The other copy is kept in the Companies data as a conflict. A red notice appears in Companies and Quotes, and a critical row appears in Today.
+- A quote with an open conflict cannot be accepted, revised or booked until you choose Keep current terms or Use restored copy. The choice and both versions are logged on the company.
+- **Bookings keep their own agreed terms.** A booking with the same id but different amount, vehicle, route or quote version keeps the current terms and the other copy is flagged. Resolving a quote conflict never edits an existing booking.
+- Restore (Replace) is different on purpose: it overwrites everything with the file. The restore preview says so, and says how many conflicts Merge would have flagged.
+- A backup that carries a null for a key that already holds a list no longer replaces that list.
+
+What still does not exist: automatic merging of two people's simultaneous edits, per-field merges, or any sync of Companies data between browsers.
