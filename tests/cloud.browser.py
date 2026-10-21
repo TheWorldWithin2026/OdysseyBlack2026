@@ -30,9 +30,24 @@ def sign_in(pg):
     pg.click('#cloud-chip'); pg.fill('#cloud-email','pope@odysseyblack.com'); pg.fill('#cloud-pass','right-pass'); pg.click('#cloud-signed-out button')
 with sync_playwright() as p:
     b=p.chromium.launch()
+    def nctx(**kw):
+        c=b.new_context(**kw); c.add_init_script("try{localStorage.setItem('ob-cloud-gate',JSON.stringify({at:'2026-10-21',note:'test gate'}))}catch(e){}"); return c
     fake=Fake()
+    # --- Release 1c gate: without a recorded verification, sign-in is blocked and never reaches the network
+    cN=b.new_context(viewport={'width':1440,'height':900}); N=cN.new_page(); hits=[]
+    N.route(re.compile(r'supabase\.co'),lambda r:(hits.append(1),r.continue_()))
+    N.goto('http://localhost:8765/index.html'); N.click('#cloud-chip')
+    t('gate: Cloud Sync is shown as blocked until verification is recorded','Cloud Sync is blocked' in N.inner_text('#cloud-gate'))
+    N.fill('#cloud-email','pope@odysseyblack.com'); N.fill('#cloud-pass','right-pass'); N.click('#cloud-signed-out button'); N.wait_for_timeout(400)
+    t('gate: sign-in refused with a plain message, no request sent, no session stored','blocked' in N.inner_text('#cloud-msg') and not hits and N.evaluate("localStorage.getItem('ob-cloud-session')") is None)
+    N.click('#cloud-gate button'); 
+    t('gate: recording needs the box ticked and a note',N.evaluate("localStorage.getItem('ob-cloud-gate')") is None)
+    N.check('#cloud-gate-ok'); N.fill('#cloud-gate-note','RLS applied; second account cannot read rows; sign-up restricted'); N.click('#cloud-gate button')
+    t('gate: verification recorded and shown',N.evaluate("localStorage.getItem('ob-cloud-gate')") is not None and 'verification recorded' in N.inner_text('#cloud-gate'))
+    t('gate: the gate record itself is never synced or in the backup',N.evaluate("APPROVED_BACKUP_KEYS.indexOf('ob-cloud-gate')===-1&&CLOUD_KEYS.indexOf('ob-cloud-gate')===-1"))
+    cN.close()
     # --- Device A: has data, cloud empty -> migration push
-    ctxA=b.new_context(viewport={'width':390,'height':844}); A=ctxA.new_page(); errs=[]
+    ctxA=nctx(viewport={'width':390,'height':844}); A=ctxA.new_page(); errs=[]
     A.on('pageerror',lambda e:errs.append(str(e))); A.route(re.compile(r'supabase\.co'),fake.handle)
     A.goto('http://localhost:8765/index.html'); A.evaluate("localStorage.setItem('ob-pipeline',JSON.stringify(%s))"%json.dumps(PIPE)); A.reload()
     t('chip starts as Cloud: off','off' in A.text_content('#cloud-chip'))
@@ -54,11 +69,11 @@ with sync_playwright() as p:
     fake.down=False; A.evaluate("saveJSON('ob-gatekeepers',[{id:1,name:'Pat'},{id:2,name:'Quinn'}])"); A.wait_for_timeout(2600)
     t('back online: change reaches cloud',len(fake.rows['ob-gatekeepers']['value'])==2)
     # --- Device B: empty -> pulls cloud data, reloads
-    ctxB=b.new_context(viewport={'width':1440,'height':900}); B=ctxB.new_page(); B.route(re.compile(r'supabase\.co'),fake.handle)
+    ctxB=nctx(viewport={'width':1440,'height':900}); B=ctxB.new_page(); B.route(re.compile(r'supabase\.co'),fake.handle)
     B.goto('http://localhost:8765/index.html'); sign_in(B); B.wait_for_function("(JSON.parse(localStorage.getItem('ob-pipeline')||'[]')).length===2",timeout=8000)
     t('empty device receives cloud data',B.evaluate("JSON.parse(localStorage.getItem('ob-pipeline')).length")==2)
     # --- Device C: different data on both sides, no history -> conflict, nothing overwritten
-    ctxC=b.new_context(viewport={'width':390,'height':844}); C=ctxC.new_page(); C.route(re.compile(r'supabase\.co'),fake.handle)
+    ctxC=nctx(viewport={'width':390,'height':844}); C=ctxC.new_page(); C.route(re.compile(r'supabase\.co'),fake.handle)
     C.goto('http://localhost:8765/index.html'); C.evaluate("localStorage.setItem('ob-pipeline',JSON.stringify([{name:'Zed'}]))"); C.reload()
     w=fake.writes; sign_in(C); C.wait_for_selector('#cloud-conflicts .card')
     t('conflict shown with both counts','1 item' in C.inner_text('#cloud-conflicts') and '2 item' in C.inner_text('#cloud-conflicts'))
