@@ -1,4 +1,4 @@
-# Live acceptance check (Release 1e)
+# Live acceptance check (Release 1f)
 
 Status: **not yet performed.** Everything below is a checklist for Kerry to run on the deployed site. Nothing here has been verified on the live site by anyone. Mark a line Pass only after you have done it and seen the stated result.
 
@@ -14,7 +14,7 @@ Repository tests (the Playwright and Node suites) check the code on a local serv
 ## A. Which release is loaded (do this first)
 
 1. Open the live site in the test profile. Open **Data & Backup**.
-2. Read the line "This page is release ...". It should say release 1e and then "Server file says release 1e ... Matches this page."
+2. Read the line "This page is release ...". It should say release 1f and then "Server file says release 1f ... Matches this page."
 3. If it says Mismatch or "Could not read": reload with the cache cleared (Ctrl+Shift+R), or close the tab and reopen it, then check again. Do not continue until it says Matches.
 
 ## B. Complete workflow (about 20 minutes)
@@ -38,6 +38,9 @@ Repository tests (the Playwright and Node suites) check the code on a local serv
 | B15 | Press the badge at the top right ("Atlanta · Premium Ground"). Choose Buckhead | The list closes. The badge says Buckhead. Reload the page: it still says Buckhead | |
 | B16 | Open Companies. Look at the "Find companies in Buckhead" box and press "Law firms" | Google Maps opens in a new tab with law firms in Buckhead. The app itself collects nothing | |
 | B17 | Add a company while Buckhead is selected, then open it | Its area says Buckhead. Switch the badge back to Atlanta: no saved company changes or disappears | |
+| B18 | Companies tab, "Find people at a company": type a real company name and press Find people (this uses the research service and costs a little) | The status says it is researching, then the company page opens with its public leaders and sources, or says plainly what could not be found. The company is saved either way | |
+| B19 | On that page, look at the Contact path box | A tap-to-call link to the main phone if one was found, and seven role searches that open Google in a new tab. Press "Plan the first call for tomorrow": it shows on Today | |
+| B20 | Type the same company name again | It opens the saved company and says it was already researched. No second lookup, no duplicate | |
 
 ## C. Refresh and restart
 

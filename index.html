@@ -1087,8 +1087,15 @@ textarea{resize:vertical;min-height:75px;}
     <div class="sec-tag">Acquisition</div>
     <div class="sec-h">Companies</div>
     <div class="sec-d">One page per company: its contacts, its opportunities, recent activity and next steps. Everything you save here is a record you entered or a sourced research result. Nothing is verified until you record a check.</div>
-    <div id="acq-top"></div>
+    <div class="card" id="acq-find">
+      <div class="sep-title"><span class="mini-badge mb-gold">Find people at a company</span></div>
+      <div class="sec-d" style="margin-bottom:10px;">Type a company name. The app looks up its publicly listed leaders with sources, saves the company, and opens its page with the next steps. It does not find assistants by name: public pages almost never list them, so the company page gives you the role searches and the call to make.</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;"><div style="flex:1;min-width:200px;"><label for="acq-fp-name">Company name</label><input type="text" id="acq-fp-name" maxlength="100" placeholder="e.g. Delta Air Lines" onkeydown="if(event.key==='Enter')acqFindPeople()"></div><button class="btn btn-gold" id="acq-find-go" onclick="acqFindPeople()">Find people</button></div>
+      <div id="acq-find-area" style="font-size:var(--fs-xs);color:var(--muted);margin-top:8px;"></div>
+      <div id="acq-find-msg" role="status" aria-live="polite" style="font-size:var(--fs-xs);color:var(--gold);margin-top:6px;overflow-wrap:anywhere;"></div>
+    </div>
     <div class="card" id="area-find"></div>
+    <div id="acq-top"></div>
     <div class="card">
       <div class="sep-title"><span class="mini-badge mb-gold">Add a company</span></div>
       <div class="g2"><div><label for="acq-new-name">Company name</label><input type="text" id="acq-new-name" maxlength="100" onkeydown="if(event.key==='Enter')acqAddCompany()"></div><div><label for="acq-new-web">Website (optional)</label><input type="text" id="acq-new-web" maxlength="200" onkeydown="if(event.key==='Enter')acqAddCompany()"></div></div>
@@ -6159,8 +6166,9 @@ var rschState=rschClean(loadJSON('ob-research',null));
 function rschSave(){saveJSON('ob-research',rschState);}
 var rschBusy=false,rschCurrent='',rschConfirm='';
 function rschCity(){return RADAR_AREA_CITY[radarArea]||'Atlanta';}
-function rschMsg(t){var e=document.getElementById('rsch-status');if(e){e.textContent=t;}}
-function rschSetBusy(b){var e=document.getElementById('rsch-btn');if(e){e.disabled=b;}}
+var rschLastMsg='';
+function rschMsg(t){rschLastMsg=String(t==null?'':t);['rsch-status','acq-find-msg'].forEach(function(id){var e=document.getElementById(id);if(e){e.textContent=t;}});}
+function rschSetBusy(b){['rsch-btn','acq-find-go'].forEach(function(id){var e=document.getElementById(id);if(e){e.disabled=b;}});}
 function rschHost(u){try{return new URL(u).hostname.replace(/^www\./,'');}catch(e){return u;}}
 function rschLink(u,label){return '<a href="'+escapeHTML(u)+'" target="_blank" rel="noopener noreferrer" style="color:var(--gold);text-decoration:underline;">'+escapeHTML(label)+'</a>';}
 function rschSrc(u){return ' <span style="font-size:var(--fs-xs);">('+rschLink(u,'source: '+rschHost(u))+')</span>';}
@@ -6905,13 +6913,80 @@ function acqResearchHtml(co){
   h+=row('Website',r.website?rschLink(r.website.url,rschHost(r.website.url))+rschSrc(r.website.source):none);
   h+=row('Address',r.address?acqE(r.address.text)+rschSrc(r.address.source):none);
   h+=row('Main phone',r.phone?acqE(r.phone.text)+rschSrc(r.phone.source):none);
-  h+=row('Publicly named executives',r.people.length?'<ul style="margin:4px 0 0 18px;padding:0;">'+r.people.map(function(x,i){return '<li>'+acqE(x.name)+(x.title?', '+acqE(x.title):'')+rschSrc(x.source)+' '+todayBtn('Add as contact','acqAddPerson(\''+co.id+'\','+i+')')+'</li>';}).join('')+'</ul>':none);
+  h+=row('Publicly named executives',r.people.length?'<ul style="margin:4px 0 0 18px;padding:0;">'+r.people.map(function(x,i){return '<li>'+acqE(x.name)+(x.title?', '+acqE(x.title):'')+rschSrc(x.source)+' '+todayBtn('Add as contact','acqAddPerson(\''+co.id+'\','+i+')')+'</li>';}).join('')+'</ul><div style="font-size:var(--fs-xs);color:var(--muted);margin-top:4px;">These are leaders listed on public pages. Assistants are not usually listed. Use the Contact path below.</div>'+(r.people.length>1?'<div class="btns" style="margin:6px 0 0 0;">'+todayBtn('Add all '+r.people.length+' as listed contacts','acqAddAllPeople(\''+co.id+'\')')+'</div>':''):none);
   h+=row('Recent news',r.news.length?'<ul style="margin:4px 0 0 18px;padding:0;">'+r.news.map(function(x){return '<li>'+rschLink(x.url,x.title)+'</li>';}).join('')+'</ul>':none);
   return h+'<div class="btns">'+todayBtn('Research again','acqResearchNow(\''+co.id+'\')')+'</div></div>';
 }
 function acqResearchNow(id){
   var co=acqCo(id);if(!co){return;}
-  todayGoTab('radar');rschStart(co.name,co.area||areaCity());
+  acqFindPeople(co.name,true);
+}
+var ACQ_RESEARCH_CITIES=['Atlanta','Sandy Springs','Dunwoody','Alpharetta','Cobb County','Gwinnett County'];
+function acqResearchCityOk(c){return ACQ_RESEARCH_CITIES.indexOf(c)!==-1;}
+function areaCityFor(co){
+  var n=acqNorm(co&&co.area||'');
+  if(n){for(var i=0;i<areaState.areas.length;i++){var a=areaState.areas[i];if(acqNorm(a.name)===n||acqNorm(a.city)===n){return a.city;}}return co.area;}
+  return areaCity();
+}
+// One box: research a company by name, save it, open its page. Nothing is guessed: a failed lookup still saves the company.
+async function acqFindPeople(nameArg,force){
+  if(!acqReady){return;}
+  if(rschBusy){rschMsg('A lookup is already running. Wait for it to finish.');return;}
+  var name=String(nameArg!==undefined&&nameArg!==null?nameArg:acqVal('acq-fp-name')).replace(/\s+/g,' ').trim();
+  if(name.length<2){rschMsg('Type a company name.');return;}
+  if(!/^[A-Za-z0-9 &.,'\-\/()]{2,100}$/.test(name)){rschMsg('Enter the company name using letters and numbers only.');return;}
+  var panel=document.getElementById('panel-companies');
+  if(panel&&!panel.classList.contains('active')){todayGoTab('companies');}
+  var co=acqFindCo(acq,name),existed=!!co;
+  if(co&&co.researchedAt&&!force){acqOpenCo(co.id);rschMsg(co.name+' was already researched on '+co.researchedAt+'. Opened it. Use "Research again" on its page to refresh.');return;}
+  var city=co&&co.area?areaCityFor(co):areaCity();
+  if(!acqResearchCityOk(city)){city='Atlanta';}
+  await rschRun(name,city);
+  co=acqFindCo(acq,name);
+  if(!co){
+    co=acqBlankCo(name);co.area=areaDefaultCoArea();acq.companies.push(co);acqSave();
+    rschMsg((rschLastMsg?rschLastMsg+' ':'')+'The company was saved anyway, so you can use its Contact path.');
+  }else if(!existed&&!areaIsHome()&&co.source==='research'){co.area=areaDefaultCoArea();acqTouch(co);acqSave();}
+  acqOpenCo(co.id);
+  var inp=document.getElementById('acq-fp-name');if(inp){inp.value='';}
+}
+function acqAddAllPeople(coId){
+  var co=acqCo(coId),r=co&&co.research;if(!r||!r.people.length){return;}
+  var added=0,skipped=0;
+  r.people.forEach(function(x){
+    var c={companyId:co.id,name:x.name,role:x.title||'',email:'',phone:'',source:'Company Research',sourceUrl:x.source,verif:[{level:'listed',what:'Listed on a public page',how:'Company Research ('+rschHost(x.source)+')',by:'Company Research tool',at:r.at||atlDateStr()}]};
+    if(acqContactDups(c,'').length){skipped++;return;}
+    acqCreateContact(c,true);added++;
+  });
+  acqSave();acqRefresh();
+  notify(added+' contact'+(added===1?'':'s')+' added as publicly listed'+(skipped?'; '+skipped+' already saved':'')+'. None is a booking contact until you confirm it.');
+}
+function acqPlanCall(coId){
+  var co=acqCo(coId);if(!co){return;}
+  if(acqCoRestricted(co.id)){notify('This company is marked do not contact');return;}
+  if(acqOppOf(co).some(function(o){return o.status==='open';})){notify('This company already has an open opportunity');return;}
+  var today=atlDateStr();
+  var o={id:acqNewId('op'),companyId:co.id,contactIds:[],title:'Executive and airport transportation',type:'executive',stage:'identified',status:'open',owner:'Kerry',
+    nextAction:{text:'Call the main line and ask who arranges car service for visiting executives',date:todayAddDays(1),kind:'outreach',contactId:''},pauseReason:'',closeReason:'',closedAt:'',qual:{},notes:'',createdAt:today,updatedAt:Date.now(),projected:null,archived:null};
+  ACQ_QUAL.forEach(function(q){o.qual[q[0]]='';});
+  acq.opps.push(o);acqLogAct(co.id,'Planned the first call for '+o.nextAction.date+'.',{oppId:o.id});acqTouch(co);acqSave();acqRefresh();
+  notify('First call planned for tomorrow. It will show on Today.');
+}
+function acqTelHref(p){var k=acqPhoneKey(p);return k?'tel:+1'+k:'';}
+function acqXrayUrl(q,co){
+  var city=acqText(areaCityFor(co),60),nm=String(co.name||'').replace(/"/g,'');
+  return 'https://www.google.com/search?q='+encodeURIComponent('site:linkedin.com/in '+q+' "'+nm+'"'+(city?' "'+city+'"':''));
+}
+function acqSearchHelpHtml(co){
+  var tel=acqTelHref(co.phone);
+  var h='<div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);"><div style="font-size:var(--fs-xs);color:var(--muted);">Start here</div><div style="font-size:var(--fs-sm);overflow-wrap:anywhere;margin-top:4px;">'+
+    (tel?'<strong>Call the main line:</strong> <a href="'+acqE(tel)+'" style="color:var(--gold);text-decoration:underline;">'+acqE(co.phone)+'</a>. Ask: &ldquo;Who arranges car service for visiting executives?&rdquo;':'No main phone saved yet. Add it under Edit details, or find it on the company website.')+'</div>';
+  h+='<div style="font-size:var(--fs-xs);color:var(--muted);margin-top:10px;">Search by role (opens Google in a new tab; the app collects nothing)</div><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;">'+
+    GK_ROLE_QUERIES.map(function(r){return '<a class="btn btn-outline" style="padding:5px 10px;font-size:var(--fs-xs);" href="'+acqE(acqXrayUrl(r.q,co))+'" target="_blank" rel="noopener noreferrer">'+acqE(r.label)+' &rarr;</a>';}).join('')+'</div>';
+  if(!acqOppOf(co).some(function(o){return o.status==='open';})&&!acqCoRestricted(co.id)){
+    h+='<div class="btns" style="margin-top:10px;">'+todayBtn('Plan the first call for tomorrow','acqPlanCall(\''+co.id+'\')',true)+'</div>';
+  }
+  return h+'</div>';
 }
 
 // ---- Contact path: which routes were tried to find the person who books ----
@@ -6936,6 +7011,7 @@ function acqPathHtml(co){
     h+=nx?'<div style="margin-top:8px;font-size:var(--fs-sm);overflow-wrap:anywhere;"><span style="font-size:var(--fs-xs);color:var(--muted);">Try next:</span> <strong>'+acqE(nx[1])+'</strong><div style="font-size:var(--fs-xs);color:var(--muted);">'+acqE(nx[2])+'</div></div>'
       :'<div style="margin-top:8px;font-size:var(--fs-xs);color:var(--muted);">Every route has been logged. If none found a booking contact, decide whether this company stays active.</div>';
   }
+  if(st!=='booker'){h+=acqSearchHelpHtml(co);}
   if(co.routes.length){
     h+='<div style="margin-top:10px;">'+co.routes.map(function(r){
       return '<div style="padding:6px 0;border-bottom:1px solid var(--border);font-size:var(--fs-sm);overflow-wrap:anywhere;"><strong>'+acqE(acqLabel(ACQ_ROUTES,r.type))+'</strong> &middot; '+acqE(acqLabel(ACQ_ROUTE_RES,r.result))+' <span style="font-size:var(--fs-xs);color:var(--muted);">'+acqE(r.date)+'</span>'+
@@ -7009,9 +7085,11 @@ function acqAddContact(){
   if(dups.length){acqPendingCreate={kind:'contact',c:c};acqDupModal('contact',dups);return;}
   acqCreateContact(c);
 }
-function acqCreateContact(p){
+function acqCreateContact(p,quiet){
   var ct={id:acqNewId('ct'),companyId:p.companyId||'',name:p.name,role:p.role||'',email:p.email||'',phone:p.phone||'',source:p.source||'',sourceUrl:p.sourceUrl||'',verif:p.verif||[],dnc:null,notes:'',origin:'',archivedInto:'',createdAt:atlDateStr(),updatedAt:Date.now(),archived:null};
-  acq.contacts.push(ct);acqSave();acqRefresh();notify('Contact added');
+  acq.contacts.push(ct);
+  if(quiet){return ct;}
+  acqSave();acqRefresh();notify('Contact added');return ct;
 }
 function acqAddPerson(coId,i){
   var co=acqCo(coId),r=co&&co.research,x=r&&r.people[i];if(!x){return;}
@@ -8045,9 +8123,11 @@ function areaApply(){
   var sel=document.getElementById('places-area');
   if(sel){sel.innerHTML=areaState.areas.map(function(x){return '<option value="'+acqE(x.q)+'"'+(x.id===a.id?' selected':'')+'>'+acqE(x.name)+'</option>';}).join('');}
   var f=document.getElementById('area-find');if(f){f.innerHTML=areaFindHtml();}
+  var fa=document.getElementById('acq-find-area');
+  if(fa){fa.textContent=acqResearchCityOk(a.city)?'Searching near: '+a.name+'.':'Searching near: '+a.name+'. Company Research only looks in Georgia metro-Atlanta cities, so for this area it searches by company name alone.';}
 }
 areaApply();
-var ACQ_RELEASE='1e';
+var ACQ_RELEASE='1f';
 function acqKeyLabel(k){return ({'ob-acq':'Companies, contacts, opportunities, quotes, bookings and activity','ob-pipeline':'Pipeline prospects','ob-gatekeepers':'Gatekeepers','ob-messages':'Saved messages','ob-research':'Company Research results','ob-radar':'Market Radar watchlist and settings','ob-quotes':'Quote log and rate settings'})[k]||(typeof cloudKeyLabel==='function'?cloudKeyLabel(k):k);}
 function acqKeyCount(k){
   var raw=null;try{raw=localStorage.getItem(k);}catch(e){}
