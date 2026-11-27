@@ -417,7 +417,7 @@ with sync_playwright() as p:
     t('a hostile test value is treated as not a test', ev(pg, "acqClean({companies:[{id:'co-aa1',name:'X',test:'yes'}]}).companies[0].test") is False)
     # release check
     open_backup(pg); pg.wait_for_function("document.getElementById('acq-rel-check').textContent.indexOf('Matches')!==-1", timeout=8000)
-    t('the Data & Backup screen shows the loaded release and that it matches the server file', 'release 1e' in pg.text_content('#backup-info') and 'Matches this page' in pg.text_content('#acq-rel-check'))
+    t('the Data & Backup screen shows the loaded release and that it matches the server file', 'release 1f' in pg.text_content('#backup-info') and 'Matches this page' in pg.text_content('#acq-rel-check'))
     pg.context.close()
     pg = new_page(b); pg.route('**/version.json', lambda r: r.fulfill(status=200, content_type='application/json', body='{"release":"1b","built":"2026-01-01"}'))
     open_backup(pg); pg.wait_for_function("document.getElementById('acq-rel-check').textContent.indexOf('Mismatch')!==-1", timeout=8000)

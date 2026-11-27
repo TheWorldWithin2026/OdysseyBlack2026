@@ -57,3 +57,10 @@ What still does not exist: automatic merging of two people's simultaneous edits,
 - The active area is a **setting, not a filter**. It sets the city in Contact Path searches, the Market Expansion (Google Places) search area, the default city for Company Research, and the area name given to newly created companies (blank at home, as before). It never hides, moves or recounts saved companies, so pilot counts do not change with the area.
 - The Companies tab has a **Find companies in (area)** box: Google Maps search links by category. They open in a new tab and need no server key. Nothing returned is stored by the app; a company exists only once you add it.
 - An area marked "not served" shows a warning before outreach. The Market Radar watchlist keeps its own curated areas and is not driven by this setting.
+
+## Release 1f: find people at a company
+
+- **Find people at a company** (top of the Companies tab): one box. It runs Company Research for the name, saves the company, and opens its page. A failed or empty lookup still saves the company, so the Contact path is never blocked. A company already researched is opened without a second lookup (the lookup costs money); "Research again" forces one. The older "Research now" buttons (Today and the company page) use the same flow and stay on Companies.
+- **What it does not do:** find assistants by name. Public pages almost never list them, and the app never guesses a person. For assistants the company page gives a tap-to-call link to the saved main phone (with the question to ask), seven role searches by company and city (Google, new tab, nothing collected), and "Plan the first call for tomorrow", which creates one open opportunity with a dated next step.
+- **Add all as listed contacts:** files each publicly listed leader as a contact at level "Publicly listed" (skipping people already saved). None counts as a booking contact until a check at level "Confirmed booker" is recorded.
+- **City limit:** the research service only accepts Georgia metro-Atlanta cities. For other search areas the app sends Atlanta and the card says it is searching by company name alone.
