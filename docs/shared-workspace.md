@@ -50,3 +50,10 @@ What still does not exist: automatic merging of two people's simultaneous edits,
 - **Removed:** Company Intel and 90-Day Plan. Both were built on the older Pipeline numbers that Companies replaces. Their stored data key `ob-cal-progress` is still accepted in old backups. The removed code is in git history (Release 1c).
 - **Kept, moved to a Reference group:** War Room and Market Expansion. They hold written strategy and a Google Places search but track nothing. Treat the dollar figures and close rates in them as the author's estimates, not sourced results.
 - **Renamed:** Gatekeeper Finder is now Contact Path. Its stored data (`ob-gatekeepers`) is unchanged.
+
+## Release 1e: search area
+
+- The badge at the top right is now a button. It opens a list of saved **search areas** (stored in `ob-areas`, included in Full Backup, not cloud-synced). Metro Atlanta is home and cannot be removed; sub-areas (Buckhead, Midtown, Downtown, Sandy Springs, Perimeter / Dunwoody, Alpharetta) are preset; any other place can be added with a "we serve this area" flag.
+- The active area is a **setting, not a filter**. It sets the city in Contact Path searches, the Market Expansion (Google Places) search area, the default city for Company Research, and the area name given to newly created companies (blank at home, as before). It never hides, moves or recounts saved companies, so pilot counts do not change with the area.
+- The Companies tab has a **Find companies in (area)** box: Google Maps search links by category. They open in a new tab and need no server key. Nothing returned is stored by the app; a company exists only once you add it.
+- An area marked "not served" shows a warning before outreach. The Market Radar watchlist keeps its own curated areas and is not driven by this setting.
