@@ -1,4 +1,4 @@
-# Live acceptance check (Release 1g)
+# Live acceptance check (Release 1h)
 
 Status: **not yet performed.** Everything below is a checklist for Kerry to run on the deployed site. Nothing here has been verified on the live site by anyone. Mark a line Pass only after you have done it and seen the stated result.
 
@@ -14,7 +14,7 @@ Repository tests (the Playwright and Node suites) check the code on a local serv
 ## A. Which release is loaded (do this first)
 
 1. Open the live site in the test profile. Open **Data & Backup**.
-2. Read the line "This page is release ...". It should say release 1g and then "Server file says release 1g ... Matches this page."
+2. Read the line "This page is release ...". It should say release 1h and then "Server file says release 1h ... Matches this page."
 3. If it says Mismatch or "Could not read": reload with the cache cleared (Ctrl+Shift+R), or close the tab and reopen it, then check again. Do not continue until it says Matches.
 
 ## B. Complete workflow (about 20 minutes)
@@ -68,7 +68,7 @@ Repository tests (the Playwright and Node suites) check the code on a local serv
 | E2 preview shows format, date, fingerprint and changes nothing | |
 | E3 Replace restore: fingerprint matches, relationships intact | |
 
-## F. Older prospect link (only if you have an older prospect saved before Release 1g)
+## F. Older prospect link (only if you have an older prospect saved before Release 1h)
 
 The Pipeline tab no longer exists. Older prospects now show on Today under "Older prospects". Link one to a TEST company (not a real one) from the company page. It should leave "Older prospects" and show once, in Acquisition on Today. Undo link should bring it back.
 
@@ -91,7 +91,7 @@ Cloud Sync sign-in is blocked in the app until verification is recorded in Data 
 
 Delete the test profile. Confirm the working browser has no `ZZ TEST` records and that its fingerprint has not changed.
 
-## H. Simplified app (Release 1g)
+## H. Simplified app (Release 1h)
 
 1. The tab bar has exactly 8 tabs: Today, Companies, Contact Path, AI Outreach, Call Script, Quote Builder, Vendor Packet, Partners.
 2. The header shows Companies, Booker found and Due today. There is no MRR, "To Target" or Pipeline value.

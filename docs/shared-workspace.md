@@ -74,3 +74,7 @@ Why: the app exists to win executive clients. Companies, Contact Path and Today 
 Data safety: no storage key was removed. APPROVED_BACKUP_KEYS is unchanged, so Full Backup and Merge restore still carry ob-pipeline, ob-radar, ob-lookalike, ob-forecast and ob-research. Older Pipeline prospects still appear on Today under "Older prospects" and can be linked to a company. The header now counts Companies, Booker found and Due today.
 
 Not removed: the unreachable renderer code and the places.js function stay in the repo for now. They are harmless and can be deleted in a later cleanup once Kerry confirms nothing is missed.
+
+## Release 1h: essential usability fixes
+
+Buttons and tabs are at least 44px tall on screens up to 900px wide. Text inputs are 16px so iPhones do not zoom on tap. The muted grey text now passes 4.5:1 contrast. Labels were already present on every field of the 8 remaining tabs. Not done on purpose: first-run checklist, collapsing long pages, self-hosted font.
