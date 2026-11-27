@@ -1,4 +1,4 @@
-# Live acceptance check (Release 1d)
+# Live acceptance check (Release 1e)
 
 Status: **not yet performed.** Everything below is a checklist for Kerry to run on the deployed site. Nothing here has been verified on the live site by anyone. Mark a line Pass only after you have done it and seen the stated result.
 
@@ -14,7 +14,7 @@ Repository tests (the Playwright and Node suites) check the code on a local serv
 ## A. Which release is loaded (do this first)
 
 1. Open the live site in the test profile. Open **Data & Backup**.
-2. Read the line "This page is release ...". It should say release 1d and then "Server file says release 1d ... Matches this page."
+2. Read the line "This page is release ...". It should say release 1e and then "Server file says release 1e ... Matches this page."
 3. If it says Mismatch or "Could not read": reload with the cache cleared (Ctrl+Shift+R), or close the tab and reopen it, then check again. Do not continue until it says Matches.
 
 ## B. Complete workflow (about 20 minutes)
@@ -35,6 +35,9 @@ Repository tests (the Playwright and Node suites) check the code on a local serv
 | B12 | Log a second route with result "Found a person or number", a note and a source link. Then press "Open search links for this company" | The link appears under Source links. The Contact Path tab opens with the company name filled in and seven search links | |
 | B13 | On the `Test Person` contact, record a check at level "Confirmed booker" | The Contact path box says "Booking contact confirmed." and the list stops saying "no booking contact yet" | |
 | B14 | Look at the tab bar | No Company Intel or 90-Day Plan tab. Win clients tabs first. "Contact Path" replaces "Gatekeeper Finder" | |
+| B15 | Press the badge at the top right ("Atlanta · Premium Ground"). Choose Buckhead | The list closes. The badge says Buckhead. Reload the page: it still says Buckhead | |
+| B16 | Open Companies. Look at the "Find companies in Buckhead" box and press "Law firms" | Google Maps opens in a new tab with law firms in Buckhead. The app itself collects nothing | |
+| B17 | Add a company while Buckhead is selected, then open it | Its area says Buckhead. Switch the badge back to Atlanta: no saved company changes or disappears | |
 
 ## C. Refresh and restart
 

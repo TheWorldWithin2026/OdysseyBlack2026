@@ -59,6 +59,8 @@ body{background:var(--black);color:var(--text);font-family:var(--ff-ui);font-siz
 header{display:flex;align-items:center;justify-content:space-between;padding:20px 36px;border-bottom:1px solid var(--border);}
 .logo-text{font-family:var(--ff-display);font-size:var(--fs-xl);letter-spacing:var(--ls-wider);color:var(--gold-light);text-transform:uppercase;}
 .logo-sub{font-size:var(--fs-xs);letter-spacing:var(--ls-widest);color:var(--muted);text-transform:uppercase;margin-top:3px;}
+.area-badge{cursor:pointer;}
+.area-badge:hover,.area-badge:focus-visible{border-color:var(--gold);outline:none;}
 .badge{font-size:var(--fs-xs);letter-spacing:var(--ls-wide);color:var(--gold);border:1px solid rgba(201,168,76,0.3);padding:6px 14px;text-transform:uppercase;}
 .wrap{max-width:1060px;margin:0 auto;padding:36px 24px 80px;}
 
@@ -546,7 +548,7 @@ textarea{resize:vertical;min-height:75px;}
 <body>
 <header>
   <div><div class="logo-text">Odyssey Black</div><div class="logo-sub">Executive Acquisition Suite</div></div>
-  <div class="badge">Atlanta &middot; Premium Ground</div>
+  <div class="badge area-badge" id="area-badge" role="button" tabindex="0" aria-haspopup="dialog" title="Change the search area" onclick="areaOpen()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();areaOpen();}"><span id="area-badge-text">Atlanta</span> &middot; Premium Ground <span aria-hidden="true">&#9662;</span></div>
 </header>
 
 <!-- COMMAND CENTER -->
@@ -1086,6 +1088,7 @@ textarea{resize:vertical;min-height:75px;}
     <div class="sec-h">Companies</div>
     <div class="sec-d">One page per company: its contacts, its opportunities, recent activity and next steps. Everything you save here is a record you entered or a sourced research result. Nothing is verified until you record a check.</div>
     <div id="acq-top"></div>
+    <div class="card" id="area-find"></div>
     <div class="card">
       <div class="sep-title"><span class="mini-badge mb-gold">Add a company</span></div>
       <div class="g2"><div><label for="acq-new-name">Company name</label><input type="text" id="acq-new-name" maxlength="100" onkeydown="if(event.key==='Enter')acqAddCompany()"></div><div><label for="acq-new-web">Website (optional)</label><input type="text" id="acq-new-web" maxlength="200" onkeydown="if(event.key==='Enter')acqAddCompany()"></div></div>
@@ -1295,7 +1298,7 @@ textarea{resize:vertical;min-height:75px;}
           </select>
         </div>
         <div style="flex:1;">
-          <label>Atlanta Neighborhood</label>
+          <label>Search area (change it with the badge at the top right)</label>
           <select id="places-area">
             <option value="Buckhead, Atlanta GA">Buckhead</option>
             <option value="Midtown, Atlanta GA">Midtown</option>
@@ -2048,7 +2051,7 @@ function notify_safe(msg){
   // may not exist yet at the moment these utilities run — this wrapper is safe either way.
   try{ if(typeof notify==='function'){ notify(msg); } else { console.warn(msg); } }catch(e){ console.warn(msg); }
 }
-var APPROVED_BACKUP_KEYS=['ob-pipeline','ob-gatekeepers','ob-messages','ob-cal-progress','ob-event-mode','ob-radar','ob-vendor','ob-partners','ob-lookalike','ob-forecast','ob-quotes','ob-research','ob-acq'];
+var APPROVED_BACKUP_KEYS=['ob-pipeline','ob-gatekeepers','ob-messages','ob-cal-progress','ob-event-mode','ob-radar','ob-vendor','ob-partners','ob-lookalike','ob-forecast','ob-quotes','ob-research','ob-acq','ob-areas'];
 var pendingRestore=null; // holds validated backup.keys while previewed, before the operator commits
 
 function csvCell(v){
@@ -4943,7 +4946,7 @@ function radarSprintReset(){
 // Only the publishable key lives here (safe by design); row-level security restricts rows to the signed-in owner.
 var CLOUD_URL='https://cicghvjkunvozriicykw.supabase.co';
 var CLOUD_KEY='sb_publishable_TuJJvWydTF5TmnsupabKMg_vNNxDKyL';
-var CLOUD_KEYS=APPROVED_BACKUP_KEYS.filter(function(k){return k!=='ob-acq';}); // Companies data stays on this device: not synced to the cloud
+var CLOUD_KEYS=APPROVED_BACKUP_KEYS.filter(function(k){return k!=='ob-acq'&&k!=='ob-areas';}); // Companies data stays on this device: not synced to the cloud
 var cloudSession=loadJSON('ob-cloud-session',null);
 var cloudMeta=loadJSON('ob-cloud-meta',{});
 if(!cloudMeta||typeof cloudMeta!=='object'||Array.isArray(cloudMeta)){cloudMeta={};}
@@ -6739,7 +6742,7 @@ function acqAddCompany(){
 }
 function acqTestChecked(){var e=document.getElementById('acq-new-test');return !!(e&&e.checked);}
 function acqCreateCompany(name,web,test){
-  var co=acqBlankCo(name);co.website=web||'';co.test=test===true;acq.companies.push(co);acqSel=co.id;acqSave();
+  var co=acqBlankCo(name);co.website=web||'';co.test=test===true;if(typeof areaDefaultCoArea==='function'){co.area=areaDefaultCoArea();}acq.companies.push(co);acqSel=co.id;acqSave();
   document.getElementById('acq-new-name').value='';document.getElementById('acq-new-web').value='';var tb=document.getElementById('acq-new-test');if(tb){tb.checked=false;}
   acqEditing=false;acqRefresh();notify('Company added. No research saved yet, so a research task was added to Today.');
 }
@@ -6908,7 +6911,7 @@ function acqResearchHtml(co){
 }
 function acqResearchNow(id){
   var co=acqCo(id);if(!co){return;}
-  todayGoTab('radar');rschStart(co.name,co.area||'Atlanta');
+  todayGoTab('radar');rschStart(co.name,co.area||areaCity());
 }
 
 // ---- Contact path: which routes were tried to find the person who books ----
@@ -7956,7 +7959,95 @@ function cloudGateSave(){
 function cloudGateClear(){try{localStorage.removeItem('ob-cloud-gate');}catch(e){}cloudGateRender();}
 
 // ---- Data & Backup: what Full Backup contains, version, last export ----
-var ACQ_RELEASE='1d';
+// ---- Search area: where searches look. A setting, never a filter: it does not hide or change saved companies. ----
+var AREA_HOME='ar-metro';
+var AREA_DEFAULTS=[
+  {id:'ar-metro',name:'Metro Atlanta',q:'Atlanta, GA',city:'Atlanta',serve:true},
+  {id:'ar-buckhead',name:'Buckhead',q:'Buckhead, Atlanta, GA',city:'Atlanta',serve:true},
+  {id:'ar-midtown',name:'Midtown',q:'Midtown, Atlanta, GA',city:'Atlanta',serve:true},
+  {id:'ar-downtown',name:'Downtown Atlanta',q:'Downtown, Atlanta, GA',city:'Atlanta',serve:true},
+  {id:'ar-sandy',name:'Sandy Springs',q:'Sandy Springs, GA',city:'Sandy Springs',serve:true},
+  {id:'ar-perimeter',name:'Perimeter / Dunwoody',q:'Perimeter Center, Atlanta, GA',city:'Atlanta',serve:true},
+  {id:'ar-alpharetta',name:'Alpharetta',q:'Alpharetta, GA',city:'Alpharetta',serve:true}
+];
+var AREA_CATS=[['Law firms','law firms'],['Financial services','financial services firms'],['Commercial real estate','commercial real estate companies'],['Corporate offices','corporate headquarters and offices'],['Consulting firms','consulting firms'],['Hotels and event venues','hotels and event venues'],['Medical practices','medical practices']];
+function areaClean(raw){
+  var out={v:1,active:AREA_HOME,areas:[]};
+  var seen={};
+  var list=(raw&&typeof raw==='object'&&Array.isArray(raw.areas))?raw.areas:null;
+  if(list===null){AREA_DEFAULTS.forEach(function(a){out.areas.push({id:a.id,name:a.name,q:a.q,city:a.city,serve:a.serve});seen[a.id]=1;});return out;}
+  list.slice(0,30).forEach(function(a){
+    if(!a||typeof a!=='object'){return;}
+    var id=(typeof a.id==='string'&&/^ar-[a-z0-9-]{2,60}$/.test(a.id)&&!seen[a.id])?a.id:'';
+    var name=acqText(a.name,60);if(!id||!name){return;}
+    seen[id]=1;
+    out.areas.push({id:id,name:name,q:acqText(a.q,100)||name,city:acqText(a.city,60)||name,serve:a.serve!==false});
+  });
+  if(!seen[AREA_HOME]){out.areas.unshift({id:AREA_HOME,name:'Metro Atlanta',q:'Atlanta, GA',city:'Atlanta',serve:true});}
+  out.active=(raw&&typeof raw.active==='string'&&seen[raw.active]||raw&&raw.active===AREA_HOME)?raw.active:AREA_HOME;
+  return out;
+}
+var areaState=areaClean(loadJSON('ob-areas',null));
+function areaSave(){return saveJSON('ob-areas',areaState);}
+function areaActive(){for(var i=0;i<areaState.areas.length;i++){if(areaState.areas[i].id===areaState.active){return areaState.areas[i];}}return areaState.areas[0];}
+function areaCity(){return areaActive().city||'Atlanta';}
+function areaIsHome(){return areaState.active===AREA_HOME;}
+function areaDefaultCoArea(){return areaIsHome()?'':acqText(areaActive().name,40);}
+function areaMapsUrl(cat,a){return 'https://www.google.com/maps/search/'+encodeURIComponent(cat+' in '+a.q);}
+function areaSet(id){
+  if(!areaState.areas.some(function(a){return a.id===id;})){return;}
+  areaState.active=id;areaSave();areaApply();acqModalClose();
+}
+function areaAdd(){
+  var name=acqText(acqVal('area-new-name'),60);
+  if(name.length<2){notify('Type the place, for example Savannah, GA');return;}
+  if(areaState.areas.length>=30){notify('That is the most areas you can save. Remove one first');return;}
+  var q=acqText(acqVal('area-new-q'),100)||name;
+  var base=('ar-'+acqSlug(name)).slice(0,50).replace(/-+$/,''),id=base,n=2;
+  while(areaState.areas.some(function(a){return a.id===id;})){id=base+'-'+n;n++;}
+  if(!/^ar-[a-z0-9-]{2,60}$/.test(id)){notify('Use letters or numbers in the name');return;}
+  areaState.areas.push({id:id,name:name,q:q,city:name.split(',')[0].trim().slice(0,60)||name,serve:acqChk('area-new-serve')});
+  areaState.active=id;areaSave();areaApply();acqModalClose();notify(name+' added and selected');
+}
+function areaRemove(id){
+  if(id===AREA_HOME){return;}
+  var a=areaState.areas.filter(function(x){return x.id===id;})[0];if(!a){return;}
+  if(!confirm('Remove '+a.name+' from your areas? Saved companies are not changed.')){return;}
+  areaState.areas=areaState.areas.filter(function(x){return x.id!==id;});
+  if(areaState.active===id){areaState.active=AREA_HOME;}
+  areaSave();areaApply();areaOpen();
+}
+function areaOpen(){
+  var h='<div style="font-size:var(--fs-sm);color:var(--muted);margin-bottom:10px;">The area you pick sets where searches look: the search links under Companies, Contact Path searches, Company Research and the Market Expansion search. It does not hide or change any saved company.</div>';
+  h+=areaState.areas.map(function(a){
+    var on=a.id===areaState.active;
+    return '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);'+(on?'border-left:3px solid var(--gold);padding-left:8px;':'')+'"><div style="min-width:160px;overflow-wrap:anywhere;"><strong style="font-size:var(--fs-sm);">'+acqE(a.name)+'</strong> '+(a.id===AREA_HOME?'<span class="mini-badge mb-green">Home</span> ':'')+(a.serve?'':'<span class="mini-badge" style="background:rgba(231,76,60,0.1);border:1px solid rgba(231,76,60,0.4);color:#e74c3c;">Not served</span> ')+'<div style="font-size:var(--fs-xs);color:var(--muted);">Searches: '+acqE(a.q)+'</div></div><div class="btns" style="margin:0;">'+(on?'<span style="font-size:var(--fs-xs);color:var(--gold);">In use</span>':todayBtn('Use this area','areaSet(\''+a.id+'\')',true))+(a.id===AREA_HOME?'':todayBtn('Remove','areaRemove(\''+a.id+'\')'))+'</div></div>';
+  }).join('');
+  h+='<div style="margin-top:14px;"><div class="g2">'+acqFieldHtml('Add an area','area-new-name','',60,'text','e.g. Marietta, GA')+acqFieldHtml('Search text (optional)','area-new-q','',100,'text','Defaults to the name')+'</div>'+
+    '<label style="display:flex;gap:6px;align-items:flex-start;margin-top:8px;font-size:var(--fs-xs);"><input type="checkbox" id="area-new-serve" checked style="width:auto;margin-top:2px;"> Odyssey Black serves this area</label>'+
+    '<div class="btns"><button class="btn btn-gold" onclick="areaAdd()">Add and use</button></div></div>';
+  acqModal('Search area',h);
+}
+function areaFindHtml(){
+  var a=areaActive();
+  var h='<div class="sep-title"><span class="mini-badge mb-gold">Find companies in '+acqE(a.name)+'</span></div>';
+  h+='<div style="font-size:var(--fs-xs);color:var(--muted);margin-bottom:8px;">Each button opens a Google Maps search in a new tab. The app collects nothing. A listing is a lead to check, not a buyer.</div>';
+  if(!a.serve){h+='<div style="margin-bottom:8px;padding:8px 10px;border:1px solid rgba(231,76,60,0.4);background:rgba(231,76,60,0.06);font-size:var(--fs-xs);">You marked this area as not served. Decide how you would serve it before you reach out.</div>';}
+  h+='<div style="display:flex;gap:8px;flex-wrap:wrap;">'+AREA_CATS.map(function(c){return '<a class="btn btn-outline" style="padding:6px 14px;font-size:var(--fs-xs);" href="'+acqE(areaMapsUrl(c[1],a))+'" target="_blank" rel="noopener noreferrer">'+acqE(c[0])+' &rarr;</a>';}).join('')+'</div>';
+  h+='<div class="btns" style="margin-top:10px;"><button class="btn btn-outline" onclick="areaOpen()">Change area</button><button class="btn btn-outline" onclick="todayGoTab(\'markets\')">Google Places search (Market Expansion)</button></div>';
+  h+='<div style="font-size:var(--fs-xs);color:var(--muted);margin-top:8px;">Found a company worth a look? Add it below'+(areaIsHome()?'':'. New companies take the area "'+acqE(areaDefaultCoArea())+'"')+'. Then follow its Contact path.</div>';
+  return h;
+}
+function areaApply(){
+  var a=areaActive();
+  var bt=document.getElementById('area-badge-text');if(bt){bt.textContent=areaIsHome()?'Atlanta':a.name;}
+  var gk=document.getElementById('gk-city');if(gk){gk.value=a.city;}
+  var sel=document.getElementById('places-area');
+  if(sel){sel.innerHTML=areaState.areas.map(function(x){return '<option value="'+acqE(x.q)+'"'+(x.id===a.id?' selected':'')+'>'+acqE(x.name)+'</option>';}).join('');}
+  var f=document.getElementById('area-find');if(f){f.innerHTML=areaFindHtml();}
+}
+areaApply();
+var ACQ_RELEASE='1e';
 function acqKeyLabel(k){return ({'ob-acq':'Companies, contacts, opportunities, quotes, bookings and activity','ob-pipeline':'Pipeline prospects','ob-gatekeepers':'Gatekeepers','ob-messages':'Saved messages','ob-research':'Company Research results','ob-radar':'Market Radar watchlist and settings','ob-quotes':'Quote log and rate settings'})[k]||(typeof cloudKeyLabel==='function'?cloudKeyLabel(k):k);}
 function acqKeyCount(k){
   var raw=null;try{raw=localStorage.getItem(k);}catch(e){}
