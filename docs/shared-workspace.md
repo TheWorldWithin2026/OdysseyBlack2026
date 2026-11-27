@@ -64,3 +64,13 @@ What still does not exist: automatic merging of two people's simultaneous edits,
 - **What it does not do:** find assistants by name. Public pages almost never list them, and the app never guesses a person. For assistants the company page gives a tap-to-call link to the saved main phone (with the question to ask), seven role searches by company and city (Google, new tab, nothing collected), and "Plan the first call for tomorrow", which creates one open opportunity with a dated next step.
 - **Add all as listed contacts:** files each publicly listed leader as a contact at level "Publicly listed" (skipping people already saved). None counts as a booking contact until a check at level "Confirmed booker" is recorded.
 - **City limit:** the research service only accepts Georgia metro-Atlanta cities. For other search areas the app sends Atlanta and the card says it is searching by company name alone.
+
+## Release 1g: simplified app
+
+Removed from the tab bar and the page: Market Radar, Prospect Builder, Apollo Import, Lookalikes, Pipeline (older), Forecast, Results, War Room, Market Expansion. Kept: Today, Companies, Contact Path, AI Outreach, Call Script, Quote Builder, Vendor Packet, Partners.
+
+Why: the app exists to win executive clients. Companies, Contact Path and Today now cover finding companies, finding people and the next call. The removed tabs duplicated that, or tracked things (MRR targets, forecasts, market news) that do not help a first call.
+
+Data safety: no storage key was removed. APPROVED_BACKUP_KEYS is unchanged, so Full Backup and Merge restore still carry ob-pipeline, ob-radar, ob-lookalike, ob-forecast and ob-research. Older Pipeline prospects still appear on Today under "Older prospects" and can be linked to a company. The header now counts Companies, Booker found and Due today.
+
+Not removed: the unreachable renderer code and the places.js function stay in the repo for now. They are harmless and can be deleted in a later cleanup once Kerry confirms nothing is missed.

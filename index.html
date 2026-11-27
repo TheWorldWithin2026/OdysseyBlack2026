@@ -67,7 +67,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:20p
 /* ── TABS ── */
 .tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:36px;overflow-x:auto;}
 .tab-group{align-self:center;white-space:nowrap;font-size:10px;letter-spacing:var(--ls-wider);text-transform:uppercase;color:var(--gold);padding:0 6px 0 14px;opacity:.8;}
-.tab{background:none;border:none;border-bottom:2px solid transparent;padding:13px 18px;font-size:var(--fs-xs);letter-spacing:var(--ls-wide);text-transform:uppercase;color:var(--muted);cursor:pointer;font-family:var(--ff-ui);font-weight:500;transition:all 0.2s;white-space:nowrap;}
+.tab{background:none;border:none;border-bottom:2px solid transparent;padding:13px 11px;font-size:var(--fs-xs);letter-spacing:var(--ls-wide);text-transform:uppercase;color:var(--muted);cursor:pointer;font-family:var(--ff-ui);font-weight:500;transition:all 0.2s;white-space:nowrap;}
 .tab:hover{color:var(--text);}
 .tab.active{color:var(--gold);border-bottom-color:var(--gold);}
 .panel{display:none;}.panel.active{display:block;}
@@ -556,36 +556,19 @@ textarea{resize:vertical;min-height:75px;}
   <button class="btn btn-outline" style="padding:6px 12px;font-size:var(--fs-xs);margin-right:14px;" onclick="openBackupModal()">&#128190; Data &amp; Backup</button>
   <button class="btn btn-outline" id="cloud-chip" style="padding:6px 12px;font-size:var(--fs-xs);margin-right:14px;" onclick="openBackupModal()">&#9729; Cloud: off</button>
   <div class="cc-stat">
-    <div class="cc-num" id="cc-mrr" style="color:var(--gold);">$0</div>
-    <div class="cc-label">Current MRR</div>
-  </div>
-  <div class="cc-gap-wrap">
-    <div class="cc-gap-inner">
-      <div>
-        <div class="cc-num" id="cc-gap" style="color:#e74c3c;">$9K</div>
-        <div class="cc-label">To Target</div>
-      </div>
-      <div>
-        <div class="cc-gap-bar"><div class="cc-gap-fill" id="cc-gap-fill" style="width:0%;background:#e74c3c;"></div></div>
-        <div style="font-size:10px;letter-spacing:0.06em;text-transform:uppercase;font-weight:600;margin-top:3px;" id="cc-gap-pct" class="rev-behind">0% of $9K</div>
-      </div>
-    </div>
+    <div class="cc-num" id="cc-cos" style="color:var(--gold);">0</div>
+    <div class="cc-label">Companies</div>
   </div>
   <div class="cc-stat">
-    <div class="cc-num" id="cc-pipe-val" style="color:var(--blue);">$0</div>
-    <div class="cc-label">Pipeline Value</div>
-  </div>
-  <div class="cc-stat">
-    <div class="cc-num" id="cc-high-conv" style="color:var(--green);">0</div>
-    <div class="cc-label">High Conv</div>
+    <div class="cc-num" id="cc-bookers" style="color:var(--green);">0</div>
+    <div class="cc-label">Booker found</div>
   </div>
   <div class="cc-stat" style="border-right:none;">
     <div class="cc-num" id="cc-urgent-num" style="color:var(--muted);">0</div>
-    <div class="cc-label">Urgent Today</div>
+    <div class="cc-label">Due today</div>
   </div>
   <div class="cc-actions">
     <div id="cc-status"></div>
-    <button class="btn btn-ghost" style="padding:6px 14px;font-size:var(--fs-xs);" onclick="todayGoTab('pipeline')">Pipeline</button>
     <button class="btn btn-outline" style="padding:6px 14px;font-size:var(--fs-xs);" onclick="generateDailyBriefingCC()">Today&#x27;s Briefing <div class="spin" id="sp-cc" style="width:11px;height:11px;border-width:1.5px;"></div></button>
   </div>
 </div>
@@ -597,28 +580,15 @@ textarea{resize:vertical;min-height:75px;}
 </div>
 
 <div class="wrap">
-  <div class="tabs">
-    <span class="tab-group">Win clients</span>
-    <button class="tab active" onclick="switchTab('today',this)">&#9728; Today</button>
-    <button class="tab" onclick="switchTab('companies',this)">&#127970; Companies</button>
-    <button class="tab" onclick="switchTab('gatekeeper',this)">&#128273; Contact Path</button>
-    <button class="tab" onclick="switchTab('outreach',this)">AI Outreach</button>
-    <button class="tab" onclick="switchTab('quotes',this)">&#128181; Quote Builder</button>
-    <button class="tab" onclick="switchTab('results',this)">&#128200; Results</button>
-    <span class="tab-group">Find prospects</span>
-    <button class="tab" onclick="switchTab('radar',this)">&#128225; Market Radar</button>
-    <button class="tab" onclick="switchTab('prospect',this)">Prospect Builder</button>
-    <button class="tab" onclick="switchTab('import',this)">Apollo Import</button>
-    <button class="tab" onclick="switchTab('partners',this)">&#129309; Partners</button>
-    <button class="tab" onclick="switchTab('lookalike',this)">&#128269; Lookalikes</button>
-    <span class="tab-group">Tools</span>
-    <button class="tab" onclick="switchTab('pipeline',this)">Pipeline (older)</button>
-    <button class="tab" onclick="switchTab('script',this)">Call Script</button>
-    <button class="tab" onclick="switchTab('vendor',this)">&#128196; Vendor Packet</button>
-    <button class="tab" onclick="switchTab('forecast',this)">&#128176; Forecast</button>
-    <span class="tab-group">Reference</span>
-    <button class="tab" onclick="switchTab('strategy',this)">&#9733; War Room</button>
-    <button class="tab" onclick="switchTab('markets',this)">&#9775; Market Expansion</button>
+  <div class="tabs" role="tablist" aria-label="Main sections">
+    <button class="tab active" role="tab" onclick="switchTab('today',this)">&#9728; Today</button>
+    <button class="tab" role="tab" onclick="switchTab('companies',this)">&#127970; Companies</button>
+    <button class="tab" role="tab" onclick="switchTab('gatekeeper',this)">&#128273; Contact Path</button>
+    <button class="tab" role="tab" onclick="switchTab('outreach',this)">&#9993; Outreach</button>
+    <button class="tab" role="tab" onclick="switchTab('script',this)">&#128222; Call Script</button>
+    <button class="tab" role="tab" onclick="switchTab('quotes',this)">&#128181; Quotes</button>
+    <button class="tab" role="tab" onclick="switchTab('vendor',this)">&#128196; Vendor Packet</button>
+    <button class="tab" role="tab" onclick="switchTab('partners',this)">&#129309; Partners</button>
   </div>
 
   <!-- TAB 1: PROSPECT BUILDER -->
@@ -630,318 +600,6 @@ textarea{resize:vertical;min-height:75px;}
     <div class="btns" style="margin-top:12px;"><button class="btn btn-outline" onclick="renderToday()">Refresh</button></div>
   </div>
 
-  <div class="panel" id="panel-prospect">
-
-    <!-- COMPANY TARGET FINDER -->
-    <div class="target-finder">
-      <div class="target-finder-header" onclick="toggleTargetFinder()">
-        <div>
-          <div class="target-finder-title">&#9654; AI Target Suggestions</div>
-          <div class="target-finder-sub">Type any company name — get candidate C-suite roles to research and score. Not a verified directory.</div>
-        </div>
-        <div class="tf-arrow" id="tf-arrow">&#9660;</div>
-      </div>
-      <div class="target-finder-body" id="tf-body">
-        <div class="tf-search-row">
-          <input type="text" id="tf-company" placeholder="e.g. Delta Air Lines, NCR Voyix, Truist Financial, Coca-Cola..." onkeydown="if(event.key==='Enter')findCompanyTargets()">
-          <button class="btn btn-gold" onclick="findCompanyTargets()">Suggest Targets <div class="spin" id="sp-tf"></div></button>
-        </div>
-        <div class="tf-hint">Works best with Fortune 500 and major Atlanta mid-market companies. Every result is an unverified suggestion — click a card to pre-fill the scoring form, then confirm on LinkedIn before any outreach.</div>
-        <div id="tf-status" class="tf-status" style="display:none;"></div>
-        <div class="target-cards" id="tf-cards" style="display:none;"></div>
-        <div class="tf-verify-note" id="tf-verify" style="display:none;">&#9432; AI-generated suggestions, not a live lookup. "Not Found" means the model didn't have reliable knowledge — it will not guess a name to fill the gap. Always verify on LinkedIn or the company website before outreach.</div>
-      </div>
-    </div>
-
-    <div class="sec-tag">Step 01</div>
-    <div class="sec-h">Score and Qualify a Prospect</div>
-    <div class="sec-d">Enter executive details, select timing signals, and add EA intelligence for a complete acquisition score.</div>
-    <div class="card">
-      <div class="g2">
-        <div><label>Executive Name</label><input type="text" id="p-name" placeholder="e.g. Carol Tome"></div>
-        <div><label>Title / Role</label><input type="text" id="p-title" placeholder="e.g. Chief Executive Officer"></div>
-      </div>
-      <div class="g2">
-        <div><label>Company</label><input type="text" id="p-company" placeholder="e.g. UPS"></div>
-        <div><label>Industry</label>
-          <select id="p-industry">
-            <option value="">Select industry...</option>
-            <option>Airline / Aviation</option><option>Financial Services / Banking</option>
-            <option>Technology</option><option>Healthcare / Pharma</option>
-            <option>Real Estate / Development</option><option>Legal / Law Firm</option>
-            <option>Private Equity / VC</option><option>Consulting</option>
-            <option>Energy / Utilities</option><option>Manufacturing / Logistics</option>
-            <option>Entertainment / Media</option><option>Other Fortune 500</option>
-          </select>
-        </div>
-      </div>
-      <div class="g3">
-        <div><label>Atlanta Presence</label>
-          <select id="p-hq" onchange="onProvenanceFieldChanged('hq')">
-            <option value="unknown">Unknown — needs verification</option>
-            <option value="yes">Headquartered here</option>
-            <option value="regional">Regional / major office</option>
-            <option value="no">Visiting / remote</option>
-          </select>
-          <div class="evidence-toggle" id="hq-evidence-toggle" style="display:none;margin-top:4px;">
-            <button type="button" class="ev-btn" id="hq-ev-estimate" onclick="setEvidenceStatus('hq','operator_estimate')">Estimate</button>
-            <button type="button" class="ev-btn" id="hq-ev-verified" onclick="setEvidenceStatus('hq','operator_verified')">Verified</button>
-          </div>
-        </div>
-        <div><label>Travel Frequency</label>
-          <select id="p-travel" onchange="updateClientTypeDisplay();onProvenanceFieldChanged('travel')">
-            <option value="unknown">Unknown — needs verification</option>
-            <option value="heavy">Heavy (weekly flights)</option>
-            <option value="moderate">Moderate (2-3x per month)</option>
-            <option value="light">Light (occasional)</option>
-          </select>
-          <div class="evidence-toggle" id="travel-evidence-toggle" style="display:none;margin-top:4px;">
-            <button type="button" class="ev-btn" id="travel-ev-estimate" onclick="setEvidenceStatus('travel','operator_estimate')">Estimate</button>
-            <button type="button" class="ev-btn" id="travel-ev-verified" onclick="setEvidenceStatus('travel','operator_verified')">Verified</button>
-          </div>
-        </div>
-        <div><label>Lead Source</label>
-          <select id="p-source">
-            <option value="linkedin">LinkedIn</option><option value="referral">Referral</option>
-            <option value="event">Event / Conference</option><option value="cold">Cold outreach</option>
-            <option value="perimeter">Market Radar (new arrival)</option><option value="hotel">Hotel concierge</option>
-          </select>
-        </div>
-      </div>
-      <div class="g1"><label>Notes</label><textarea id="p-notes" placeholder="Intel, context, mutual connections..."></textarea></div>
-
-      <!-- TRAVEL INTELLIGENCE -->
-      <div class="section-sep">
-        <div class="sep-title">
-          <span class="mini-badge" style="background:rgba(52,152,219,0.1);border:1px solid rgba(52,152,219,0.3);color:var(--blue);">Travel Intelligence</span>
-          <span style="font-size:var(--fs-sm);color:var(--muted);">Drives recurring service positioning and client type classification</span>
-        </div>
-        <div class="g2">
-          <div>
-            <label>Common Routes</label>
-            <select id="tr-route1" onchange="updateClientTypeDisplay()">
-              <option value="">Primary route...</option>
-              <option value="ATL-NYC">ATL &rarr; NYC (LaGuardia / JFK)</option>
-              <option value="ATL-DC">ATL &rarr; DC (Reagan / Dulles)</option>
-              <option value="ATL-CHI">ATL &rarr; Chicago (O'Hare)</option>
-              <option value="ATL-LAX">ATL &rarr; Los Angeles</option>
-              <option value="ATL-MIA">ATL &rarr; Miami</option>
-              <option value="ATL-DFW">ATL &rarr; Dallas</option>
-              <option value="ATL-BOS">ATL &rarr; Boston</option>
-              <option value="ATL-SEA">ATL &rarr; Seattle</option>
-              <option value="ATL-SFO">ATL &rarr; San Francisco</option>
-              <option value="ATL-HOU">ATL &rarr; Houston</option>
-              <option value="INTL">International routes</option>
-              <option value="OTHER">Other domestic routes</option>
-            </select>
-          </div>
-          <div>
-            <label>Secondary Route (optional)</label>
-            <select id="tr-route2">
-              <option value="">Secondary route...</option>
-              <option value="ATL-NYC">ATL &rarr; NYC</option>
-              <option value="ATL-DC">ATL &rarr; DC</option>
-              <option value="ATL-CHI">ATL &rarr; Chicago</option>
-              <option value="ATL-LAX">ATL &rarr; Los Angeles</option>
-              <option value="ATL-MIA">ATL &rarr; Miami</option>
-              <option value="ATL-DFW">ATL &rarr; Dallas</option>
-              <option value="ATL-BOS">ATL &rarr; Boston</option>
-              <option value="ATL-SEA">ATL &rarr; Seattle</option>
-              <option value="ATL-SFO">ATL &rarr; San Francisco</option>
-              <option value="ATL-INTL">International</option>
-            </select>
-          </div>
-        </div>
-        <div class="g3">
-          <div>
-            <label>Weekly Travel Pattern</label>
-            <select id="tr-pattern" onchange="updateClientTypeDisplay()">
-              <option value="mon-thu">Mon depart / Thu return</option>
-              <option value="mon-fri">Mon depart / Fri return</option>
-              <option value="tue-thu">Tue depart / Thu return</option>
-              <option value="variable">Variable / unpredictable</option>
-              <option value="monthly">Monthly trips</option>
-              <option value="events">Event-driven only</option>
-            </select>
-          </div>
-          <div>
-            <label>Primary Airport</label>
-            <select id="tr-airport">
-              <option value="ATL-main">Hartsfield-Jackson (ATL) - Main</option>
-              <option value="ATL-intl">ATL - International Terminal</option>
-              <option value="PDK">Peachtree DeKalb (PDK) - Private</option>
-              <option value="FTY">Fulton County (FTY) - Private</option>
-              <option value="mixed">Mixed ATL + Private</option>
-            </select>
-          </div>
-          <div>
-            <label>Travel Companions</label>
-            <select id="tr-companions">
-              <option value="solo">Solo traveler</option>
-              <option value="team">Travels with team</option>
-              <option value="exec-team">C-suite / exec team</option>
-              <option value="client">Client-facing travel</option>
-            </select>
-          </div>
-        </div>
-        <div id="tr-classification" style="margin-top:12px;padding:12px 16px;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:1px;display:none;">
-          <div style="font-size:var(--fs-xs);letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;font-weight:600;">Client Type Classification</div>
-          <div style="display:flex;align-items:center;gap:12px;">
-            <div class="client-type-badge" id="ct-badge"></div>
-            <div style="font-size:var(--fs-sm);color:var(--muted);" id="ct-desc"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Timing Signals -->
-      <div class="section-sep">
-        <div class="sep-title">
-          <span class="mini-badge mb-green">Timing Signals</span>
-          <span style="font-size:var(--fs-sm);color:var(--muted);">Select all active signals to calculate Buying Moment Score</span>
-        </div>
-        <div class="signals-grid">
-          <div class="sig-chip" id="chip-hired" onclick="toggleSig('sig-hired','chip-hired')"><input type="checkbox" id="sig-hired" onclick="event.stopPropagation()"><span>Recently hired or promoted</span></div>
-          <div class="sig-chip" id="chip-office" onclick="toggleSig('sig-office','chip-office')"><input type="checkbox" id="sig-office" onclick="event.stopPropagation()"><span>Company opening new Atlanta office</span></div>
-          <div class="sig-chip" id="chip-earnings" onclick="toggleSig('sig-earnings','chip-earnings')"><input type="checkbox" id="sig-earnings" onclick="event.stopPropagation()"><span>Upcoming earnings call or board meeting</span></div>
-          <div class="sig-chip" id="chip-speaking" onclick="toggleSig('sig-speaking','chip-speaking')"><input type="checkbox" id="sig-speaking" onclick="event.stopPropagation()"><span>Speaking at an Atlanta event</span></div>
-          <div class="sig-chip" id="chip-reloc" onclick="toggleSig('sig-reloc','chip-reloc')"><input type="checkbox" id="sig-reloc" onclick="event.stopPropagation()"><span>Relocating to Atlanta</span></div>
-          <div class="sig-chip" id="chip-travel" onclick="toggleSig('sig-travel','chip-travel')"><input type="checkbox" id="sig-travel" onclick="event.stopPropagation()"><span>Increased travel activity detected</span></div>
-        </div>
-        <div class="bm-row" id="bm-row">
-          <div><div style="font-size:var(--fs-xs);letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;font-weight:600;">Buying Moment</div><div class="bm-num" id="bm-num" style="color:var(--muted);">0</div></div>
-          <div class="bm-right"><div class="bm-track"><div class="bm-fill" id="bm-fill" style="background:var(--muted);"></div></div><div class="bm-desc" id="bm-desc" style="color:var(--muted);">No signals active</div></div>
-        </div>
-      </div>
-
-      <!-- EA Intelligence -->
-      <div class="section-sep">
-        <div class="sep-title"><span class="mini-badge mb-gold">EA Intelligence</span></div>
-        <label class="ea-tog-row"><input type="checkbox" id="ea-toggle" onchange="toggleEAFields(this)"><span>I have Executive Assistant access</span></label>
-        <div class="ea-fields" id="ea-fields">
-          <div class="g2" style="margin-top:14px;">
-            <div><label>Assistant Name</label><input type="text" id="ea-name" placeholder="e.g. Jennifer Harris"></div>
-            <div><label>Assistant Role</label>
-              <select id="ea-role" onchange="calcEAInf()">
-                <option value="ea">Executive Assistant</option><option value="cos">Chief of Staff</option>
-                <option value="om">Office Manager</option><option value="tc">Travel Coordinator</option>
-              </select>
-            </div>
-          </div>
-          <div class="g2">
-            <div><label>Assistant Email</label><input type="email" id="ea-email" placeholder="e.g. j.harris@ups.com"></div>
-            <div><label>Assistant Phone (optional)</label><input type="tel" id="ea-phone" placeholder="e.g. 404-555-0100"></div>
-          </div>
-          <div class="section-sep" style="margin-top:14px;padding-top:14px;">
-            <div class="sep-title" style="margin-bottom:10px;">
-              <span class="mini-badge" style="background:rgba(52,152,219,0.1);border:1px solid rgba(52,152,219,0.3);color:var(--blue);">Assistant Intelligence Profile</span>
-              <span style="font-size:var(--fs-sm);color:var(--muted);">Treat this person like a VIP, not a gatekeeper</span>
-            </div>
-            <div class="g2">
-              <div>
-                <label>Preferred Communication</label>
-                <select id="ea-comm-pref" onchange="updateEAProfile()">
-                  <option value="email">Email — formal, written</option>
-                  <option value="email-casual">Email — casual, brief</option>
-                  <option value="phone">Phone call preferred</option>
-                  <option value="text">Text / SMS</option>
-                  <option value="linkedin">LinkedIn message</option>
-                  <option value="in-person">In-person / office visit</option>
-                  <option value="unknown">Unknown yet</option>
-                </select>
-              </div>
-              <div>
-                <label>Responsiveness</label>
-                <select id="ea-responsiveness" onchange="updateEAProfile()">
-                  <option value="fast">Fast — responds same day</option>
-                  <option value="moderate">Moderate — 2-3 days</option>
-                  <option value="slow">Slow — needs follow-up</option>
-                  <option value="gatekeeper">Protective gatekeeper</option>
-                  <option value="champion">Champion — actively helps</option>
-                  <option value="unknown">Unknown yet</option>
-                </select>
-              </div>
-            </div>
-            <div class="g2">
-              <div>
-                <label>Booking Habits</label>
-                <select id="ea-booking" onchange="updateEAProfile()">
-                  <option value="plans-ahead">Plans ahead — books 1-2 weeks out</option>
-                  <option value="last-minute">Last-minute — same day or next day</option>
-                  <option value="recurring">Sets recurring / standing bookings</option>
-                  <option value="reactive">Reactive — only books when told</option>
-                  <option value="unknown">Unknown yet</option>
-                </select>
-              </div>
-              <div>
-                <label>Personality Cues</label>
-                <select id="ea-personality" onchange="updateEAProfile()">
-                  <option value="professional">Professional — formal, task-focused</option>
-                  <option value="warm">Warm — friendly, relationship-oriented</option>
-                  <option value="efficient">Efficient — brief, no small talk</option>
-                  <option value="cautious">Cautious — needs approval for everything</option>
-                  <option value="empowered">Empowered — makes decisions independently</option>
-                  <option value="unknown">Unknown yet</option>
-                </select>
-              </div>
-            </div>
-            <div class="g1"><label>Additional Intelligence Notes</label><textarea id="ea-notes" placeholder="e.g. Prefers morning contact, mentioned executive travels every Monday, very organized, uses shared calendar..."></textarea></div>
-            <div id="ea-intel-profile" style="display:none;margin-top:12px;padding:12px 14px;background:rgba(52,152,219,0.05);border:1px solid rgba(52,152,219,0.2);border-radius:1px;">
-              <div style="font-size:var(--fs-xs);letter-spacing:0.08em;text-transform:uppercase;color:var(--blue);margin-bottom:8px;font-weight:600;">EA Profile Summary</div>
-              <div id="ea-intel-summary" style="font-size:var(--fs-sm);color:var(--text);line-height:1.7;"></div>
-              <div id="ea-contact-rec" style="margin-top:8px;font-size:var(--fs-xs);color:var(--gold);font-weight:700;letter-spacing:0.04em;"></div>
-            </div>
-          </div>
-          <div class="g3" style="margin-top:14px;">
-            <div class="chk-row" id="cr-tc" onclick="toggleChkRow(this,'ea-tc')"><input type="checkbox" id="ea-tc" onclick="event.stopPropagation()"><label for="ea-tc">Controls Travel Bookings (+5)</label></div>
-            <div class="chk-row" id="cr-ten" onclick="toggleChkRow(this,'ea-ten')"><input type="checkbox" id="ea-ten" onclick="event.stopPropagation()"><label for="ea-ten">Long Tenure 3+ Years (+3)</label></div>
-            <div class="chk-row" id="cr-multi" onclick="toggleChkRow(this,'ea-multi')"><input type="checkbox" id="ea-multi" onclick="event.stopPropagation()"><label for="ea-multi">Supports Multiple Execs (+4)</label></div>
-          </div>
-          <div class="ea-inf-row"><span class="ea-inf-lbl">EA Influence Level:</span><span class="ea-inf-badge inf-low" id="ea-inf-badge">Low</span><span class="ea-inf-note" id="ea-inf-note">Pursue exec directly</span></div>
-          <div class="ea-bonus">&#9650; EA access adds +6 to +10 points to acquisition score</div>
-        </div>
-      </div>
-
-      <!-- Event Mode Toggle -->
-      <div class="section-sep" style="margin-top:16px;padding-top:16px;">
-        <label class="event-toggle-row" id="event-toggle-row">
-          <input type="checkbox" id="event-mode" onchange="toggleEventMode(this)">
-          <span>&#9889; Event Mode — prospect is attending or speaking at an upcoming Atlanta event</span>
-        </label>
-        <div id="event-mode-fields" style="display:none;">
-          <div class="g2" style="margin-top:12px;">
-            <div><label>Event Name</label><input type="text" id="ev-name" placeholder="e.g. ATL CEO Summit 2026"></div>
-            <div><label>Event Date</label><input type="date" id="ev-date"></div>
-          </div>
-          <div class="g1"><label>Event Notes</label><textarea id="ev-notes" placeholder="e.g. Keynote speaker, panel moderator, VIP attendee..." style="min-height:55px;"></textarea></div>
-        </div>
-      </div>
-      <div class="btns" style="margin-top:20px;">
-        <button class="btn btn-gold" onclick="scoreProspect()">Calculate Score <div class="spin" id="sp1"></div></button>
-        <button class="btn btn-ghost" onclick="clearProspect()">Clear All</button>
-      </div>
-    </div>
-
-    <!-- Score Result -->
-    <div class="card" id="score-card" style="display:none;">
-      <div id="r-name" style="font-family:var(--ff-display);font-size:var(--fs-xl);font-weight:500;margin-bottom:3px;"></div>
-      <div id="r-sub" style="font-size:var(--fs-sm);color:var(--muted);margin-bottom:16px;"></div>
-      <div class="score-panel">
-        <div class="score-block"><div class="score-block-label">Acquisition Score</div><div class="score-block-val" id="acq-val" style="color:var(--gold);">--</div><div class="score-block-sub" id="acq-tier"></div></div>
-        <div class="score-block"><div class="score-block-label">Buying Moment</div><div class="score-block-val" id="bm-val" style="color:var(--muted);">0/10</div><div class="score-block-sub" id="bm-tier-lbl" style="color:var(--muted);">No signals</div></div>
-        <div class="score-block" id="ea-sb" style="display:none;"><div class="score-block-label">EA Influence</div><div class="score-block-val" id="ea-sb-val" style="font-size:var(--fs-lg);margin-top:6px;"></div><div class="score-block-sub" id="ea-sb-note"></div></div>
-        <div class="score-block" id="ct-sb" style="display:none;"><div class="score-block-label">Client Type</div><div style="margin-top:6px;" id="ct-sb-badge"></div><div class="score-block-sub" id="ct-sb-note" style="margin-top:6px;"></div></div>
-        <div class="score-block"><div class="score-block-label">Conversion Probability</div><div style="margin-top:6px;" id="conv-badge-el"><span style="font-size:var(--fs-sm);color:var(--muted);">Score first</span></div><div class="score-block-sub" id="conv-sub" style="margin-top:6px;"></div></div>
-      </div>
-      <div class="breakdown" id="breakdown"></div>
-      <div class="divider"></div>
-      <div class="btns">
-        <button class="btn btn-gold" onclick="generateStrategy()">Generate Approach Strategy <div class="spin" id="sp2"></div></button>
-        <button class="btn btn-outline" onclick="addToPipeline()">Add to Pipeline</button>
-        <button class="btn btn-outline" onclick="generateEventCapture()" id="event-capture-btn" style="display:none;border-color:rgba(155,89,182,0.5);color:#9b59b6;">&#9889; Event Capture Strategy <div class="spin" id="sp-ev"></div></button>
-      </div>
-      <div class="ai-box" id="strat-box"><span class="ai-label">AI Strategy</span><button class="copy-btn" onclick="copyText('strat-ai')">Copy</button><div class="ai-text" id="strat-ai"></div></div>
-    </div>
-  </div>
 
   <!-- TAB 2: OUTREACH -->
   <div class="panel" id="panel-outreach">
@@ -1035,52 +693,6 @@ textarea{resize:vertical;min-height:75px;}
   </div>
 
   <!-- TAB 3: PIPELINE -->
-  <div class="panel" id="panel-pipeline">
-    <div class="sec-tag">Your Prospects</div>
-    <div class="sec-h">Acquisition Pipeline</div>
-    <div class="sec-d">8-stage pipeline tracking real business progression. Click a card to advance. Green border = active buying moment.</div>
-
-    <!-- Today's Action Queue -->
-    <div class="action-queue" id="action-queue">
-      <div class="aq-header">
-        <div class="aq-title">&#9889; Today&#x27;s Action Queue</div>
-        <div class="aq-count" id="aq-count"></div>
-      </div>
-      <div class="aq-items" id="aq-items"></div>
-    </div>
-
-    <!-- Event Mode Bar -->
-    <div class="event-mode-bar" id="event-mode-bar">
-      <div>
-        <div class="event-mode-title">&#9889; Event Mode Active</div>
-        <div class="event-mode-desc" id="event-mode-desc">Scoring boosted for event attendees. Act today.</div>
-      </div>
-      <div class="event-urgency">Time-Sensitive Window</div>
-    </div>
-
-    <!-- Revenue Stats -->
-    <div class="stats">
-      <div class="stat"><div class="stat-n" id="st-total">0</div><div class="stat-l">Total</div></div>
-      <div class="stat"><div class="stat-n" id="st-hot">0</div><div class="stat-l">High Conv</div></div>
-      <div class="stat"><div class="stat-n" id="st-revenue" style="font-size:var(--fs-lg);padding-top:4px;">$0</div><div class="stat-l">Est Monthly</div></div>
-      <div class="stat"><div class="stat-n" id="st-bm">0</div><div class="stat-l">Overdue / BM</div></div>
-    </div>
-
-    <!-- 8-Stage Board -->
-    <div class="pipe-scroll">
-      <div class="pipe-inner">
-        <div class="pipe-col"><div class="pipe-col-header">Identified <span class="pipe-cnt" id="cnt-identified">0</span></div><div id="col-identified"></div></div>
-        <div class="pipe-col"><div class="pipe-col-header">Contacted <span class="pipe-cnt" id="cnt-contacted">0</span></div><div id="col-contacted"></div></div>
-        <div class="pipe-col"><div class="pipe-col-header">Asst Engaged <span class="pipe-cnt" id="cnt-assistant">0</span></div><div id="col-assistant"></div></div>
-        <div class="pipe-col"><div class="pipe-col-header">Trial Scheduled <span class="pipe-cnt" id="cnt-trial-sched">0</span></div><div id="col-trial-sched"></div></div>
-        <div class="pipe-col"><div class="pipe-col-header">Trial Done <span class="pipe-cnt" id="cnt-trial-done">0</span></div><div id="col-trial-done"></div></div>
-        <div class="pipe-col"><div class="pipe-col-header">Active Client <span class="pipe-cnt" id="cnt-active">0</span></div><div id="col-active"></div></div>
-        <div class="pipe-col"><div class="pipe-col-header">Recurring <span class="pipe-cnt" id="cnt-recurring">0</span></div><div id="col-recurring"></div></div>
-        <div class="pipe-col"><div class="pipe-col-header">Corporate Acct <span class="pipe-cnt" id="cnt-corporate">0</span></div><div id="col-corporate"></div></div>
-      </div>
-    </div>
-    <div class="empty-msg" id="pipe-empty">No prospects yet. Score a prospect and add them to the pipeline.</div>
-  </div>
 
   <!-- TAB 4: CALL SCRIPT -->
   <div class="panel" id="panel-companies">
@@ -1140,449 +752,11 @@ textarea{resize:vertical;min-height:75px;}
   </div>
 
   <!-- TAB 5: APOLLO IMPORT -->
-  <div class="panel" id="panel-import">
-    <div class="sec-tag">Apollo Integration</div>
-    <div class="sec-h">Bulk Import and Score</div>
-    <div class="sec-d">Export your Apollo search as CSV and drop it here. All prospects scored instantly.</div>
-    <div class="card">
-      <div class="sec-tag" style="margin-bottom:12px;">How to export from Apollo</div>
-      <div style="font-size:var(--fs-sm);color:var(--muted);line-height:2;">1. Apollo people search, set filters: CEO / CFO / COO plus Atlanta plus 1000+ employees<br>2. Check the top checkbox to select all visible records<br>3. Click Export in the toolbar, then Export to CSV<br>4. Drop the downloaded CSV file below</div>
-    </div>
-    <div class="card">
-      <div class="import-drop" id="drop-zone" onclick="document.getElementById('csv-file').click()" ondragover="event.preventDefault();this.classList.add('over')" ondragleave="this.classList.remove('over')" ondrop="handleDrop(event)">
-        <div class="import-icon">&#128203;</div>
-        <div class="import-text">Drop Apollo CSV here or click to browse</div>
-        <div class="import-sub">Accepts Apollo people export CSV</div>
-      </div>
-      <input type="file" id="csv-file" accept=".csv" style="display:none" onchange="handleFile(this.files[0])">
-    </div>
-    <div id="import-results" style="display:none;">
-      <div class="filter-row">
-        <div id="import-summary" style="font-size:var(--fs-sm);color:var(--muted);flex:1;"></div>
-        <button class="fbtn on" onclick="filterBulk('all',this)">All</button>
-        <button class="fbtn" onclick="filterBulk('hot',this)">HOT Only</button>
-        <button class="fbtn" onclick="filterBulk('strong',this)">Strong Plus</button>
-        <button class="btn btn-outline" style="padding:6px 16px;font-size:var(--fs-xs);" onclick="addAllHot()">Add HOT to Pipeline</button>
-      </div>
-      <div class="card" style="padding:0;overflow:auto;">
-        <table class="bulk-table"><thead><tr><th>Name</th><th>Title</th><th>Company</th><th>Score</th><th>Tier</th><th>Action</th></tr></thead><tbody id="bulk-tbody"></tbody></table>
-      </div>
-    </div>
-  </div>
 
   <!-- TAB 8: WAR ROOM -->
-  <div class="panel" id="panel-strategy">
-    <div class="sec-tag">Executive Domination</div>
-    <div class="sec-h">Odyssey Black War Room</div>
-    <div class="sec-d">The strategic playbook to become Atlanta's #1 black car service for Fortune 500 executives.</div>
-
-    <!-- 5 Pillars -->
-    <div class="strat-pillar">
-      <div class="strat-pillar-num">01</div>
-      <div class="strat-pillar-title">Own the Routes, Not the Rides</div>
-      <div class="strat-pillar-body">
-        <strong>The play:</strong> Every Fortune 500 executive flying ATL-NYC on Monday morning is a standing reservation waiting to happen. Your goal is not to get booked once — it is to own their departure slot permanently.<br><br>
-        <strong>How:</strong> When a prospect has a predictable travel pattern (Mon/Thu, ATL-NYC), propose a standing reservation by name. "I want to own your Monday 6AM to LaGuardia." That specificity closes deals that generic pitches cannot.<br><br>
-        <strong>Revenue math:</strong> One executive, ATL-NYC weekly = $3,200/month. Ten executives on standing routes = $32,000 MRR. This is the recurring contract model that separates you from every rideshare and one-off car service in Atlanta.
-      </div>
-    </div>
-
-    <div class="strat-pillar">
-      <div class="strat-pillar-num">02</div>
-      <div class="strat-pillar-title">The EA Network Is Your Sales Force</div>
-      <div class="strat-pillar-body">
-        <strong>The play:</strong> Executive assistants control access to every C-suite calendar in Atlanta. Most car services ignore them. You will treat them like the VIP decision-makers they are.<br><br>
-        <strong>How:</strong> Build a relationship with every EA in your pipeline before you ever contact their executive. Send them value first — a relevant industry article, a genuine compliment on how well they manage a complex schedule. Then make the pitch: "I want to make your job easier." An EA who trusts you will put you on the standing travel list without the executive ever receiving a cold pitch.<br><br>
-        <strong>The multiplier:</strong> One EA at Delta Air Lines manages 3-5 C-suite executives. One relationship = five clients.
-      </div>
-    </div>
-
-    <div class="strat-pillar">
-      <div class="strat-pillar-num">03</div>
-      <div class="strat-pillar-title">Event Windows Are Revenue Windows</div>
-      <div class="strat-pillar-body">
-        <strong>The play:</strong> Every major Atlanta business event — ATL CEO Summit, Buckhead Business Association, Georgia 500 conference, Atlanta Business Chronicle events — concentrates your ideal clients in one place at one time with elevated transportation needs.<br><br>
-        <strong>How:</strong> Use Event Mode in the app. Identify every speaker and VIP attendee 2-3 weeks before the event. Score them all. Send event-specific outreach: "I'll be handling executive transportation for several attendees at the ATL CEO Summit next Thursday. I'd like to take care of you as well." The transportation need is real and immediate — you are solving a problem they have right now.<br><br>
-        <strong>The compounding effect:</strong> Executives talk to each other at events. One satisfied client at a conference becomes a referral source for every executive in the room who asks "who was your driver?"
-      </div>
-    </div>
-
-    <div class="strat-pillar">
-      <div class="strat-pillar-num">04</div>
-      <div class="strat-pillar-title">The Trial Ride Is the Product Demo</div>
-      <div class="strat-pillar-body">
-        <strong>The play:</strong> No executive will commit to a recurring service they have never experienced. Remove every barrier to that first ride. Make it impossible to say no.<br><br>
-        <strong>How:</strong> Offer a complimentary or deeply discounted first ride framed as a professional courtesy — not a promotion. "I would like to take care of your next airport departure as my introduction. No obligation." Confirm 24 hours before with a personal message. Send driver information and a photo the morning of. Follow up within 48 hours with a genuine question about the experience.<br><br>
-        <strong>The close rate:</strong> An executive who experiences the service converts at 60-70%. The trial ride is not a cost — it is your highest-ROI marketing investment.
-      </div>
-    </div>
-
-    <div class="strat-pillar">
-      <div class="strat-pillar-num">05</div>
-      <div class="strat-pillar-title">Corporate Account Expansion</div>
-      <div class="strat-pillar-body">
-        <strong>The play:</strong> One executive at a Fortune 500 company is the door. The entire C-suite is the prize. Once you have one active client at Delta, UPS, or Coca-Cola, you have social proof inside that organization.<br><br>
-        <strong>How:</strong> After 30 days with any new client, ask directly: "Who else on your leadership team travels frequently? I would like to extend the same service." Most executives will name 2-3 colleagues without hesitation. Use the Company Intel tab to track every executive at that company and build a coordinated account strategy.<br><br>
-        <strong>The endgame:</strong> A corporate account agreement with a Fortune 500 company — where OD Black is the designated ground transportation provider for all executive travel — is worth $15,000-50,000 per month in recurring revenue.
-      </div>
-    </div>
-
-    <!-- Channels -->
-    <div style="margin-top:32px;">
-      <div class="sec-tag">Channel Strategy</div>
-      <div class="sec-h" style="font-size:var(--fs-xl);">Where and How to Reach Them</div>
-      <div class="channel-grid">
-        <div class="channel-card">
-          <div class="channel-name">LinkedIn — Cold Outreach</div>
-          <div class="channel-body">Best for: VP and above with active profiles.<br>Approach: Connection request with a personalized note referencing their specific route or recent promotion. Keep it under 3 sentences. No pitch in the first message — lead with relevance.<br><strong style="color:var(--text);">Conversion target: 15% reply rate</strong></div>
-        </div>
-        <div class="channel-card">
-          <div class="channel-name">EA Email — The Side Door</div>
-          <div class="channel-body">Best for: C-suite with high EA influence scores.<br>Approach: Find the EA on LinkedIn or company directory. Send a 150-word email focused entirely on making their job easier. Propose a standing booking arrangement. No jargon, no luxury language.<br><strong style="color:var(--text);">Conversion target: 25% reply rate</strong></div>
-        </div>
-        <div class="channel-card">
-          <div class="channel-name">Event Networking — In Person</div>
-          <div class="channel-body">Best for: Anyone attending Atlanta business events.<br>Approach: Attend Chamber of Commerce mixers, Atlanta Business Chronicle events, industry conferences. Have one sentence ready: "I run Odyssey Black — we handle ground transportation for Fortune 500 executives across Atlanta." Let them ask questions.<br><strong style="color:var(--text);">Conversion target: 40% follow-up rate</strong></div>
-        </div>
-        <div class="channel-card">
-          <div class="channel-name">Referral — The Multiplier</div>
-          <div class="channel-body">Best for: Every active client you have right now.<br>Approach: Ask every client after their 3rd ride: "Who on your team travels as much as you do? I would love to take care of them." Make it a habit, not a favor request. Offer a complimentary ride credit for referrals that convert.<br><strong style="color:var(--text);">Conversion target: 1 referral per 2 clients</strong></div>
-        </div>
-        <div class="channel-card">
-          <div class="channel-name">Hotel Concierge Partnerships</div>
-          <div class="channel-body">Best for: Out-of-town executives staying at Buckhead / Midtown hotels.<br>Approach: Partner with concierge teams at W Atlanta, Four Seasons, St. Regis, Intercontinental. Leave professional cards, offer a referral fee or reciprocal value. Every concierge recommendation carries the trust weight of a personal referral.<br><strong style="color:var(--text);">Target: 3 hotel partnerships in 90 days</strong></div>
-        </div>
-        <div class="channel-card">
-          <div class="channel-name">Corporate Travel Managers</div>
-          <div class="channel-body">Best for: Large Fortune 500 companies with centralized travel programs.<br>Approach: Identify the Director of Corporate Travel or Travel Operations at your target companies. This person manages ground transportation budgets and vendor relationships. One meeting with them bypasses every executive entirely.<br><strong style="color:var(--text);">Target: 5 travel manager meetings in 90 days</strong></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- AI War Room -->
-    <div class="war-room-ai" style="margin-top:32px;">
-      <div class="sec-tag">AI Advisor</div>
-      <div class="sec-h" style="font-size:var(--fs-xl);">Get Strategic Advice</div>
-      <div class="sec-d">Ask anything about your acquisition strategy, a specific prospect, or how to close a deal.</div>
-      <div class="card">
-        <div class="g1"><textarea id="wr-question" placeholder="e.g. How do I approach the CFO at Delta Air Lines? What should I do when an executive says they already use Uber Black? How do I build a corporate account at NCR?" style="min-height:90px;"></textarea></div>
-        <div class="btns">
-          <button class="btn btn-gold" onclick="askWarRoom()">Get Strategy Advice <div class="spin" id="sp-wr"></div></button>
-          <button class="btn btn-outline" onclick="askDailyBriefing()">Today's Briefing <div class="spin" id="sp-brief"></div></button>
-        </div>
-      </div>
-      <div class="ai-box" id="wr-box"><span class="ai-label">Strategic Advice</span><button class="copy-btn" onclick="copyText('wr-ai')">Copy</button><div class="ai-text" id="wr-ai"></div></div>
-    </div>
-  </div>
 
 
   <!-- TAB 9: MARKET EXPANSION -->
-  <div class="panel" id="panel-markets">
-    <div class="sec-tag">Market Intelligence</div>
-    <div class="sec-h">Market Expansion Engine</div>
-    <div class="sec-d">Three-tier targeting system. Fortune 500 executives, mid-market businesses, and hospitality / medical / event sectors. Each tier has its own scoring model, decision-maker profile, and outreach strategy.</div>
-
-    <!-- Google Places Search -->
-    <div class="card" style="margin-bottom:24px;">
-      <div class="sec-tag" style="margin-bottom:6px;">Live Business Search</div>
-      <div style="font-size:var(--fs-lg);font-weight:600;color:var(--text);margin-bottom:4px);">Find Atlanta Prospects by Category</div>
-      <div style="font-size:var(--fs-sm);color:var(--muted);margin-bottom:16px;">Search hotels, medical practices, event venues, and mid-market companies in Atlanta. Powered by Google Places API. Results are scored automatically.</div>
-
-      <div style="font-size:var(--fs-sm);color:var(--muted);margin-bottom:16px;padding:10px 12px;background:rgba(52,152,219,0.06);border:1px solid rgba(52,152,219,0.2);border-radius:1px;">&#9432; Search now runs through a secured server function — no API key is stored in this browser. If your builder hasn't deployed <code>netlify/functions/places.js</code> and set <code>GOOGLE_PLACES_KEY</code> in Netlify yet, searches below will show a clear "not yet configured" message rather than failing silently.</div>
-
-      <div class="search-bar">
-        <div style="flex:1.5;">
-          <label>Search Category</label>
-          <select id="places-category">
-            <option value="hotel">Hotels &amp; Hospitality</option>
-            <option value="hospital|doctor|medical_office">Medical &amp; Wellness</option>
-            <option value="event_venue|banquet_hall">Event Venues &amp; Planners</option>
-            <option value="lawyer">Law Firms</option>
-            <option value="finance|accounting">Financial Services</option>
-            <option value="real_estate_agency">Commercial Real Estate</option>
-            <option value="spa|beauty_salon">High-End Wellness &amp; Spas</option>
-            <option value="corporate_office|establishment">Corporate Offices</option>
-          </select>
-        </div>
-        <div style="flex:1;">
-          <label>Search area (change it with the badge at the top right)</label>
-          <select id="places-area">
-            <option value="Buckhead, Atlanta GA">Buckhead</option>
-            <option value="Midtown, Atlanta GA">Midtown</option>
-            <option value="Downtown, Atlanta GA">Downtown Atlanta</option>
-            <option value="Sandy Springs, GA">Sandy Springs</option>
-            <option value="Perimeter Center, Atlanta GA">Perimeter / Dunwoody</option>
-            <option value="Alpharetta, GA">Alpharetta</option>
-            <option value="Atlanta, GA">All Atlanta</option>
-          </select>
-        </div>
-        <div style="flex:0.8;">
-          <label>Min Rating</label>
-          <select id="places-rating">
-            <option value="0">Any rating</option>
-            <option value="3.5">3.5+ stars</option>
-            <option value="4.0" selected>4.0+ stars</option>
-            <option value="4.5">4.5+ stars</option>
-          </select>
-        </div>
-        <button class="btn btn-gold" onclick="searchPlaces()" style="margin-top:22px;">Search <div class="spin" id="sp-places"></div></button>
-      </div>
-
-      <div id="places-status" class="search-status" style="display:none;"></div>
-      <div id="places-results" style="display:none;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-          <div id="places-count" style="font-size:var(--fs-sm);color:var(--muted);"></div>
-          <button class="btn btn-outline" style="padding:6px 14px;font-size:var(--fs-xs);" onclick="addAllPlacesToPipeline()">Review HOT/STRONG Prospects</button>
-        </div>
-        <div class="places-grid" id="places-grid"></div>
-      </div>
-      <div id="places-no-key" style="padding:12px;background:rgba(231,76,60,0.06);border:1px solid rgba(231,76,60,0.2);border-radius:1px;font-size:var(--fs-sm);color:#e74c3c;display:none;">
-        &#9888; Market search isn't configured yet on the server. Ask your builder to deploy <code>netlify/functions/places.js</code> and set the <code>GOOGLE_PLACES_KEY</code> environment variable in Netlify.
-      </div>
-    </div>
-
-    <!-- Tier Overview -->
-    <div class="tier-grid">
-      <div class="tier-card">
-        <div class="tier-card-num" style="color:var(--gold);">T1</div>
-        <div class="tier-card-name" style="color:var(--gold);">Fortune 500</div>
-        <div class="tier-card-rev">$3K-50K/mo</div>
-        <div class="tier-card-desc">C-suite executives with standing route potential. Longest sales cycle, highest lifetime value. Use Prospect Builder for all Tier 1 targets.</div>
-      </div>
-      <div class="tier-card">
-        <div class="tier-card-num" style="color:var(--green);">T2</div>
-        <div class="tier-card-name" style="color:var(--green);">Mid-Market</div>
-        <div class="tier-card-rev">$2K-8K/mo</div>
-        <div class="tier-card-desc">50-999 employee companies. Law firms, consulting groups, healthcare groups, tech companies. Faster to close, strong recurring volume.</div>
-      </div>
-      <div class="tier-card">
-        <div class="tier-card-num" style="color:var(--blue);">T3</div>
-        <div class="tier-card-name" style="color:var(--blue);">Volume Partners</div>
-        <div class="tier-card-rev">$1.5K-5K/mo</div>
-        <div class="tier-card-desc">Hotels, medical practices, event venues, wellness centers. Volume-based partnerships. Fastest to close, builds cash flow while Tier 1 develops.</div>
-      </div>
-    </div>
-
-    <!-- Market Segments -->
-    <div class="sec-tag" style="margin-bottom:8px;">Tier 3 — Volume Partner Segments</div>
-    <div class="sec-d">These are businesses with repeat daily transportation demand. They are currently sending clients and staff to Uber and Lyft. Your job is to intercept that demand.</div>
-
-    <!-- Hotels -->
-    <div class="market-card" id="mc-hotels">
-      <div class="market-card-header" onclick="toggleMarket('hotels')">
-        <div style="display:flex;align-items:center;">
-          <span class="market-icon">🏨</span>
-          <div><div class="market-name">Hotels & Hospitality</div><div class="market-sub">Concierge desks, corporate guests, event transportation</div></div>
-        </div>
-        <div class="market-score"><div class="market-score-num" id="hotel-score">0</div><div class="market-score-lbl">Demand Score</div></div>
-      </div>
-      <div class="market-card-body" id="mb-hotels">
-        <div style="margin-top:14px;">
-          <div class="sec-tag" style="margin-bottom:8px;">Why Hotels Are Priority #1</div>
-          <p style="font-size:var(--fs-base);color:var(--muted);line-height:1.7;margin-bottom:12px;">Hotel concierge desks order 10-30 rides per day for guests. Corporate guests staying in Buckhead or Midtown are frequently Fortune 500 executives who need reliable transportation to ATL airport or meetings. One concierge relationship equals a stream of daily bookings. A concierge who trusts you will recommend you over Uber every time because Uber reflects on them when it goes wrong — you do not.</p>
-          <div class="biz-score-grid">
-            <div class="biz-score-item"><div class="biz-score-label">Target Hotels</div><div class="biz-score-val">W Atlanta, Four Seasons, St. Regis Buckhead, Loews, Grand Hyatt, Intercontinental, Kimpton Sylvan</div></div>
-            <div class="biz-score-item"><div class="biz-score-label">Est. Monthly Value</div><div class="biz-score-val" style="color:var(--green);">$2,000 - $6,000 per hotel partner</div></div>
-            <div class="biz-score-item"><div class="biz-score-label">Sales Cycle</div><div class="biz-score-val">1-2 weeks. In-person introduction preferred.</div></div>
-            <div class="biz-score-item"><div class="biz-score-label">Ride Likelihood Score</div><div class="biz-score-val" style="color:var(--gold);">95/100 — Daily demand confirmed</div></div>
-          </div>
-          <div class="sec-tag" style="margin-bottom:8px;">Decision Makers</div>
-          <div class="decision-maker-row"><div class="dm-role">Concierge Manager</div><div class="dm-approach">Your primary contact. Visits in person with a professional card and one-page info sheet. Offer a referral arrangement: $10-20 credit per booking they send.</div></div>
-          <div class="decision-maker-row"><div class="dm-role">Director of Guest Services</div><div class="dm-approach">Signs off on preferred vendor relationships. Request a 15-minute meeting after the concierge is warm.</div></div>
-          <div class="decision-maker-row"><div class="dm-role">General Manager</div><div class="dm-approach">Corporate account level. Target for a formal preferred vendor agreement covering all hotel transportation needs.</div></div>
-        </div>
-        <div class="market-prospect-form">
-          <div class="sec-tag" style="margin-bottom:12px;">Score a Hotel Prospect</div>
-          <div class="g2">
-            <div><label>Hotel Name</label><input type="text" id="ht-name" placeholder="e.g. W Atlanta Midtown"></div>
-            <div><label>Location</label><select id="ht-location"><option value="buckhead">Buckhead</option><option value="midtown">Midtown</option><option value="downtown">Downtown</option><option value="airport">Airport Corridor</option><option value="perimeter">Perimeter / Sandy Springs</option></select></div>
-          </div>
-          <div class="g2">
-            <div><label>Hotel Tier</label><select id="ht-tier"><option value="luxury">Luxury (5-star)</option><option value="upscale">Upscale (4-star)</option><option value="business">Business Class</option></select></div>
-            <div><label>Primary Guest Type</label><select id="ht-guests"><option value="corporate">Corporate / business travelers</option><option value="mixed">Mixed corporate and leisure</option><option value="event">Event and conference heavy</option><option value="luxury-leisure">Luxury leisure</option></select></div>
-          </div>
-          <div class="g1"><label>Contact Name and Role (if known)</label><input type="text" id="ht-contact" placeholder="e.g. Marcus Webb, Concierge Manager"></div>
-          <div class="btns">
-            <button class="btn btn-gold" onclick="scoreHotel()">Score This Hotel <div class="spin" id="sp-ht"></div></button>
-            <button class="btn btn-outline" onclick="generateHotelOutreach()">Generate Outreach <div class="spin" id="sp-ht2"></div></button>
-          </div>
-          <div class="ai-box" id="hotel-ai-box"><span class="ai-label">Hotel Strategy</span><button class="copy-btn" onclick="copyText('hotel-ai')">Copy</button><div class="ai-text" id="hotel-ai"></div></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Medical -->
-    <div class="market-card" id="mc-medical">
-      <div class="market-card-header" onclick="toggleMarket('medical')">
-        <div style="display:flex;align-items:center;">
-          <span class="market-icon">🏥</span>
-          <div><div class="market-name">Medical & Wellness</div><div class="market-sub">Surgery centers, concierge medicine, high-end spas</div></div>
-        </div>
-        <div class="market-score"><div class="market-score-num" id="med-score">0</div><div class="market-score-lbl">Demand Score</div></div>
-      </div>
-      <div class="market-card-body" id="mb-medical">
-        <div style="margin-top:14px;">
-          <div class="sec-tag" style="margin-bottom:8px;">Why Medical Is High-Value</div>
-          <p style="font-size:var(--fs-base);color:var(--muted);line-height:1.7;margin-bottom:12px;">Surgery centers and concierge medical practices regularly need transportation for patients who cannot drive post-procedure. These clients value discretion and reliability above all else — exactly Odyssey Black's positioning. High-end spas and wellness centers serving executives have the same need. This is a recession-resistant segment that Uber handles poorly due to inconsistency.</p>
-          <div class="biz-score-grid">
-            <div class="biz-score-item"><div class="biz-score-label">Target Businesses</div><div class="biz-score-val">Surgery centers, concierge doctor practices, Emory executive health, high-end med spas, plastic surgery practices</div></div>
-            <div class="biz-score-item"><div class="biz-score-label">Est. Monthly Value</div><div class="biz-score-val" style="color:var(--green);">$1,500 - $4,000 per practice partner</div></div>
-            <div class="biz-score-item"><div class="biz-score-label">Sales Cycle</div><div class="biz-score-val">1-3 weeks. Office manager is the key contact.</div></div>
-            <div class="biz-score-item"><div class="biz-score-label">Ride Likelihood Score</div><div class="biz-score-val" style="color:var(--gold);">82/100 — Consistent weekly demand</div></div>
-          </div>
-          <div class="sec-tag" style="margin-bottom:8px;">Decision Makers</div>
-          <div class="decision-maker-row"><div class="dm-role">Office Manager</div><div class="dm-approach">Primary contact. Email first with a focus on patient experience and HIPAA-safe discretion. No patient names — just reliable, private transportation.</div></div>
-          <div class="decision-maker-row"><div class="dm-role">Practice Manager</div><div class="dm-approach">Signs preferred vendor agreements. Emphasize liability reduction — a professional car service reduces their risk versus sending patients to Uber.</div></div>
-          <div class="decision-maker-row"><div class="dm-role">Physician Owner</div><div class="dm-approach">For concierge practices only. Direct approach works here. Lead with patient experience and your discretion guarantee.</div></div>
-        </div>
-        <div class="market-prospect-form">
-          <div class="sec-tag" style="margin-bottom:12px;">Score a Medical Prospect</div>
-          <div class="g2">
-            <div><label>Practice / Center Name</label><input type="text" id="med-name" placeholder="e.g. Atlanta Center for Cosmetic Surgery"></div>
-            <div><label>Practice Type</label><select id="med-type"><option value="surgery">Surgery Center</option><option value="concierge">Concierge Medicine</option><option value="medspa">Medical Spa</option><option value="wellness">Executive Wellness</option><option value="dental">Cosmetic Dental</option></select></div>
-          </div>
-          <div class="g2">
-            <div><label>Patient Profile</label><select id="med-patients"><option value="executive">Executive / high-net-worth</option><option value="mixed-high">Mixed, skewing affluent</option><option value="general">General professional</option></select></div>
-            <div><label>Procedure Volume</label><select id="med-volume"><option value="high">High (10+ procedures/week)</option><option value="moderate">Moderate (5-10/week)</option><option value="low">Low (under 5/week)</option></select></div>
-          </div>
-          <div class="g1"><label>Contact Name and Role (if known)</label><input type="text" id="med-contact" placeholder="e.g. Sandra Torres, Practice Manager"></div>
-          <div class="btns">
-            <button class="btn btn-gold" onclick="scoreMedical()">Score This Practice <div class="spin" id="sp-med"></div></button>
-            <button class="btn btn-outline" onclick="generateMedicalOutreach()">Generate Outreach <div class="spin" id="sp-med2"></div></button>
-          </div>
-          <div class="ai-box" id="medical-ai-box"><span class="ai-label">Medical Strategy</span><button class="copy-btn" onclick="copyText('medical-ai')">Copy</button><div class="ai-text" id="medical-ai"></div></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Events -->
-    <div class="market-card" id="mc-events">
-      <div class="market-card-header" onclick="toggleMarket('events')">
-        <div style="display:flex;align-items:center;">
-          <span class="market-icon">🎭</span>
-          <div><div class="market-name">Event Planners & Venues</div><div class="market-sub">Corporate events, weddings, private VIP functions</div></div>
-        </div>
-        <div class="market-score"><div class="market-score-num" id="ev-score">0</div><div class="market-score-lbl">Demand Score</div></div>
-      </div>
-      <div class="market-card-body" id="mb-events">
-        <div style="margin-top:14px;">
-          <div class="sec-tag" style="margin-bottom:8px;">Why Events Generate High Ticket Revenue</div>
-          <p style="font-size:var(--fs-base);color:var(--muted);line-height:1.7;margin-bottom:12px;">Corporate events and private VIP functions require coordinated group transportation — something Uber cannot reliably execute. One corporate event with 20 executives moving from a Midtown hotel to a venue and back can be $3,000-8,000 in a single evening. Event planners who trust you become repeat referral sources for every event they plan. This segment also produces the fastest single-transaction revenue.</p>
-          <div class="biz-score-grid">
-            <div class="biz-score-item"><div class="biz-score-label">Target Businesses</div><div class="biz-score-val">Corporate event planners, luxury wedding planners, Atlanta venues (Biltmore, W, Fox Theatre), DMC companies</div></div>
-            <div class="biz-score-item"><div class="biz-score-label">Est. Per-Event Value</div><div class="biz-score-val" style="color:var(--green);">$1,500 - $8,000 per event</div></div>
-            <div class="biz-score-item"><div class="biz-score-label">Sales Cycle</div><div class="biz-score-val">Immediate for booked events. Relationship-based for ongoing partnerships.</div></div>
-            <div class="biz-score-item"><div class="biz-score-label">Ride Likelihood Score</div><div class="biz-score-val" style="color:var(--gold);">78/100 — Event-driven, high per-booking value</div></div>
-          </div>
-          <div class="sec-tag" style="margin-bottom:8px;">Decision Makers</div>
-          <div class="decision-maker-row"><div class="dm-role">Event Coordinator</div><div class="dm-approach">Your primary contact. Lead with reliability and group coordination capability. Offer to handle logistics for one event as an introduction.</div></div>
-          <div class="decision-maker-row"><div class="dm-role">Venue Manager</div><div class="dm-approach">Venues recommend transportation providers to every event client. A preferred vendor relationship here produces passive referrals.</div></div>
-          <div class="decision-maker-row"><div class="dm-role">Corporate Planner</div><div class="dm-approach">Manages multiple events per year. One satisfied corporate planner accounts = 8-15 events annually.</div></div>
-        </div>
-        <div class="market-prospect-form">
-          <div class="sec-tag" style="margin-bottom:12px;">Score an Event Prospect</div>
-          <div class="g2">
-            <div><label>Company / Venue Name</label><input type="text" id="ev-mkt-name" placeholder="e.g. Atlanta Event Management Group"></div>
-            <div><label>Business Type</label><select id="ev-type"><option value="corporate-planner">Corporate Event Planner</option><option value="venue">Event Venue</option><option value="luxury-wedding">Luxury Wedding Planner</option><option value="dmc">DMC / Destination Company</option><option value="entertainment">Entertainment / Talent Agency</option></select></div>
-          </div>
-          <div class="g2">
-            <div><label>Event Frequency</label><select id="ev-freq"><option value="weekly">Weekly events</option><option value="biweekly">Bi-weekly</option><option value="monthly">Monthly</option><option value="seasonal">Seasonal / occasional</option></select></div>
-            <div><label>Client Profile</label><select id="ev-clients"><option value="corporate">Corporate / Fortune 500</option><option value="luxury">Luxury private clients</option><option value="mixed">Mixed</option></select></div>
-          </div>
-          <div class="g1"><label>Contact Name and Role (if known)</label><input type="text" id="ev-contact" placeholder="e.g. Lisa Chen, Senior Event Coordinator"></div>
-          <div class="btns">
-            <button class="btn btn-gold" onclick="scoreEvent()">Score This Prospect <div class="spin" id="sp-ev2"></div></button>
-            <button class="btn btn-outline" onclick="generateEventOutreach()">Generate Outreach <div class="spin" id="sp-ev3"></div></button>
-          </div>
-          <div class="ai-box" id="event-market-ai-box"><span class="ai-label">Event Strategy</span><button class="copy-btn" onclick="copyText('event-market-ai')">Copy</button><div class="ai-text" id="event-market-ai"></div></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Mid-Market -->
-    <div class="market-card" id="mc-midmarket">
-      <div class="market-card-header" onclick="toggleMarket('midmarket')">
-        <div style="display:flex;align-items:center;">
-          <span class="market-icon">🏢</span>
-          <div><div class="market-name">Mid-Market Companies</div><div class="market-sub">50-999 employees — law firms, consulting, tech, healthcare groups</div></div>
-        </div>
-        <div class="market-score"><div class="market-score-num" id="mm-score">0</div><div class="market-score-lbl">Demand Score</div></div>
-      </div>
-      <div class="market-card-body" id="mb-midmarket">
-        <div style="margin-top:14px;">
-          <div class="sec-tag" style="margin-bottom:8px;">Why Mid-Market Closes Faster</div>
-          <p style="font-size:var(--fs-base);color:var(--muted);line-height:1.7;margin-bottom:12px;">Mid-market companies have the same executive travel needs as Fortune 500 firms but far fewer gatekeepers. The managing partner at a 150-person law firm is the decision-maker and can say yes on the first call. They have partners and associates traveling to court, client meetings, and depositions daily. They do not have a corporate travel department — they are using Uber and hating the inconsistency. You are the professional alternative they have been looking for.</p>
-          <div class="biz-score-grid">
-            <div class="biz-score-item"><div class="biz-score-label">Top Sectors in Atlanta</div><div class="biz-score-val">Law firms, private equity, consulting groups, technology companies, healthcare management groups, commercial real estate</div></div>
-            <div class="biz-score-item"><div class="biz-score-label">Est. Monthly Value</div><div class="biz-score-val" style="color:var(--green);">$2,000 - $8,000 per account</div></div>
-            <div class="biz-score-item"><div class="biz-score-label">Sales Cycle</div><div class="biz-score-val">3-7 days. Decision-maker is accessible and empowered.</div></div>
-            <div class="biz-score-item"><div class="biz-score-label">Ride Likelihood Score</div><div class="biz-score-val" style="color:var(--gold);">88/100 — Daily travel, no current solution</div></div>
-          </div>
-          <div class="sec-tag" style="margin-bottom:8px;">Decision Makers</div>
-          <div class="decision-maker-row"><div class="dm-role">Managing Partner</div><div class="dm-approach">For law firms and consulting: direct LinkedIn or email. Lead with professionalism and eliminating the Uber inconsistency problem for client-facing travel.</div></div>
-          <div class="decision-maker-row"><div class="dm-role">Office Manager</div><div class="dm-approach">Often controls all vendor relationships including travel. Treat exactly like an EA — build the relationship first, then get introduced to the decision-maker.</div></div>
-          <div class="decision-maker-row"><div class="dm-role">COO / Operations Director</div><div class="dm-approach">In tech and healthcare groups. Focus on operational reliability and the cost of executive time wasted on unreliable rideshare.</div></div>
-        </div>
-        <div class="market-prospect-form">
-          <div class="sec-tag" style="margin-bottom:12px;">Score a Mid-Market Prospect</div>
-          <div class="g2">
-            <div><label>Company Name</label><input type="text" id="mm-name" placeholder="e.g. Troutman Pepper (Atlanta office)"></div>
-            <div><label>Industry</label><select id="mm-industry"><option value="law">Law Firm</option><option value="pe">Private Equity / VC</option><option value="consulting">Consulting</option><option value="tech">Technology</option><option value="healthcare">Healthcare Group</option><option value="realestate">Commercial Real Estate</option><option value="finance">Financial Services</option><option value="other">Other Professional Services</option></select></div>
-          </div>
-          <div class="g3">
-            <div><label>Company Size</label><select id="mm-size"><option value="50-100">50-100 employees</option><option value="100-250">100-250 employees</option><option value="250-500">250-500 employees</option><option value="500-999">500-999 employees</option></select></div>
-            <div><label>Travel Intensity</label><select id="mm-travel"><option value="heavy">Heavy — daily client/court travel</option><option value="moderate">Moderate — several times weekly</option><option value="light">Light — occasional</option></select></div>
-            <div><label>Atlanta Presence</label><select id="mm-atl"><option value="hq">HQ in Atlanta</option><option value="office">Major Atlanta office</option><option value="regional">Regional presence</option></select></div>
-          </div>
-          <div class="g1"><label>Contact Name and Role (if known)</label><input type="text" id="mm-contact" placeholder="e.g. David Park, Managing Partner"></div>
-          <div class="btns">
-            <button class="btn btn-gold" onclick="scoreMidMarket()">Score This Company <div class="spin" id="sp-mm"></div></button>
-            <button class="btn btn-outline" onclick="generateMidMarketOutreach()">Generate Outreach <div class="spin" id="sp-mm2"></div></button>
-          </div>
-          <div class="ai-box" id="mm-ai-box"><span class="ai-label">Mid-Market Strategy</span><button class="copy-btn" onclick="copyText('mm-ai')">Copy</button><div class="ai-text" id="mm-ai"></div></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Ride Likelihood Calculator -->
-    <div style="margin-top:28px;">
-      <div class="sec-tag" style="margin-bottom:6px;">Ride Likelihood Calculator</div>
-      <div class="sec-h" style="font-size:var(--fs-xl);">Any Business, Any Sector</div>
-      <div class="sec-d">Score any business to determine how likely they are to have regular transportation demand and whether Odyssey Black is the right fit.</div>
-      <div class="card">
-        <div class="g2">
-          <div><label>Business Name</label><input type="text" id="rl-name" placeholder="Any Atlanta business"></div>
-          <div><label>Business Type</label>
-            <select id="rl-type">
-              <option value="hotel">Hotel / Hospitality</option>
-              <option value="corporate">Corporate Office</option>
-              <option value="law">Law Firm</option>
-              <option value="medical">Medical / Wellness</option>
-              <option value="events">Event Venue / Planner</option>
-              <option value="finance">Financial Services</option>
-              <option value="tech">Technology</option>
-              <option value="realestate">Real Estate</option>
-              <option value="entertainment">Entertainment / Media</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
-        </div>
-        <div class="g3">
-          <div><label>Near Airport or I-285?</label><select id="rl-airport"><option value="yes">Yes — within 20 min of ATL</option><option value="moderate">Moderate — 20-40 min</option><option value="no">No — over 40 min</option></select></div>
-          <div><label>Has Reception / Concierge?</label><select id="rl-concierge"><option value="yes">Yes</option><option value="no">No</option></select></div>
-          <div><label>Hosts External Clients?</label><select id="rl-clients"><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="occasional">Occasionally</option><option value="no">Rarely</option></select></div>
-        </div>
-        <div class="g2">
-          <div><label>Estimated Staff Who Travel</label><select id="rl-staff"><option value="many">Many (10+)</option><option value="some">Some (3-10)</option><option value="few">Few (1-3)</option></select></div>
-          <div><label>Current Transportation Solution</label><select id="rl-current"><option value="uber">Uber / Lyft (rideshare)</option><option value="mixed">Mixed — some rideshare, some car service</option><option value="service">Existing car service</option><option value="own">Company vehicles</option><option value="unknown">Unknown</option></select></div>
-        </div>
-        <div class="btns">
-          <button class="btn btn-gold" onclick="calcRideLikelihood()">Calculate Ride Likelihood <div class="spin" id="sp-rl"></div></button>
-        </div>
-        <div class="ai-box" id="rl-ai-box"><span class="ai-label">Ride Likelihood Analysis</span><button class="copy-btn" onclick="copyText('rl-ai')">Copy</button><div class="ai-text" id="rl-ai"></div></div>
-      </div>
-    </div>
-  </div>
 
   <!-- TAB 10: GATEKEEPER FINDER -->
   <div class="panel" id="panel-partners">
@@ -1596,7 +770,7 @@ textarea{resize:vertical;min-height:75px;}
       <div><label for="pt-area">Area (optional)</label><select id="pt-area"><option value="">Not set</option><option value="perimeter">Perimeter</option><option value="concourse">Concourse (Sandy Springs)</option><option value="alpharetta">Alpharetta / North Fulton</option><option value="cobb">Cobb</option><option value="gwinnett">Gwinnett</option></select></div></div>
       <label for="pt-contact">How to reach them (optional)</label><input type="text" id="pt-contact" maxlength="200" placeholder="Phone, email or where you met">
       <label for="pt-notes">Notes (optional)</label><input type="text" id="pt-notes" maxlength="500" onkeydown="if(event.key==='Enter')ptAdd()">
-      <div class="btns" style="margin-top:10px;"><button class="btn btn-gold" onclick="ptAdd()">Add partner</button><button class="btn btn-outline" onclick="ptImportHotels()">Import hotels from Market Radar</button></div>
+      <div class="btns" style="margin-top:10px;"><button class="btn btn-gold" onclick="ptAdd()">Add partner</button><button class="btn btn-outline" onclick="ptImportHotels()">Import Atlanta hotels</button></div>
     </div>
     <div class="card"><div class="sep-title"><span class="mini-badge mb-green">Your partners</span></div>
       <div id="pt-summary" style="font-size:var(--fs-sm);margin-bottom:10px;"></div>
@@ -1604,35 +778,7 @@ textarea{resize:vertical;min-height:75px;}
       <div id="pt-body" style="overflow-wrap:anywhere;min-width:0;"></div></div>
   </div>
 
-  <div class="panel" id="panel-lookalike">
-    <div class="sec-tag">Find more clients like your best ones</div>
-    <div class="sec-h">Lookalike Finder</div>
-    <div class="sec-d">List the companies you already serve. The app finds what they have in common, then builds ready-to-click searches for similar companies, and for the assistants and office managers who book their travel. It does not name companies for you: you confirm each one, then send it to your Radar watchlist.</div>
-    <div class="card"><div class="sep-title"><span class="mini-badge mb-gold">Your best clients</span></div>
-      <div id="lk-clients"></div>
-      <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border);">
-        <div style="font-size:var(--fs-sm);font-weight:600;margin-bottom:8px;">Add a client</div>
-        <div class="g2"><div><label for="lk-name">Company</label><input type="text" id="lk-name" maxlength="100"></div>
-        <div><label for="lk-ind">Industry (your words)</label><input type="text" id="lk-ind" maxlength="60" list="lk-ind-list" placeholder="e.g. insurance brokerage"><datalist id="lk-ind-list"><option value="Insurance brokerage"><option value="Consumer goods"><option value="Media and communications"><option value="Financial services"><option value="Technology"><option value="Healthcare"><option value="Real estate"><option value="Professional services"><option value="Manufacturing and logistics"></datalist></div></div>
-        <div class="g2"><div><label for="lk-size">Size</label><select id="lk-size"><option value="">Not sure</option><option value="smb">About 50-200 employees</option><option value="mid">About 200-1,000 employees</option><option value="large">1,000+ employees</option></select></div>
-        <div><label for="lk-area">Where their Atlanta office is</label><select id="lk-area"><option value="">Not sure</option><option value="perimeter">Perimeter</option><option value="concourse">Concourse (Sandy Springs)</option><option value="alpharetta">Alpharetta / North Fulton</option><option value="cobb">Cobb</option><option value="gwinnett">Gwinnett</option></select></div></div>
-        <div class="g2"><div><label for="lk-books">Who books their travel</label><select id="lk-books"><option value="">Not sure</option><option value="assistant">Executive assistant</option><option value="office">Office manager</option><option value="travel">Travel coordinator</option><option value="exec">The executive books it</option><option value="other">Other</option></select></div>
-        <div><label for="lk-note">Note (optional)</label><input type="text" id="lk-note" maxlength="200" onkeydown="if(event.key==='Enter')lkAdd()"></div></div>
-        <div class="btns" style="margin-top:10px;"><button class="btn btn-gold" onclick="lkAdd()">Add client</button></div>
-      </div></div>
-    <div class="card"><div class="sep-title"><span class="mini-badge mb-green">What they have in common</span></div><div id="lk-pattern"></div></div>
-    <div id="lk-body"></div>
-    <div class="card" style="margin-top:12px;"><div class="sep-title"><span class="mini-badge mb-gold">Companies to check</span></div>
-      <div style="font-size:var(--fs-xs);color:var(--muted);">Names pulled from public pages, each with its source. They are unverified until you confirm the company and its Atlanta-area office yourself, then tick the box. You can only add a company to your Radar watchlist after you tick it. Only industries with sourced names are listed so far, and the media and consumer goods lists are short.</div>
-      <div id="lk-cands"></div></div>
-  </div>
 
-  <div class="panel" id="panel-forecast">
-    <div class="sec-tag">What your pipeline could be worth</div>
-    <div class="sec-h">Revenue Forecast</div>
-    <div class="sec-d">Current monthly revenue from your clients, plus what your open prospects are worth once weighted by how likely each stage is to close. Every assumption is visible and editable. This is a planning aid, not a prediction.</div>
-    <div id="fc-body"></div>
-  </div>
 
   <div class="panel" id="panel-quotes">
     <div class="sec-tag">Price a trip in seconds</div>
@@ -1696,62 +842,7 @@ textarea{resize:vertical;min-height:75px;}
     </div>
   </div>
 
-  <div class="panel" id="panel-results">
-    <div class="sec-tag">What is actually working</div>
-    <div class="sec-h">Results by Channel</div>
-    <div class="sec-d">Built from the Source you pick when adding a prospect, plus each prospect's current stage and response. It shows where replies and clients really come from, so you can put your time there. Counts are current stages, not history.</div>
-    <div id="results-body"></div>
-  </div>
 
-  <div class="panel" id="panel-radar">
-    <div class="sec-tag">Perimeter &middot; North Fulton &middot; Cobb &middot; Gwinnett</div>
-    <div class="sec-h">Market Radar</div>
-    <div class="btns" id="radar-area-chips" style="margin-bottom:14px;flex-wrap:wrap;"></div>
-    <div class="sec-d">Watch for companies moving into the area, work a sourced watchlist, and run a 30-day sprint. Everything here is a <strong>lead, not a verified fact</strong> &mdash; confirm the company and the move before any outreach.</div>
-
-    <div class="card">
-      <div class="sep-title"><span class="mini-badge mb-gold">Company Research</span></div>
-      <div class="sec-d" style="margin-bottom:14px;">Type a company and press Research. The app searches public web pages and returns the official website, address, main phone, publicly named executives and recent news, each with its source link. It leaves out anything it cannot source. Everything is unverified until you confirm it. Each lookup uses a small amount of your Anthropic credit.</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;"><input type="text" id="rsch-name" maxlength="100" placeholder="Company name" aria-label="Company to research" style="flex:1;min-width:180px;" onkeydown="if(event.key==='Enter')rschGo()"><button class="btn btn-gold" id="rsch-btn" onclick="rschGo()">Research</button></div>
-      <div id="rsch-status" style="font-size:var(--fs-xs);color:var(--muted);margin-top:10px;" aria-live="polite"></div>
-      <div id="rsch-result" style="margin-top:12px;"></div>
-      <div id="rsch-saved" style="margin-top:12px;overflow-wrap:anywhere;"></div>
-    </div>
-
-    <div class="card">
-      <div class="sep-title"><span class="mini-badge mb-gold">Live Move Scan</span></div>
-      <div class="sec-d" style="margin-bottom:14px;">Scans public news headlines for relocations, new headquarters and office leases across Perimeter, Alpharetta / North Fulton, Cobb and Gwinnett. It is a headline monitor, not a directory &mdash; it can miss moves that were never reported.</div>
-      <div class="btns"><button class="btn btn-gold" onclick="radarScan()">Scan Now</button><button class="btn btn-outline" onclick="radarMarkAllSeen()">Mark All Seen</button></div>
-      <div id="radar-scan-status" style="font-size:var(--fs-xs);color:var(--muted);margin-top:10px;"></div>
-      <div id="radar-scan-list" style="margin-top:12px;"></div>
-    </div>
-
-    <div class="card">
-      <div class="sep-title"><span class="mini-badge mb-blue">Watchlist &mdash; Public-News Snapshot</span></div>
-      <div class="sec-d" style="margin-bottom:14px;">Compiled from public news and broker announcements as of October 2026. No individual contacts are included &mdash; use Contact Path to find the right people. Verify each item before outreach.</div>
-      <div id="radar-watchlist"></div>
-      <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border);">
-        <div style="font-size:var(--fs-sm);font-weight:600;margin-bottom:8px;">Add a company you are targeting</div>
-        <div class="g2"><div><label for="rc-name">Company name</label><input type="text" id="rc-name" maxlength="100" placeholder="e.g. a company you know is expanding"></div>
-        <div><label for="rc-area">Area</label><select id="rc-area"><option value="perimeter">Perimeter / Sandy Springs / Dunwoody</option><option value="concourse">Concourse (Sandy Springs)</option><option value="alpharetta">Alpharetta / North Fulton</option><option value="cobb">Cobb (Cumberland, Marietta, Kennesaw)</option><option value="gwinnett">Gwinnett (Peachtree Corners, Norcross, Duluth)</option></select></div></div>
-        <label for="rc-note">Why it is a target (optional)</label><input type="text" id="rc-note" maxlength="200" placeholder="e.g. new office, lots of visiting executives" onkeydown="if(event.key==='Enter')radarAddCompany()">
-        <div class="btns" style="margin-top:10px;"><button class="btn btn-gold" onclick="radarAddCompany()">Add to Watchlist</button></div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="sep-title"><span class="mini-badge mb-green">Hotel Concierge Referral Channel</span></div>
-      <div class="sec-d" style="margin-bottom:14px;">Perimeter and Alpharetta hotels host visiting executives and corporate groups. Ask each front desk or concierge who handles ground-transportation referrals, then log the visit.</div>
-      <div id="radar-hotels"></div>
-    </div>
-
-    <div class="card">
-      <div class="sep-title"><span class="mini-badge mb-gold">30-Day Sprint</span></div>
-      <div id="radar-sprint-head" style="font-size:var(--fs-sm);margin-bottom:12px;"></div>
-      <div id="radar-sprint"></div>
-      <div class="btns" style="margin-top:12px;"><button class="btn btn-outline" onclick="radarSprintReset()">Restart Sprint</button></div>
-    </div>
-  </div>
 
   <div class="panel" id="panel-gatekeeper">
     <div class="sec-tag">No Sales Navigator Needed</div>
@@ -3919,47 +3010,20 @@ function addAllPlacesToPipeline(){
 var MRR_TARGET = 9000;
 
 function renderCommandCenter(){
-  var active = pipeline.filter(function(p){ return p.stage==='active'||p.stage==='recurring'||p.stage==='corporate'; });
-  var mrr = active.reduce(function(s,p){ return s+(p.monthlyValue||0); },0);
-  var pipeVal = pipeline.filter(function(p){ return p.convProb==='High'&&p.stage!=='active'&&p.stage!=='recurring'&&p.stage!=='corporate'; }).reduce(function(s,p){ return s+(p.monthlyValue||0); },0);
-  var highConv = pipeline.filter(function(p){ return p.convProb==='High'&&p.stage!=='active'&&p.stage!=='recurring'&&p.stage!=='corporate'; }).length;
-  var gap = Math.max(0, MRR_TARGET - mrr);
-  var pct = Math.min(100, Math.round((mrr/MRR_TARGET)*100));
-  var today = atlDateStr();
-  var overdueCount = pipeLive().filter(function(p){ return p.followUp&&p.followUp<today; }).length;
-  var trialDoneCount = pipeLive().filter(function(p){ return p.stage==='trial-done'; }).length;
-  var urgentTotal = overdueCount + trialDoneCount;
-  var gapColor = pct>=100?'var(--gold)':pct>=60?'var(--yellow)':'#e74c3c';
-  var gapClass = pct>=100?'rev-on-track':pct>=60?'rev-close':'rev-behind';
-
   function setEl(id,val){ var e=document.getElementById(id); if(e)e.textContent=val; }
   function setStyle(id,prop,val){ var e=document.getElementById(id); if(e)e.style[prop]=val; }
-  function setClass(id,cls){ var e=document.getElementById(id); if(e)e.className=cls; }
-
-  setEl('cc-mrr','$'+mrr.toLocaleString());
-  setEl('cc-gap', gap===0?'Target Hit':'$'+gap.toLocaleString());
-  setStyle('cc-gap','color',gapColor);
-  setStyle('cc-gap-fill','width',pct+'%');
-  setStyle('cc-gap-fill','background',gapColor);
-  setEl('cc-gap-pct', pct+'% of $'+MRR_TARGET.toLocaleString());
-  setClass('cc-gap-pct', gapClass);
-  setEl('cc-pipe-val','$'+pipeVal.toLocaleString());
-  setEl('cc-high-conv',highConv);
-  setEl('cc-urgent-num',urgentTotal);
-  setStyle('cc-urgent-num','color',urgentTotal>0?'#e74c3c':'var(--green)');
+  var cos=(typeof acqReady!=='undefined'&&acqReady)?acqLiveCos():[];
+  var bookers=cos.filter(function(c){return acqPathState(c)==='booker';}).length;
+  var today=atlDateStr(),due=0;
+  if(typeof acqReady!=='undefined'&&acqReady){acq.opps.forEach(function(o){if(o.status==='open'&&!acqOppSuppressed(o)&&(!o.nextAction||o.nextAction.date<=today)){due++;}});}
+  due+=pipeLive().filter(function(p){ return p.followUp&&p.followUp<=today; }).length;
+  setEl('cc-cos',cos.length);
+  setEl('cc-bookers',bookers);
+  setEl('cc-urgent-num',due);
+  setStyle('cc-urgent-num','color',due>0?'#e74c3c':'var(--green)');
 
   var statusEl = document.getElementById('cc-status');
-  if(statusEl){
-    if(urgentTotal>0){
-      statusEl.innerHTML='<div class="cc-badge-urgent" onclick="todayGoTab(\'pipeline\')">&#9888; '+urgentTotal+' Urgent</div>';
-    } else if(mrr>=MRR_TARGET){
-      statusEl.innerHTML='<div class="cc-badge-ok">&#10003; Target Hit</div>';
-    } else if(pipeline.length>0){
-      statusEl.innerHTML='<div class="cc-badge-ok">&#10003; On Track</div>';
-    } else {
-      statusEl.innerHTML='';
-    }
-  }
+  if(statusEl){statusEl.innerHTML='';}
 }
 
 async function generateDailyBriefingCC(){
@@ -5177,10 +4241,10 @@ function renderToday(){
   var rows=[];
   var open=pipeline.filter(function(p){return TODAY_INACTIVE_STAGES.indexOf(p.stage)===-1&&!acqNameRestricted(p.company,p.name)&&!acqProspectLinked(p.id);});
   open.filter(function(p){return p.stage==='trial-done';}).forEach(function(p){
-    rows.push({r:0,h:todayItem('crit',escapeHTML(p.name)+' &middot; '+escapeHTML(p.company||''),'Trial ride done. Close within 48 hours.',[todayBtn('Open Pipeline','todayGoTab(\'pipeline\')',true),todayBtn('Log touch','todayLogTouch('+p.id+')')])});
+    rows.push({r:0,h:todayItem('crit',escapeHTML(p.name)+' &middot; '+escapeHTML(p.company||''),'Trial ride done. Close within 48 hours.',[todayBtn('Open Companies','todayGoTab(\'companies\')',true),todayBtn('Log touch','todayLogTouch('+p.id+')')])});
   });
   open.filter(function(p){return p.stage==='trial-sched';}).forEach(function(p){
-    rows.push({r:1,h:todayItem('high',escapeHTML(p.name)+' &middot; '+escapeHTML(p.company||''),'Trial ride scheduled. Confirm and brief the driver.',[todayBtn('Open Pipeline','todayGoTab(\'pipeline\')',true)])});
+    rows.push({r:1,h:todayItem('high',escapeHTML(p.name)+' &middot; '+escapeHTML(p.company||''),'Trial ride scheduled. Confirm and brief the driver.',[todayBtn('Open Companies','todayGoTab(\'companies\')',true)])});
   });
   open.filter(function(p){return p.followUp&&p.followUp<today&&p.stage!=='trial-done';}).forEach(function(p){
     var d=todayDaysBetween(p.followUp,today);
@@ -5194,7 +4258,7 @@ function renderToday(){
   });
   rows.sort(function(a,b){return a.r-b.r;});
   total+=rows.length;
-  var pipeHtml=rows.slice(0,8).map(function(x){return x.h;}).join('')+(rows.length>8?'<div style="font-size:var(--fs-xs);color:var(--muted);padding-top:8px;">+ '+(rows.length-8)+' more in Pipeline</div>':'');
+  var pipeHtml=rows.slice(0,8).map(function(x){return x.h;}).join('')+(rows.length>8?'<div style="font-size:var(--fs-xs);color:var(--muted);padding-top:8px;">+ '+(rows.length-8)+' more older prospects</div>':'');
   // 2. Gatekeepers
   var gk=gatekeepers.filter(function(g){return g.followup&&g.followup<=today&&!acqNameRestricted('',g.name);}).sort(function(a,b){return a.followup<b.followup?-1:1;});
   total+=gk.length;
@@ -5202,25 +4266,6 @@ function renderToday(){
     var d=todayDaysBetween(g.followup,today);
     return todayItem(d>0?'high':'med',escapeHTML(g.name)+' &middot; '+escapeHTML(GK_TYPE_LABELS[g.type]||g.type||''),d>0?'Follow-up overdue '+d+' day'+(d===1?'':'s'):'Follow-up due today',[todayBtn('Log contact','todayGkDone('+g.id+')',true),todayBtn('Snooze 3d','todayGkSnooze('+g.id+')'),todayBtn('Open','todayGoTab(\'gatekeeper\')')]);
   }).join('');
-  // 3. Radar
-  var rh='';
-  var last=radarState.lastScanAt?new Date(radarState.lastScanAt):null;
-  var ageDays=last?Math.floor((Date.now()-last.getTime())/86400000):null;
-  var cache=Array.isArray(radarState.scanCache)?radarState.scanCache:[];
-  var fresh=cache.filter(function(it){return radarState.seen.indexOf(it.id)===-1;});
-  if(ageDays===null||ageDays>=3){
-    total++;rh+=todayItem('med','Check for companies moving into your target areas',ageDays===null?'No scan yet. A scan takes a few seconds.':'Last scan was '+ageDays+' days ago.',[todayBtn('Scan now','todayScan()',true)]);
-  }
-  fresh.slice(0,3).forEach(function(it){
-    total++;
-    rh+=todayItem('high','<a href="'+escapeHTML(it.url)+'" target="_blank" rel="noopener noreferrer" style="color:var(--gold);text-decoration:underline;">'+escapeHTML(it.title)+'</a>',escapeHTML(it.source||'source unknown')+' &middot; unverified lead',[todayBtn('Open Radar','todayGoTab(\'radar\')',true)]);
-  });
-  var allW=radarAllWatch();allW.forEach(function(c,i){c._i=i;});
-  var nextCo=allW.filter(function(c){return c.tier==='A'&&!radarState.watch[c.id];}).slice(0,2);
-  nextCo.forEach(function(c){
-    total++;
-    rh+=todayItem('med','Research '+escapeHTML(c.name),escapeHTML(c.signal)+' &middot; unverified',[todayBtn('Find gatekeepers','radarFindGatekeepers('+c._i+')',true)]);
-  });
   // 3b. Partners
   var ptList=(typeof partners!=='undefined'&&Array.isArray(partners))?partners:[];
   var ptDue=ptList.filter(function(p){return p.status!=='dormant'&&p.nextFollow&&p.nextFollow<=today&&!acqNameRestricted(p.org,p.name);}).sort(function(a,b){return a.nextFollow<b.nextFollow?-1:1;});
@@ -5239,30 +4284,17 @@ function renderToday(){
     var d=todayDaysBetween(q.follow,today);
     return todayItem(d>0?'high':'med',escapeHTML(q.client||'Quote')+' &middot; '+(q.sedan!==null?'Sedan $'+q.sedan.toFixed(2):'')+(q.suv!==null?' SUV $'+q.suv.toFixed(2):''),d>0?'Quote follow-up overdue '+d+' day'+(d===1?'':'s'):'Quote follow-up due today',(function(){var aq=acqReady?acqQuoteByLegacy(q.id):null;return aq?[todayBtn('Open in Companies','acqGoCo(\''+aq.companyId+'\')',true)]:[todayBtn('Won','qtSet(\''+q.id+'\',\'status\',\'won\')',true),todayBtn('Lost','qtSet(\''+q.id+'\',\'status\',\'lost\')')];})().concat([todayBtn('Snooze 3d','qtSnooze(\''+q.id+'\')'),todayBtn('Open','todayGoTab(\'quotes\')')]));
   }).join('');
-  // 4. Sprint
-  var sh='';
-  if(!radarState.sprintStart){
-    sh=todayItem('low','30-Day Perimeter Sprint is not started','Starting it puts each week\'s tasks here.',[todayBtn('Start sprint today','todaySprintStart()',true)]);
-  }else{
-    var wk=Math.min(4,Math.floor(todayDaysBetween(radarState.sprintStart,today)/7)+1);
-    var wkObj=RADAR_SPRINT[wk-1];
-    var pending=wkObj.tasks.filter(function(t){return !radarState.sprintDone[t.id];});
-    total+=pending.length;
-    sh='<div style="font-size:var(--fs-xs);color:var(--muted);margin-bottom:6px;">Week '+wk+' of 4</div>'+
-      (pending.length?pending.map(function(t){return todayItem('low',escapeHTML(t.t),'',[todayBtn('Done','todaySprintTick(\''+t.id+'\')')]);}).join(''):'');
-  }
   var acqT=acqTodayBlock(today);total+=acqT.count;
   body.innerHTML=
     (acqT.html?todaySection('Acquisition','mb-gold',acqT.html,''):'')+
-    todaySection('Pipeline','mb-gold',pipeHtml,'No pipeline follow-ups are due. Add prospects or set follow-up dates in Pipeline.')+
+    (rows.length?todaySection('Older prospects','mb-gold',pipeHtml,''):'')+
     todaySection('Gatekeepers','mb-blue',gkHtml,'No gatekeeper follow-ups are due.')+
-    todaySection('Market Radar','mb-green',rh,'Nothing new from the Radar today.')+
     (ptList.length?todaySection('Partners','mb-blue',ptHtml,'No partner follow-ups are due.'):'')+
     (qtList.length?todaySection('Quotes','mb-gold',(qtHtml||(qtHeld.length?'<div style="font-size:var(--fs-sm);color:var(--muted);">No quote follow-ups are due.</div>':''))+acqHeldQuotesHtml(qtHeld),'No quote follow-ups are due.'):'')+
-    todaySection('Sprint','mb-gold',sh,'All of this week\'s sprint tasks are done.')+
     todaySection('Weekly digest','mb-blue',(typeof TODAY_INACTIVE_STAGES!=='undefined'?digestHTML():''),'');
   var sm=document.getElementById('today-summary');
-  if(sm){sm.textContent=total?(total+' thing'+(total===1?'':'s')+' need'+(total===1?'s':'')+' you today. Start at the top.'):'You are all caught up. Add prospects, or run a Radar scan.';}
+  if(sm){sm.textContent=total?(total+' thing'+(total===1?'':'s')+' need'+(total===1?'s':'')+' you today. Start at the top.'):'You are all caught up. Add a company, or use Find people on the Companies tab.';}
+  renderCommandCenter();
 }
 async function todayScan(){await radarScan();renderToday();}
 
@@ -5702,13 +4734,6 @@ function digestBuild(){
   var pl=Array.isArray(pipeline)?pipeline:[];
   var ptl=(typeof partners!=='undefined'&&Array.isArray(partners))?partners:[];
   var L=[],F=[];
-  // Radar
-  var cache=Array.isArray(radarState.scanCache)?radarState.scanCache:[];
-  var fresh=cache.filter(function(it){return radarState.seen.indexOf(it.id)===-1;}).length;
-  var last=radarState.lastScanAt?atlDateStr(new Date(radarState.lastScanAt)):'';
-  var ageDays=last?todayDaysBetween(last,today):null;
-  var st={};Object.keys(radarState.watch||{}).forEach(function(k){var v=radarState.watch[k];st[v]=(st[v]||0)+1;});
-  L.push('Market Radar: '+(last?'last scan '+last:'no scan yet')+'; '+fresh+' headline'+(fresh===1?'':'s')+' you have not reviewed; '+(st.contacted||0)+' watchlist compan'+((st.contacted||0)===1?'y':'ies')+' contacted, '+(st.meeting||0)+' with a meeting set.');
   // Pipeline
   var addedWeek=pl.filter(function(p){return typeof p.id==='number'&&p.id>=nowMs-7*86400000&&p.id<=nowMs;}).length;
   var touchedWeek=pl.filter(function(p){return p.lastContact&&p.lastContact>=weekAgo;}).length;
@@ -5716,25 +4741,17 @@ function digestBuild(){
   var trials=pl.filter(function(p){return p.stage==='trial-sched'||p.stage==='trial-done';}).length;
   var clients=pl.filter(function(p){return ['active','recurring','corporate'].indexOf(p.stage)!==-1;});
   var mrr=clients.reduce(function(a,p){return a+(+p.monthlyValue||0);},0);
-  L.push('Pipeline: '+addedWeek+' prospect'+(addedWeek===1?'':'s')+' added and '+touchedWeek+' contacted in the last 7 days; '+overdue+' follow-up'+(overdue===1?'':'s')+' overdue; '+trials+' in trial stages; '+clients.length+' client'+(clients.length===1?'':'s')+' ($'+mrr.toLocaleString()+' per month as you entered it).');
+  L.push('Older prospects: '+addedWeek+' prospect'+(addedWeek===1?'':'s')+' added and '+touchedWeek+' contacted in the last 7 days; '+overdue+' follow-up'+(overdue===1?'':'s')+' overdue; '+trials+' in trial stages; '+clients.length+' client'+(clients.length===1?'':'s')+' ($'+mrr.toLocaleString()+' per month as you entered it).');
   // Partners
   var ptWeek=ptl.filter(function(p){return p.lastContact&&p.lastContact>=weekAgo;}).length;
   var ptDue=ptl.filter(function(p){return p.status!=='dormant'&&p.nextFollow&&p.nextFollow<=today;}).length;
   var sent=0,won=0;ptl.forEach(function(p){sent+=p.sent;won+=p.won;});
   L.push('Partners: '+ptl.length+' tracked; '+ptWeek+' contacted in the last 7 days; '+ptDue+' follow-up'+(ptDue===1?'':'s')+' due; '+sent+' referral'+(sent===1?'':'s')+' sent, '+won+(won===1?' became a client.':' became clients.'));
-  // Sprint
-  if(radarState.sprintStart){
-    var wk=Math.min(4,Math.floor(todayDaysBetween(radarState.sprintStart,today)/7)+1);
-    var pend=RADAR_SPRINT[wk-1].tasks.filter(function(t){return !radarState.sprintDone[t.id];}).length;
-    L.push('30-day sprint: week '+wk+' of 4; '+pend+' task'+(pend===1?'':'s')+' left this week.');
-  }else{L.push('30-day sprint: not started.');}
   // Focus
   if(overdue>0){F.push('Clear the '+overdue+' overdue pipeline follow-up'+(overdue===1?'':'s')+' first.');}
   if(ptDue>0){F.push('Follow up with '+ptDue+' partner'+(ptDue===1?'':'s')+' that '+(ptDue===1?'is':'are')+' due.');}
-  if(fresh>0){F.push('Review '+fresh+' new Radar headline'+(fresh===1?'':'s')+' and verify each before outreach.');}
-  if(ageDays===null||ageDays>=3){F.push('Run a Radar scan.');}
   if(ptl.length&&!ptWeek){F.push('Contact at least one hotel or planner partner this week.');}
-  if(!pl.length){F.push('Add prospects in Prospect Builder so this digest has something to track.');}
+  if(!pl.length){F.push('Add a company on the Companies tab so this digest has something to track.');}
   if(!F.length){F.push('Keep the pace. Add new prospects and partners.');}
   return {date:today,lines:L,focus:F};
 }
@@ -6710,7 +5727,7 @@ function acqSetupCheck(){
 }
 function acqSetupSkip(){acq.migratedAt=atlDateStr();acqSave();renderCompanies();}
 
-function renderCompanies(){
+function renderCompanies(){renderCommandCenter();
   var top=document.getElementById('acq-top');if(!top||!acqReady){return;}
   top.innerHTML=acqNoticeHtml()+acqSetupHtml()+'<div class="card"><div class="sep-title"><span class="mini-badge mb-green">Pilot counts</span></div>'+acqCountsHtml()+'</div>';
   var sel=document.getElementById('acq-radar-pick');
@@ -6721,7 +5738,7 @@ function acqRenderList(){
   var el=document.getElementById('acq-list');if(!el){return;}
   var f=acqNorm(acqFilter),today=atlDateStr();
   var cos=acqLiveCos().filter(function(c){return !f||acqNorm(c.name).indexOf(f)!==-1;}).sort(function(a,b){return a.name.toLowerCase()<b.name.toLowerCase()?-1:1;});
-  if(!acqLiveCos().length){el.innerHTML='<div class="card"><div style="font-size:var(--fs-sm);color:var(--muted);">'+(acq.companies.some(function(c){return !c.archivedInto;})?'No active companies.':'No companies yet. Add one above, run Company Research on the Radar tab, or import what you already have.')+'</div>'+acqArchivedListHtml()+'</div>';return;}
+  if(!acqLiveCos().length){el.innerHTML='<div class="card"><div style="font-size:var(--fs-sm);color:var(--muted);">'+(acq.companies.some(function(c){return !c.archivedInto;})?'No active companies.':'No companies yet. Add one above, use the Find people box above, or import what you already have.')+'</div>'+acqArchivedListHtml()+'</div>';return;}
   el.innerHTML='<div class="card"><div style="font-size:var(--fs-xs);color:var(--muted);margin-bottom:6px;">'+cos.length+' compan'+(cos.length===1?'y':'ies')+(cos.length>50?' (showing 50, use the search box)':'')+'</div>'+cos.slice(0,50).map(function(c){
     var opps=acqOppOf(c),open=opps.filter(function(o){return o.status==='open';}).length;
     var od=opps.filter(function(o){return o.status==='open'&&!acqOppSuppressed(o)&&o.nextAction&&o.nextAction.date<today;}).length;
@@ -7366,7 +6383,7 @@ function acqTodayBlock(today){
   noRes.forEach(function(c){rows.push({r:5,h:todayItem('low','Research '+acqE(c.name),'No research saved for this company yet.',[todayBtn('Research now','acqResearchNow(\''+c.id+'\')',true),todayBtn('Open company','acqGoCo(\''+c.id+'\')')])});});
   rows.sort(function(a,b){return a.r-b.r;});
   var html=rows.slice(0,10).map(function(x){return x.h;}).join('')+(rows.length>10?'<div style="font-size:var(--fs-xs);color:var(--muted);padding-top:8px;">+ '+(rows.length-10)+' more. Open Companies to see them all.</div>':'');
-  if(!acq.companies.length){html='<div style="font-size:var(--fs-sm);color:var(--muted);">No companies yet. Add one, or run Company Research on the Radar tab.</div><div class="btns">'+todayBtn('Open Companies','todayGoTab(\'companies\')',true)+'</div>';}
+  if(!acq.companies.length){html='<div style="font-size:var(--fs-sm);color:var(--muted);">No companies yet. Add one, or use Find people on the Companies tab.</div><div class="btns">'+todayBtn('Open Companies','todayGoTab(\'companies\')',true)+'</div>';}
   else if(!rows.length){html='<div style="font-size:var(--fs-sm);color:var(--muted);">No acquisition actions are due.</div>';}
   html+=acqCountsHtml();
   return {html:html,count:rows.length};
@@ -7760,13 +6777,13 @@ function acqPipelineHtml(co){
     h+=links.map(function(l){
       var p=acqProspect(l.pid),o=acqOp(l.oppId),c=acqCt(l.contactId);
       return '<div style="padding:8px 0;border-bottom:1px solid var(--border);overflow-wrap:anywhere;font-size:var(--fs-sm);"><strong>'+acqE(p?p.name:'Prospect removed from Pipeline')+'</strong>'+(p&&p.title?', '+acqE(p.title):'')+' <span class="mini-badge mb-green">Linked</span><div style="font-size:var(--fs-xs);color:var(--muted);">Contact: '+acqE(c?c.name:'-')+' &middot; Opportunity: '+acqE(o?o.title:'-')+' &middot; Pipeline stage: '+acqE(p?getStageLabel(p.stage):'-')+' &middot; linked '+acqE(l.at)+'. Its Pipeline reminders no longer appear in Today; the Companies next step replaces them.</div>'+
-        (p&&p.notes?'<details style="margin-top:4px;"><summary style="cursor:pointer;font-size:var(--fs-xs);color:var(--gold);">Pipeline notes (kept in Pipeline)</summary><div style="font-size:var(--fs-xs);white-space:pre-wrap;">'+acqE(String(p.notes).slice(0,2000))+'</div></details>':'')+
+        (p&&p.notes?'<details style="margin-top:4px;"><summary style="cursor:pointer;font-size:var(--fs-xs);color:var(--gold);">Older prospect notes (kept with the prospect)</summary><div style="font-size:var(--fs-xs);white-space:pre-wrap;">'+acqE(String(p.notes).slice(0,2000))+'</div></details>':'')+
         '<div class="btns" style="margin-top:4px;">'+todayBtn('Undo link','acqProspectUnlink(\''+acqE(l.pid)+'\')')+'</div></div>';
     }).join('');
   }
   if(free.length){
     free=free.slice().sort(function(a,b){var am=acqNorm(a.company)===nk?0:1,bm=acqNorm(b.company)===nk?0:1;return am-bm;});
-    h+='<div style="margin-top:10px;font-size:var(--fs-xs);color:var(--muted);">Link a Pipeline prospect to this company. Same-name prospects are listed first, but you choose. The prospect stays in Pipeline unchanged.</div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;"><select id="acq-pl-pick" aria-label="Pipeline prospect to link" style="flex:1;min-width:200px;">'+acqOptions(free.slice(0,100).map(function(p){return [String(p.id),p.name+(p.company?' ('+p.company+')':'')+(acqNorm(p.company)===nk?' - same company name':'')];}),'','Choose a prospect...')+'</select><button class="btn btn-outline" onclick="acqProspectOpen(\''+co.id+'\')">Link or convert</button></div>';
+    h+='<div style="margin-top:10px;font-size:var(--fs-xs);color:var(--muted);">Link an older prospect to this company. Same-name prospects are listed first, but you choose. The prospect stays in Pipeline unchanged.</div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;"><select id="acq-pl-pick" aria-label="Pipeline prospect to link" style="flex:1;min-width:200px;">'+acqOptions(free.slice(0,100).map(function(p){return [String(p.id),p.name+(p.company?' ('+p.company+')':'')+(acqNorm(p.company)===nk?' - same company name':'')];}),'','Choose a prospect...')+'</select><button class="btn btn-outline" onclick="acqProspectOpen(\''+co.id+'\')">Link or convert</button></div>';
   }
   return h+'</div>';
 }
@@ -7812,8 +6829,8 @@ function acqProspectSave(){
     acq.opps.push(o);
   }else if(o.contactIds.indexOf(ct.id)===-1&&o.contactIds.length<10){o.contactIds.push(ct.id);acqTouch(o);}
   acq.plinks.push({pid:String(p.id),companyId:co.id,contactId:ct.id,oppId:o.id,at:today});
-  acqLogAct(co.id,'Linked Pipeline prospect "'+p.name+'" ('+getStageLabel(p.stage)+'). Pipeline notes and history stay in Pipeline and are shown here.',{oppId:o.id,contactId:ct.id});
-  if(p.lastContact&&ptDate(p.lastContact)){var a=acqLogAct(co.id,'Last contact recorded in Pipeline.',{oppId:o.id,contactId:ct.id});a.at=ptDate(p.lastContact);}
+  acqLogAct(co.id,'Linked older prospect "'+p.name+'" ('+getStageLabel(p.stage)+'). Notes and history stay with the prospect and are shown here.',{oppId:o.id,contactId:ct.id});
+  if(p.lastContact&&ptDate(p.lastContact)){var a=acqLogAct(co.id,'Last contact recorded on the older prospect.',{oppId:o.id,contactId:ct.id});a.at=ptDate(p.lastContact);}
   acqSave();acqModalClose();acqRefresh();notify('Prospect linked. Its Pipeline reminders are replaced by the Companies next step.');
 }
 function acqProspectUnlink(pid){
@@ -8112,7 +7129,7 @@ function areaFindHtml(){
   h+='<div style="font-size:var(--fs-xs);color:var(--muted);margin-bottom:8px;">Each button opens a Google Maps search in a new tab. The app collects nothing. A listing is a lead to check, not a buyer.</div>';
   if(!a.serve){h+='<div style="margin-bottom:8px;padding:8px 10px;border:1px solid rgba(231,76,60,0.4);background:rgba(231,76,60,0.06);font-size:var(--fs-xs);">You marked this area as not served. Decide how you would serve it before you reach out.</div>';}
   h+='<div style="display:flex;gap:8px;flex-wrap:wrap;">'+AREA_CATS.map(function(c){return '<a class="btn btn-outline" style="padding:6px 14px;font-size:var(--fs-xs);" href="'+acqE(areaMapsUrl(c[1],a))+'" target="_blank" rel="noopener noreferrer">'+acqE(c[0])+' &rarr;</a>';}).join('')+'</div>';
-  h+='<div class="btns" style="margin-top:10px;"><button class="btn btn-outline" onclick="areaOpen()">Change area</button><button class="btn btn-outline" onclick="todayGoTab(\'markets\')">Google Places search (Market Expansion)</button></div>';
+  h+='<div class="btns" style="margin-top:10px;"><button class="btn btn-outline" onclick="areaOpen()">Change area</button></div>';
   h+='<div style="font-size:var(--fs-xs);color:var(--muted);margin-top:8px;">Found a company worth a look? Add it below'+(areaIsHome()?'':'. New companies take the area "'+acqE(areaDefaultCoArea())+'"')+'. Then follow its Contact path.</div>';
   return h;
 }
@@ -8127,7 +7144,7 @@ function areaApply(){
   if(fa){fa.textContent=acqResearchCityOk(a.city)?'Searching near: '+a.name+'.':'Searching near: '+a.name+'. Company Research only looks in Georgia metro-Atlanta cities, so for this area it searches by company name alone.';}
 }
 areaApply();
-var ACQ_RELEASE='1f';
+var ACQ_RELEASE='1g';
 function acqKeyLabel(k){return ({'ob-acq':'Companies, contacts, opportunities, quotes, bookings and activity','ob-pipeline':'Pipeline prospects','ob-gatekeepers':'Gatekeepers','ob-messages':'Saved messages','ob-research':'Company Research results','ob-radar':'Market Radar watchlist and settings','ob-quotes':'Quote log and rate settings'})[k]||(typeof cloudKeyLabel==='function'?cloudKeyLabel(k):k);}
 function acqKeyCount(k){
   var raw=null;try{raw=localStorage.getItem(k);}catch(e){}
