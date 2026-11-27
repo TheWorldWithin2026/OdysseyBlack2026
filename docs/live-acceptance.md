@@ -1,4 +1,4 @@
-# Live acceptance check (Release 1c)
+# Live acceptance check (Release 1d)
 
 Status: **not yet performed.** Everything below is a checklist for Kerry to run on the deployed site. Nothing here has been verified on the live site by anyone. Mark a line Pass only after you have done it and seen the stated result.
 
@@ -14,7 +14,7 @@ Repository tests (the Playwright and Node suites) check the code on a local serv
 ## A. Which release is loaded (do this first)
 
 1. Open the live site in the test profile. Open **Data & Backup**.
-2. Read the line "This page is release ...". It should say release 1c and then "Server file says release 1c ... Matches this page."
+2. Read the line "This page is release ...". It should say release 1d and then "Server file says release 1d ... Matches this page."
 3. If it says Mismatch or "Could not read": reload with the cache cleared (Ctrl+Shift+R), or close the tab and reopen it, then check again. Do not continue until it says Matches.
 
 ## B. Complete workflow (about 20 minutes)
@@ -31,6 +31,10 @@ Repository tests (the Playwright and Node suites) check the code on a local serv
 | B8 | Accept the one-trip quote, create its booking, then try a second | Second is refused | |
 | B9 | Revise the accepted recurring quote to 230 dollars | v1 stays accepted at 200; existing bookings stay at 200 | |
 | B10 | Open the Quotes tab (link a saved quote first if you have one) | A linked quote shows "Managed in Companies. Change it there." and no status dropdown | |
+| B11 | Open the `ZZ TEST Acme` company. Find the "Contact path" box. Log a route: Called the company line, result Tried, found nothing | The box says "No booking contact yet. 1 route logged, 1 found nothing." and suggests checking the company website next. The Companies list says "no booking contact yet" | |
+| B12 | Log a second route with result "Found a person or number", a note and a source link. Then press "Open search links for this company" | The link appears under Source links. The Contact Path tab opens with the company name filled in and seven search links | |
+| B13 | On the `Test Person` contact, record a check at level "Confirmed booker" | The Contact path box says "Booking contact confirmed." and the list stops saying "no booking contact yet" | |
+| B14 | Look at the tab bar | No Company Intel or 90-Day Plan tab. Win clients tabs first. "Contact Path" replaces "Gatekeeper Finder" | |
 
 ## C. Refresh and restart
 

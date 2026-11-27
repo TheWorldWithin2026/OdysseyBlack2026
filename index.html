@@ -64,6 +64,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:20p
 
 /* ── TABS ── */
 .tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:36px;overflow-x:auto;}
+.tab-group{align-self:center;white-space:nowrap;font-size:10px;letter-spacing:var(--ls-wider);text-transform:uppercase;color:var(--gold);padding:0 6px 0 14px;opacity:.8;}
 .tab{background:none;border:none;border-bottom:2px solid transparent;padding:13px 18px;font-size:var(--fs-xs);letter-spacing:var(--ls-wide);text-transform:uppercase;color:var(--muted);cursor:pointer;font-family:var(--ff-ui);font-weight:500;transition:all 0.2s;white-space:nowrap;}
 .tab:hover{color:var(--text);}
 .tab.active{color:var(--gold);border-bottom-color:var(--gold);}
@@ -595,25 +596,27 @@ textarea{resize:vertical;min-height:75px;}
 
 <div class="wrap">
   <div class="tabs">
+    <span class="tab-group">Win clients</span>
     <button class="tab active" onclick="switchTab('today',this)">&#9728; Today</button>
-    <button class="tab" onclick="switchTab('prospect',this)">Prospect Builder</button>
-    <button class="tab" onclick="switchTab('outreach',this)">AI Outreach</button>
-    <button class="tab" onclick="switchTab('pipeline',this)">Pipeline</button>
     <button class="tab" onclick="switchTab('companies',this)">&#127970; Companies</button>
+    <button class="tab" onclick="switchTab('gatekeeper',this)">&#128273; Contact Path</button>
+    <button class="tab" onclick="switchTab('outreach',this)">AI Outreach</button>
+    <button class="tab" onclick="switchTab('quotes',this)">&#128181; Quote Builder</button>
     <button class="tab" onclick="switchTab('results',this)">&#128200; Results</button>
+    <span class="tab-group">Find prospects</span>
+    <button class="tab" onclick="switchTab('radar',this)">&#128225; Market Radar</button>
+    <button class="tab" onclick="switchTab('prospect',this)">Prospect Builder</button>
+    <button class="tab" onclick="switchTab('import',this)">Apollo Import</button>
     <button class="tab" onclick="switchTab('partners',this)">&#129309; Partners</button>
     <button class="tab" onclick="switchTab('lookalike',this)">&#128269; Lookalikes</button>
-    <button class="tab" onclick="switchTab('quotes',this)">&#128181; Quote Builder</button>
+    <span class="tab-group">Tools</span>
+    <button class="tab" onclick="switchTab('pipeline',this)">Pipeline (older)</button>
+    <button class="tab" onclick="switchTab('script',this)">Call Script</button>
     <button class="tab" onclick="switchTab('vendor',this)">&#128196; Vendor Packet</button>
     <button class="tab" onclick="switchTab('forecast',this)">&#128176; Forecast</button>
-    <button class="tab" onclick="switchTab('script',this)">Call Script</button>
-    <button class="tab" onclick="switchTab('import',this)">Apollo Import</button>
-    <button class="tab" onclick="switchTab('company',this)">Company Intel</button>
-    <button class="tab" onclick="switchTab('calendar',this)">90-Day Plan</button>
+    <span class="tab-group">Reference</span>
     <button class="tab" onclick="switchTab('strategy',this)">&#9733; War Room</button>
     <button class="tab" onclick="switchTab('markets',this)">&#9775; Market Expansion</button>
-    <button class="tab" onclick="switchTab('radar',this)">&#128225; Market Radar</button>
-    <button class="tab" onclick="switchTab('gatekeeper',this)">&#128273; Gatekeeper Finder</button>
   </div>
 
   <!-- TAB 1: PROSPECT BUILDER -->
@@ -1155,80 +1158,6 @@ textarea{resize:vertical;min-height:75px;}
         <table class="bulk-table"><thead><tr><th>Name</th><th>Title</th><th>Company</th><th>Score</th><th>Tier</th><th>Action</th></tr></thead><tbody id="bulk-tbody"></tbody></table>
       </div>
     </div>
-  </div>
-
-  <!-- TAB 6: COMPANY INTEL -->
-  <div class="panel" id="panel-company">
-    <div class="sec-tag">Phase 3</div>
-    <div class="sec-h">Company Intelligence</div>
-    <div class="sec-d">Link multiple executives to the same company and identify multi-executive account opportunities.</div>
-    <div class="btns" style="margin-bottom:24px;">
-      <button class="btn btn-gold" onclick="buildCoMap()">Build from Pipeline <div class="spin" id="sp-co"></div></button>
-      <button class="btn btn-outline" onclick="genAccountStrategy()">Generate Account Strategy <div class="spin" id="sp-co2"></div></button>
-    </div>
-    <div id="co-map" style="display:none;"><div id="co-list"></div></div>
-    <div class="empty-msg" id="co-empty">Add prospects to your pipeline first, then build the company map.</div>
-    <div class="ai-box" id="co-strat-box"><span class="ai-label">Account Expansion Strategy</span><button class="copy-btn" onclick="copyText('co-strat-ai')">Copy</button><div class="ai-text" id="co-strat-ai"></div></div>
-  </div>
-
-  <!-- TAB 7: 90-DAY CALENDAR -->
-  <div class="panel" id="panel-calendar">
-    <div class="sec-tag">Mission Control</div>
-    <div class="sec-h">90-Day Executive Acquisition Plan</div>
-    <div class="sec-d">Your daily and weekly action system. Check off tasks as you complete them. Progress saves automatically.</div>
-
-    <!-- KPI Dashboard -->
-    <div class="kpi-grid">
-      <div class="kpi-card">
-        <div class="kpi-target">25</div>
-        <div class="kpi-actual" id="kpi-pipeline">0</div>
-        <div class="kpi-label">Pipeline Target</div>
-        <div class="kpi-gap" id="kpi-pipeline-gap">0 of 25 added</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-target">15</div>
-        <div class="kpi-actual" id="kpi-contacted">0</div>
-        <div class="kpi-label">Contacted</div>
-        <div class="kpi-gap" id="kpi-contacted-gap">0 of 15 reached</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-target">5</div>
-        <div class="kpi-actual" id="kpi-trials">0</div>
-        <div class="kpi-label">Trial Rides</div>
-        <div class="kpi-gap" id="kpi-trials-gap">0 of 5 scheduled</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-target">3</div>
-        <div class="kpi-actual" id="kpi-clients">0</div>
-        <div class="kpi-label">New Clients</div>
-        <div class="kpi-gap" id="kpi-clients-gap">0 of 3 closed</div>
-      </div>
-    </div>
-
-    <!-- Overall Progress -->
-    <div class="card" style="margin-bottom:24px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-        <div style="font-size:var(--fs-xs);letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);font-weight:600;">Overall 90-Day Progress</div>
-        <div style="font-size:var(--fs-lg);font-weight:700;color:var(--gold);" id="cal-pct">0%</div>
-      </div>
-      <div class="progress-bar"><div class="progress-fill" id="cal-progress" style="width:0%"></div></div>
-      <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:var(--fs-xs);color:var(--muted);">
-        <span id="cal-tasks-done">0 tasks completed</span>
-        <button class="btn btn-ghost" style="padding:4px 12px;font-size:var(--fs-xs);" onclick="resetCalendar()">Reset</button>
-      </div>
-    </div>
-
-    <!-- Phase 1 -->
-    <div class="phase-header phase-1"><div class="phase-title" style="color:var(--blue);">Phase 1 — Foundation (Days 1-30)</div><div class="phase-desc">Build your target list, establish your outreach infrastructure, and land your first 5 conversations</div></div>
-    <div id="cal-phase1"></div>
-
-    <!-- Phase 2 -->
-    <div class="phase-header phase-2" style="margin-top:8px;"><div class="phase-title" style="color:var(--gold);">Phase 2 — Momentum (Days 31-60)</div><div class="phase-desc">Convert conversations to trial rides. Activate EA relationships. Close your first clients.</div></div>
-    <div id="cal-phase2"></div>
-
-    <!-- Phase 3 -->
-    <div class="phase-header phase-3" style="margin-top:8px;"><div class="phase-title" style="color:var(--green);">Phase 3 — Dominance (Days 61-90)</div><div class="phase-desc">Expand accounts, build referral engine, establish OD Black as Atlanta's #1 executive car service.</div></div>
-    <div id="cal-phase3"></div>
   </div>
 
   <!-- TAB 8: WAR ROOM -->
@@ -1789,7 +1718,7 @@ textarea{resize:vertical;min-height:75px;}
 
     <div class="card">
       <div class="sep-title"><span class="mini-badge mb-blue">Watchlist &mdash; Public-News Snapshot</span></div>
-      <div class="sec-d" style="margin-bottom:14px;">Compiled from public news and broker announcements as of October 2026. No individual contacts are included &mdash; use Gatekeeper Finder to find the right people. Verify each item before outreach.</div>
+      <div class="sec-d" style="margin-bottom:14px;">Compiled from public news and broker announcements as of October 2026. No individual contacts are included &mdash; use Contact Path to find the right people. Verify each item before outreach.</div>
       <div id="radar-watchlist"></div>
       <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border);">
         <div style="font-size:var(--fs-sm);font-weight:600;margin-bottom:8px;">Add a company you are targeting</div>
@@ -1816,8 +1745,46 @@ textarea{resize:vertical;min-height:75px;}
 
   <div class="panel" id="panel-gatekeeper">
     <div class="sec-tag">No Sales Navigator Needed</div>
-    <div class="sec-h">Gatekeeper Finder</div>
-    <div class="sec-d">Find EAs, Chiefs of Staff, and every other gatekeeper standing between you and the executive — without paying for LinkedIn Sales Navigator.</div>
+    <div class="sec-h">Contact Path</div>
+    <div class="sec-d">How to find the person who actually books car service, in the order that works fastest and costs least. No Sales Navigator needed. Log each attempt on the company page under Contact path, so the app always shows what to try next.</div>
+
+    <div class="card">
+      <div class="sep-title"><span class="mini-badge mb-gold">The path, in order</span></div>
+      <div class="sec-d" style="margin-bottom:10px;">At most companies the executive's assistant or a travel manager books the car, and someone else approves it. Aim to confirm one booker per company, not just a name.</div>
+      <ol style="margin:0 0 0 20px;padding:0;font-size:var(--fs-sm);line-height:1.7;">
+        <li><strong>Company line or front desk.</strong> Call the main number and ask: &ldquo;Who arranges car service for visiting executives?&rdquo; Write down the name and role exactly as given. No tools needed.</li>
+        <li><strong>Company website.</strong> Check the leadership or team page, any vendor or supplier registration page, and a travel or facilities contact. Save the link as the source.</li>
+        <li><strong>A referral.</strong> Ask hotel concierges, FBO staff and any client: &ldquo;Who books car service at your company?&rdquo; One introduction beats ten cold searches.</li>
+        <li><strong>Where the buyers gather.</strong> See the next card. Go to meet people, not to pitch.</li>
+        <li><strong>Free LinkedIn X-ray search.</strong> Use the search links further down to find public profiles by role. You look at the page yourself; nothing is collected automatically.</li>
+        <li><strong>Email lookup, last.</strong> Only once you have a name and a company. See &ldquo;Free tools&rdquo; below.</li>
+      </ol>
+      <div class="sec-d" style="margin-top:10px;font-size:var(--fs-xs);">If a company shows no booking contact after steps 1 to 3, that is a real result. The company page will say &ldquo;No booking contact yet&rdquo; instead of hiding it.</div>
+    </div>
+
+    <div class="card">
+      <div class="sep-title"><span class="mini-badge mb-green">Where the buyers gather in Atlanta</span></div>
+      <div style="font-size:var(--fs-sm);line-height:1.7;">
+        <div><strong>GBTA (Global Business Travel Association), Georgia chapter.</strong> Corporate travel managers. Chapter meetings and an annual Education Day. <a href="https://gbta.org/events/" target="_blank" rel="noopener noreferrer" style="color:var(--gold);text-decoration:underline;">Events calendar</a></div>
+        <div style="margin-top:6px;"><strong>IAAP (International Association of Administrative Professionals), Georgia branch.</strong> Executive and administrative assistants. Mixers and lunch-and-learns. <a href="https://www.iaap-hq.org/" target="_blank" rel="noopener noreferrer" style="color:var(--gold);text-decoration:underline;">IAAP site</a></div>
+      </div>
+      <div class="sec-d" style="margin-top:10px;font-size:var(--fs-xs);">Check each calendar for the next meeting before you plan around it. The app does not track their dates. When you meet someone, add them as a contact and log the route as &ldquo;Met through an event&rdquo;.</div>
+    </div>
+
+    <div class="card">
+      <div class="sep-title"><span class="mini-badge" style="background:rgba(52,152,219,0.1);border:1px solid rgba(52,152,219,0.3);color:var(--blue);">Free tools, and their limits</span></div>
+      <ul style="margin:0 0 0 18px;padding:0;font-size:var(--fs-sm);line-height:1.7;">
+        <li><strong>Free LinkedIn account.</strong> Searching people is capped each month (the limit is not published; reports say a few hundred searches). X-ray search through Google avoids the cap.</li>
+        <li><strong>Hunter, free plan.</strong> 50 credits a month. A credit is one email found; nothing is charged when nothing is found.</li>
+        <li><strong>Apollo, free plan.</strong> Searching is free; revealing contact data uses credits. Reveal emails only, because a phone number costs several times as many credits. Check Apollo&rsquo;s pricing page for the current allowance.</li>
+        <li><strong>Do not use</strong> browser extensions or bots that collect LinkedIn profiles for you. LinkedIn does not permit them and can restrict your account.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="sep-title"><span class="mini-badge" style="background:rgba(231,76,60,0.1);border:1px solid rgba(231,76,60,0.3);color:#e74c3c;">Before you send an email</span></div>
+      <div style="font-size:var(--fs-sm);line-height:1.7;">The app only drafts. You read it, edit it and send it yourself. Business-to-business email still falls under CAN-SPAM: an honest subject line and sender, your real postal address, the message identified as an advertisement, and a working way to opt out that you honor within 10 business days. Anyone on the Do not contact list stays off every list.</div>
+    </div>
 
     <!-- X-RAY SEARCH GENERATOR -->
     <div class="card">
@@ -1836,13 +1803,13 @@ textarea{resize:vertical;min-height:75px;}
     <!-- APOLLO EA FILTER BUILDER -->
     <div class="card">
       <div class="sep-title"><span class="mini-badge" style="background:rgba(52,152,219,0.1);border:1px solid rgba(52,152,219,0.3);color:var(--blue);">Apollo &mdash; EA-Specific Pull</span></div>
-      <div class="sec-d" style="margin-bottom:12px;">Your existing Apollo searches target executives. Run a <em>second</em>, parallel search using these titles to pull the gatekeepers directly instead of guessing from the exec list.</div>
+      <div class="sec-d" style="margin-bottom:12px;">If you use Apollo, search by these titles to reach the assistants directly instead of guessing from the executive list.</div>
       <div class="ai-box" style="display:block;">
         <span class="ai-label">Paste into Apollo's Job Title filter</span>
         <button class="copy-btn" onclick="copyText('gk-apollo-titles')">Copy</button>
         <div class="ai-text" id="gk-apollo-titles">Executive Assistant, Chief of Staff, Office Manager, Travel Coordinator, Personal Assistant, Executive Business Partner, Administrative Business Partner, Senior Executive Assistant</div>
       </div>
-      <div class="sec-d" style="margin-top:10px;font-size:var(--fs-xs);">Company filter: same Fortune 500 / Atlanta list you already use. Employee filter: remove the 1,000+ minimum &mdash; admin titles undercount on LinkedIn-sourced employee data.</div>
+      <div class="sec-d" style="margin-top:10px;font-size:var(--fs-xs);">Company filter: the company you are working on. Employee filter: do not set a large minimum, because assistant titles are often under-counted in company data.</div>
     </div>
 
     <!-- GATEKEEPER NETWORK TRACKER -->
@@ -2383,7 +2350,7 @@ var SIG_SCORES={'sig-hired':3,'sig-office':2,'sig-earnings':1,'sig-speaking':2,'
 var SIG_LABELS={'sig-hired':'Recently hired/promoted','sig-office':'Company opening ATL office','sig-earnings':'Upcoming earnings/board meeting','sig-speaking':'Speaking at ATL event','sig-reloc':'Relocating to Atlanta','sig-travel':'Increased travel activity'};
 var CHIP_IDS={'sig-hired':'chip-hired','sig-office':'chip-office','sig-earnings':'chip-earnings','sig-speaking':'chip-speaking','sig-reloc':'chip-reloc','sig-travel':'chip-travel'};
 
-function switchTab(n,el){document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});el.classList.add('active');document.getElementById('panel-'+n).classList.add('active');if(n==='pipeline'){renderPipeline();}if(n==='company'){buildCoMap();}if(n==='calendar'){initCalendar();updateKPIs();}if(n==='gatekeeper'){renderGatekeepers();}if(n==='radar'){renderRadar();}if(n==='today'){renderToday();}if(n==='results'){renderResults();}if(n==='vendor'){renderVendor();}if(n==='partners'){renderPartners();}if(n==='lookalike'){renderLookalike();}if(n==='forecast'){renderForecast();}if(n==='quotes'){renderQuotes();}if(n==='companies'){renderCompanies();}}
+function switchTab(n,el){document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});el.classList.add('active');document.getElementById('panel-'+n).classList.add('active');if(n==='pipeline'){renderPipeline();}if(n==='gatekeeper'){renderGatekeepers();}if(n==='radar'){renderRadar();}if(n==='today'){renderToday();}if(n==='results'){renderResults();}if(n==='vendor'){renderVendor();}if(n==='partners'){renderPartners();}if(n==='lookalike'){renderLookalike();}if(n==='forecast'){renderForecast();}if(n==='quotes'){renderQuotes();}if(n==='companies'){renderCompanies();}}
 
 function toggleSig(sid,cid){var cb=document.getElementById(sid);var chip=document.getElementById(cid);cb.checked=!cb.checked;if(cb.checked){chip.classList.add('on');}else{chip.classList.remove('on');}refreshBM();}
 function refreshBM(){var total=0;Object.keys(SIG_SCORES).forEach(function(id){var el=document.getElementById(id);if(el&&el.checked){total+=SIG_SCORES[id];}});total=Math.min(total,10);var num=document.getElementById('bm-num'),fill=document.getElementById('bm-fill'),desc=document.getElementById('bm-desc');num.textContent=total;fill.style.width=(total*10)+'%';var c,d;if(total===0){c='var(--muted)';d='No signals active';}else if(total<=3){c='#e67e22';d='Mild timing - monitor';}else if(total<=6){c='var(--yellow)';d='Good timing - reach out soon';}else if(total<=8){c='var(--green)';d='Strong timing - act this week';}else{c='var(--gold)';d='PEAK MOMENT - reach out today';}num.style.color=c;fill.style.background=c;desc.style.color=c;desc.textContent=d;return total;}
@@ -2910,42 +2877,6 @@ function clearProspect(){
   eventModeActive=false;
   showEventModeBar(false,null);
   currentP=null;
-}
-
-function buildCoMap(){
-  var cos={};
-  pipeline.forEach(function(p){var co=(p.company||'Unknown').trim();if(!cos[co]){cos[co]=[];}cos[co].push(p);});
-  var list=document.getElementById('co-list');var map=document.getElementById('co-map');var empty=document.getElementById('co-empty');
-  if(Object.keys(cos).length===0){empty.style.display='block';map.style.display='none';return;}
-  empty.style.display='none';map.style.display='block';
-  var sorted=Object.keys(cos).sort(function(a,b){return cos[b].length-cos[a].length;});
-  list.innerHTML=sorted.map(function(co){
-    var execs=cos[co];
-    var avg=Math.round(execs.reduce(function(s,p){return s+p.score;},0)/execs.length);
-    var hot=execs.filter(function(p){return p.score>=28;}).length;
-    var bm=execs.filter(function(p){return p.bmScore&&p.bmScore>=5;}).length;
-    var totalRev=execs.reduce(function(s,p){return s+(p.monthlyValue||estimateMonthlyValue(p));},0);
-    var activeRev=execs.filter(function(p){return p.stage==='active'||p.stage==='recurring'||p.stage==='corporate';}).reduce(function(s,p){return s+(p.monthlyValue||0);},0);
-    var opp=Math.min(10,Math.round(execs.length*1.5+hot*1.5+bm));
-    var oppC=opp>=8?'var(--gold)':opp>=5?'var(--green)':'var(--muted)';
-    var rows=execs.map(function(p){return'<div class="co-exec-row"><div><div class="co-exec-name">'+escapeHTML(p.name)+'</div><div class="co-exec-title">'+escapeHTML(p.title)+'</div></div><div class="'+getTierClass(p.score)+'" style="font-weight:600;">'+p.score+(p.bmScore>=5?' &#9650;':'')+'</div></div>';}).join('');
-    var revStr=totalRev>0?'<span style="color:var(--green);font-weight:600;margin-left:8px;">$'+totalRev.toLocaleString()+'/mo est</span>'+(activeRev>0?' <span style="color:var(--gold);font-size:var(--fs-xs);font-weight:700;">('+('$'+activeRev.toLocaleString())+' active)</span>':''):'';
-    return'<div class="co-card"><div class="co-head"><div><div class="co-name">'+escapeHTML(co)+'</div><div class="co-meta">'+execs.length+' executive'+(execs.length!==1?'s':'')+' in pipeline &nbsp;&middot;&nbsp; Avg score: '+avg+(bm>0?' &nbsp;&middot;&nbsp; '+bm+' active BM':'')+revStr+'</div></div><div><div class="co-opp-label">Opp Score</div><div class="co-opp-val" style="color:'+oppC+';">'+opp+'/10</div></div></div><div class="co-execs-list">'+rows+'</div></div>';
-  }).join('');
-}
-
-async function genAccountStrategy(){
-  var cos={};pipeline.forEach(function(p){var co=(p.company||'Unknown').trim();if(!cos[co]){cos[co]=[];}cos[co].push(p);});
-  var top=Object.keys(cos).sort(function(a,b){return cos[b].length-cos[a].length;}).slice(0,3);
-  if(top.length===0){notify('Add prospects to pipeline first');return;}
-  var sp=document.getElementById('sp-co2');var box=document.getElementById('co-strat-box');var out=document.getElementById('co-strat-ai');
-  sp.classList.add('on');box.classList.remove('show');
-  var summary=top.map(function(co){var execs=cos[co];return co+': '+execs.length+' executive(s) - '+execs.map(function(p){return p.name+' ('+p.title+', score '+p.score+(p.bmScore>=5?', active buying moment':')');}).join('; ');}).join('\n');
-  try{
-    out.textContent=await callAI(['You are a senior business development strategist for Odyssey Black VIP Transportation in Atlanta.','These are companies with multiple executive prospects in our pipeline:',summary,'','For each company write a multi-executive account expansion plan with these sections:','1. ACCOUNT ENTRY POINT: which executive to approach first and exactly why','2. EXPANSION STRATEGY: how to turn 1 booking into 3-5 executive accounts','3. INTERNAL CHAMPION: who is most likely to refer colleagues internally','4. CORPORATE ACCOUNT PITCH: one paragraph positioning Odyssey Black as the company-wide solution','5. 30/60/90 DAY MILESTONES: realistic expansion timeline','','Be specific and strategic. Flag any prospect with active buying moment as priority.'],1500);
-    box.classList.add('show');buildCoMap();
-  }catch(e){out.textContent='Error: '+e.message;box.classList.add('show');}
-  sp.classList.remove('on');
 }
 
 function handleDrop(e){e.preventDefault();document.getElementById('drop-zone').classList.remove('over');var f=e.dataTransfer.files[0];if(f){handleFile(f);}}
@@ -3504,171 +3435,6 @@ function showEventModeBar(active,evData){
   }else if(bar){
     bar.classList.remove('active');
   }
-}
-
-
-// ══════════════════════════════════════════════════════════
-// 90-DAY CALENDAR SYSTEM
-// ══════════════════════════════════════════════════════════
-var CAL_TASKS = {
-  phase1: [
-    {week:1, title:'Week 1 — Target List', focus:'Build your 25 HOT prospects', tasks:[
-      {id:'w1t1', title:'Apollo Search Setup', detail:'Run 3 searches: CEO, CFO, COO in Atlanta with 1000+ employees. Export each CSV.', tag:'prospect'},
-      {id:'w1t2', title:'Import & Score All Prospects', detail:'Drop each CSV into Apollo Import. Review HOT and STRONG scores. Identify your top 25.', tag:'prospect'},
-      {id:'w1t3', title:'Add Top 25 to Pipeline', detail:'Manually score your top 25 in Prospect Builder. Set travel routes and timing signals.', tag:'prospect'},
-      {id:'w1t4', title:'Research Top 10', detail:'Use Research Executive on your 10 highest-scored prospects. Read every result carefully.', tag:'prospect'}
-    ]},
-    {week:2, title:'Week 2 — EA Intelligence', focus:'Find and profile every assistant', tasks:[
-      {id:'w2t1', title:'Identify EAs for Top 10', detail:'Search LinkedIn: company name + Executive Assistant or Chief of Staff. Find names and emails.', tag:'prospect'},
-      {id:'w2t2', title:'Build EA Profiles', detail:'Add EA Intelligence data for each prospect. Communication style, responsiveness, personality.', tag:'prospect'},
-      {id:'w2t3', title:'Generate 10 Approach Strategies', detail:'Run Generate Approach Strategy for all 10 top prospects. Read each one. Note the recommended channel.', tag:'outreach'},
-      {id:'w2t4', title:'Identify 2 Atlanta Events (Next 30 Days)', detail:'Search ATL CEO Summit, Atlanta Business Chronicle, Buckhead Business events. Add to calendar.', tag:'prospect'}
-    ]},
-    {week:3, title:'Week 3 — First Outreach Wave', focus:'Send 10 personalized messages', tasks:[
-      {id:'w3t1', title:'Send 5 EA Emails', detail:'Use Assistant Mode for your top 5 High-EA-Influence prospects. Personalize with route data.', tag:'outreach'},
-      {id:'w3t2', title:'Send 5 Executive LinkedIn DMs', detail:'Use Executive Mode for remaining 5. Research first, then generate. Keep under 150 words.', tag:'outreach'},
-      {id:'w3t3', title:'Mark All as Contacted', detail:'Advance all 10 to Contacted stage in pipeline. Set follow-up dates 3 days out.', tag:'followup'},
-      {id:'w3t4', title:'Score 5 New Prospects', detail:'Keep pipeline full. Score 5 new prospects from Apollo. Add the best 3 to pipeline.', tag:'prospect'}
-    ]},
-    {week:4, title:'Week 4 — Follow-Up & First Responses', focus:'Work every reply and change angles on silence', tasks:[
-      {id:'w4t1', title:'Follow Up Wave 1 (No Response)', detail:'Click Follow-up on all Contacted prospects with no reply. AI generates a new angle automatically.', tag:'followup'},
-      {id:'w4t2', title:'Handle Positive Responses', detail:'For anyone who replied positively — advance to next stage. Generate a call script and schedule a call.', tag:'close'},
-      {id:'w4t3', title:'LinkedIn Connection Follow-Up', detail:'For anyone who connected but did not reply — send a 2nd message from a different angle (route-based hook).', tag:'followup'},
-      {id:'w4t4', title:'Score Week 4 Prospects', detail:'Add 5 more prospects to pipeline. Focus on companies with multiple executives already in pipeline.', tag:'prospect'}
-    ]}
-  ],
-  phase2: [
-    {week:5, title:'Week 5 — Trial Ride Offers', focus:'Convert conversations to scheduled rides', tasks:[
-      {id:'w5t1', title:'Offer Trial Rides to 5 Prospects', detail:'Anyone in Asst Engaged or Contacted with positive response gets a complimentary first ride offer.', tag:'close'},
-      {id:'w5t2', title:'Third Touch — Channel Switch', detail:'Everyone still silent after 2 touches: switch channels. Email → call. LinkedIn → email. Use Call Script builder.', tag:'outreach'},
-      {id:'w5t3', title:'Attend 1 Atlanta Business Event', detail:'Chamber of Commerce, Atlanta Business Chronicle, or industry mixer. Bring cards. Have your 1-sentence intro ready.', tag:'prospect'},
-      {id:'w5t4', title:'Contact 2 Hotel Concierges', detail:'W Atlanta, Four Seasons, or St Regis Buckhead. Introduce Odyssey Black. Leave materials. Propose a referral arrangement.', tag:'account'}
-    ]},
-    {week:6, title:'Week 6 — Trial Execution', focus:'Deliver flawless trial rides', tasks:[
-      {id:'w6t1', title:'Pre-Ride Confirmation Protocol', detail:'For every trial scheduled: confirm 24hrs before, send driver info and photo morning of, text when en route.', tag:'close'},
-      {id:'w6t2', title:'Post-Ride Follow-Up (48hrs)', detail:'Follow up with every trial rider within 48 hours. Ask one genuine question about experience. Propose recurring.', tag:'close'},
-      {id:'w6t3', title:'Advance Trial Done Prospects', detail:'Anyone who completed a trial: advance to Active Client or Trial Done in pipeline. Generate account strategy.', tag:'account'},
-      {id:'w6t4', title:'Second Outreach Wave — 10 New Prospects', detail:'Repeat the Week 3 outreach process with 10 new prospects. You should now have 25+ in pipeline.', tag:'outreach'}
-    ]},
-    {week:7, title:'Week 7 — Account Activation', focus:'Convert trial clients to recurring', tasks:[
-      {id:'w7t1', title:'Propose Standing Reservations', detail:'For every trial client: propose a specific standing booking using their travel route and pattern data.', tag:'close'},
-      {id:'w7t2', title:'Build Company Intel Maps', detail:'Go to Company Intel tab. Build maps for all companies with 2+ prospects. Generate account strategies.', tag:'account'},
-      {id:'w7t3', title:'First Referral Asks', detail:'Ask every active client: "Who else on your team travels frequently?" Document every name they mention.', tag:'account'},
-      {id:'w7t4', title:'EA Champion Activation', detail:'For every EA who responded positively: deepen the relationship. Ask them to introduce you to another exec.', tag:'account'}
-    ]},
-    {week:8, title:'Week 8 — Momentum Review', focus:'Audit what is working and double down', tasks:[
-      {id:'w8t1', title:'Pipeline Revenue Audit', detail:'Check pipeline revenue stat. Calculate actual vs projected monthly value. Identify top 5 by conversion probability.', tag:'close'},
-      {id:'w8t2', title:'Channel Performance Review', detail:'Which channel generated the most positive responses? LinkedIn, EA email, event, or referral? Double the winner.', tag:'outreach'},
-      {id:'w8t3', title:'Contact 2 Corporate Travel Managers', detail:'Identify Director of Corporate Travel at Delta, UPS, or Coca-Cola. This is your biggest account opportunity.', tag:'account'},
-      {id:'w8t4', title:'Score 10 New Prospects for Phase 3', detail:'Build your Phase 3 target list. Focus on companies where you already have 1+ active clients.', tag:'prospect'}
-    ]}
-  ],
-  phase3: [
-    {week:9, title:'Week 9 — Corporate Account Push', focus:'Build company-wide relationships', tasks:[
-      {id:'w9t1', title:'Corporate Account Pitch — Top 3 Companies', detail:'For companies with 2+ active clients: generate a corporate account expansion strategy. Schedule a meeting.', tag:'account'},
-      {id:'w9t2', title:'Referral System Activation', detail:'Formalize referral program: every client who refers a new booking gets a complimentary ride credit.', tag:'account'},
-      {id:'w9t3', title:'Event Calendar — Next 30 Days', detail:'Identify all Atlanta business events in the next 30 days. Score every speaker and VIP attendee.', tag:'prospect'},
-      {id:'w9t4', title:'Follow Up All Stalled Prospects', detail:'Anyone in Contacted or Asst Engaged for 30+ days with no movement: new angle or graceful exit.', tag:'followup'}
-    ]},
-    {week:10, title:'Week 10 — Scale What Works', focus:'Systemize your best-performing channels', tasks:[
-      {id:'w10t1', title:'Build 3 Reusable Outreach Templates', detail:'Take your 3 highest-performing generated messages. Save as starting templates for future outreach.', tag:'outreach'},
-      {id:'w10t2', title:'Second Hotel Partnership Push', detail:'Add 2 more hotel concierge partnerships. Target Loews Atlanta, Grand Hyatt Buckhead, Kimpton Sylvan.', tag:'account'},
-      {id:'w10t3', title:'LinkedIn Presence Build', detail:'Post 2 pieces of content: one about Atlanta executive travel, one about OD Black differentiation. Tag prospects.', tag:'outreach'},
-      {id:'w10t4', title:'Corporate Travel Manager Meetings', detail:'Follow up on Week 8 contacts. The goal is one in-person meeting this week.', tag:'account'}
-    ]},
-    {week:11, title:'Week 11 — Referral Engine', focus:'Turn clients into a sales team', tasks:[
-      {id:'w11t1', title:'Client Satisfaction Check-In', detail:'Personal outreach to every active client. Not a pitch — a genuine check-in. Ask for one piece of feedback.', tag:'close'},
-      {id:'w11t2', title:'Referral Ask — Second Round', detail:'Ask every client who has had 3+ rides for a specific referral. Name the person you want to meet.', tag:'account'},
-      {id:'w11t3', title:'Score All Referred Names', detail:'Every name given by a referral: add to pipeline immediately. Score them. Set referral source.', tag:'prospect'},
-      {id:'w11t4', title:'Advance Corporate Account Conversations', detail:'Any company where you have had a corporate travel meeting: follow up with a specific proposal.', tag:'account'}
-    ]},
-    {week:12, title:'Week 12 — 90-Day Debrief', focus:'Measure, learn, and set the next 90-day target', tasks:[
-      {id:'w12t1', title:'Full Pipeline Revenue Audit', detail:'Calculate total MRR from all active, recurring, and corporate clients. Compare to $9,000 target.', tag:'close'},
-      {id:'w12t2', title:'Identify Your 3 Best Clients', detail:'Who converted fastest? What channel? What approach? These are your templates for the next 90 days.', tag:'close'},
-      {id:'w12t3', title:'Set Next 90-Day Targets', detail:'Based on current MRR and pipeline velocity: set new targets for clients 4-10. Plan Phase 2 expansion.', tag:'prospect'},
-      {id:'w12t4', title:'Thank Your Champions', detail:'Personal thank-you to every EA, referral source, and hotel concierge who helped this quarter.', tag:'account'}
-    ]}
-  ]
-};
-
-var calProgress = loadJSON('ob-cal-progress', {});
-
-function initCalendar(){
-  renderCalPhase('cal-phase1', CAL_TASKS.phase1);
-  renderCalPhase('cal-phase2', CAL_TASKS.phase2);
-  renderCalPhase('cal-phase3', CAL_TASKS.phase3);
-  updateCalProgress();
-  updateKPIs();
-}
-
-function renderCalPhase(containerId, weeks){
-  var el = document.getElementById(containerId);
-  if(!el){return;}
-  el.innerHTML = weeks.map(function(w){
-    var taskHTML = w.tasks.map(function(t){
-      var done = calProgress[t.id];
-      var tagCls = 'ct-'+t.tag;
-      var tagLabel = {prospect:'Prospecting',outreach:'Outreach',followup:'Follow-up',close:'Closing',account:'Account'}[t.tag]||t.tag;
-      return '<div class="cal-task'+(done?' done':'')+'">'+
-        '<div class="cal-task-check'+(done?' checked':'')+'" onclick="toggleCalTask(\"'+t.id+'\")">'+' '+(done?'&#10003;':'')+'</div>'+
-        '<div class="cal-task-body">'+
-          '<div class="cal-task-title">'+t.title+'</div>'+
-          '<div class="cal-task-detail">'+t.detail+'</div>'+
-          '<span class="cal-task-tag '+tagCls+'">'+tagLabel+'</span>'+
-        '</div>'+
-      '</div>';
-    }).join('');
-    return '<div class="cal-week card">'+
-      '<div class="cal-week-header">'+
-        '<div class="cal-week-num">W'+w.week+'</div>'+
-        '<div><div class="cal-week-title">'+w.title+'</div><div class="cal-week-focus">Focus: '+w.focus+'</div></div>'+
-      '</div>'+
-      '<div class="cal-tasks">'+taskHTML+'</div>'+
-    '</div>';
-  }).join('');
-}
-
-function toggleCalTask(id){
-  calProgress[id] = !calProgress[id];
-  saveJSON('ob-cal-progress', calProgress);
-  initCalendar();
-}
-
-function updateCalProgress(){
-  var allTasks = [];
-  ['phase1','phase2','phase3'].forEach(function(ph){
-    CAL_TASKS[ph].forEach(function(w){ w.tasks.forEach(function(t){ allTasks.push(t.id); }); });
-  });
-  var done = allTasks.filter(function(id){ return calProgress[id]; }).length;
-  var pct = Math.round((done/allTasks.length)*100);
-  var progEl = document.getElementById('cal-progress');
-  var pctEl = document.getElementById('cal-pct');
-  var doneEl = document.getElementById('cal-tasks-done');
-  if(progEl){progEl.style.width = pct+'%';}
-  if(pctEl){pctEl.textContent = pct+'%';}
-  if(doneEl){doneEl.textContent = done+' of '+allTasks.length+' tasks completed';}
-}
-
-function updateKPIs(){
-  var total = pipeline.length;
-  var contacted = pipeline.filter(function(p){ return p.stage !== 'identified'; }).length;
-  var trials = pipeline.filter(function(p){ return p.stage === 'trial-sched' || p.stage === 'trial-done' || p.stage === 'active' || p.stage === 'recurring' || p.stage === 'corporate'; }).length;
-  var clients = pipeline.filter(function(p){ return p.stage === 'active' || p.stage === 'recurring' || p.stage === 'corporate'; }).length;
-  var kpis = [{id:'kpi-pipeline',val:total,target:25,gap:'pipeline'},{id:'kpi-contacted',val:contacted,target:15,gap:'contacted'},{id:'kpi-trials',val:trials,target:5,gap:'trials'},{id:'kpi-clients',val:clients,target:3,gap:'clients'}];
-  kpis.forEach(function(k){
-    var el = document.getElementById(k.id);
-    var gapEl = document.getElementById(k.id+'-gap');
-    if(el){el.textContent = k.val; el.style.color = k.val >= k.target ? 'var(--gold)' : k.val >= k.target*0.6 ? 'var(--green)' : 'var(--text)';}
-    if(gapEl){gapEl.textContent = k.val+' of '+k.target+' '+(k.val>=k.target?'— TARGET HIT ✓':'remaining');}
-  });
-}
-
-function resetCalendar(){
-  if(!confirm('Reset all calendar progress?')){return;}
-  calProgress = {};
-  localStorage.removeItem('ob-cal-progress');
-  initCalendar();
-  notify('Calendar reset');
 }
 
 // ══════════════════════════════════════════════════════════
@@ -4997,7 +4763,7 @@ var RADAR_HOTELS=[
 var RADAR_SPRINT=[
   {w:1,label:'Week 1 &mdash; Foundation',tasks:[
     {id:'w1a',t:'Verify every Tier A watchlist company: confirm the move from a second source'},
-    {id:'w1b',t:'Run Gatekeeper Finder searches for all 4 Tier A companies'},
+    {id:'w1b',t:'Run Contact Path searches for all 4 Tier A companies'},
     {id:'w1c',t:'Log 10 gatekeepers (EA, office manager, facilities, events) from public sources'},
     {id:'w1d',t:'Visit 3 hotel concierge desks; ask who owns ground-transport referrals'}]},
   {w:2,label:'Week 2 &mdash; First Contact',tasks:[
@@ -6480,6 +6246,13 @@ var ACQ_OUTCOMES=[['no_response','No response or voicemail'],['callback','Asked 
 var ACQ_TYPES=[['airport','Airport transportation'],['executive','Executive account'],['event','Event or summit'],['group','Group or shuttle'],['other','Other']];
 var ACQ_STAGES=[['identified','Identified'],['contacted','Contacted'],['qualified','Qualified'],['quoted','Quoted'],['booked','Booked']];
 var ACQ_LEVELS=[['listed','Publicly listed'],['contact','Confirmed contact'],['booker','Confirmed booker']];
+var ACQ_ROUTES=[['frontdesk','Called the company line or front desk','Ask: "Who arranges car service for visiting executives?" and write down the name and role exactly as given.'],
+['site','Checked the company website or vendor page','Look for a leadership page, a vendor or supplier registration page, or a travel or facilities contact. Save the link.'],
+['referral','Asked for a referral','Ask a hotel concierge, an FBO contact or a client who books car service there.'],
+['event','Met through an event or association','GBTA Georgia (travel managers) or IAAP Georgia (assistants). Check their calendars for the next meeting.'],
+['xray','Free LinkedIn X-ray search','Open the search links on the Contact Path tab and note the profile you found. Look yourself; collect nothing automatically.'],
+['email','Looked up an email','Only once you have a name. Use Hunter or Apollo free and reveal emails, not phone numbers.']];
+var ACQ_ROUTE_RES=[['planned','Planned'],['found','Found a person or number'],['waiting','Waiting for a reply'],['nothing','Tried, found nothing']];
 var ACQ_SOURCES=['Company website','LinkedIn','Apollo','Phone call','Referral','Company Research','Other'];
 var ACQ_QUAL=[['need','Transportation need'],['frequency','Expected frequency'],['routes','Typical routes'],['vehicles','Vehicle requirements'],['timing','Timing'],['provider','Current provider (if volunteered)'],['authority','Booking authority'],['approval','Vendor approval process'],['nextStep','Agreed next step']];
 var ACQ_SCRIPT_DEFAULT='Hello, this is Kerry Pope with Odyssey Black, an executive transportation company here in Atlanta. Who arranges ground transportation for visiting leadership at your office? I\'d like to send them a short introduction. May I have their name and the best way to reach them?';
@@ -6540,9 +6313,18 @@ function acqClean(raw){
         people:(Array.isArray(rr.people)?rr.people:[]).slice(0,6).map(function(x){if(!x||typeof x!=='object'){return null;}var n=acqText(x.name,80),s=acqUrl(x.source);return (n.length>=2&&s)?{name:n,title:acqText(x.title,100),source:s}:null;}).filter(Boolean),
         news:(Array.isArray(rr.news)?rr.news:[]).slice(0,5).map(function(x){if(!x||typeof x!=='object'){return null;}var t=acqText(x.title,200),u=acqUrl(x.url);return (t&&u)?{title:t,url:u}:null;}).filter(Boolean)};
     }
+    var rseen={};
+    var routes=(Array.isArray(c.routes)?c.routes:[]).slice(0,20).map(function(r){
+      if(!r||typeof r!=='object'){return null;}
+      var t=acqPick(r.type,acqKeys(ACQ_ROUTES),''),res=acqPick(r.result,acqKeys(ACQ_ROUTE_RES),'');
+      var id=(typeof r.id==='string'&&/^rt-[a-z0-9-]{2,90}$/.test(r.id)&&!rseen[r.id])?r.id:'';
+      if(!t||!res||!id){return null;}
+      rseen[id]=1;
+      return {id:id,type:t,result:res,note:acqText(r.note,200),url:acqUrl(r.url),date:ptDate(r.date)};
+    }).filter(Boolean);
     out.companies.push({id:c.id,name:name,website:acqWebsite(c.website),address:acqText(c.address,200),phone:acqText(c.phone,30),area:acqText(c.area,40),
       source:acqPick(c.source,['research','radar','pipeline','manual'],'manual'),sourceLinks:links,researchedAt:ptDate(c.researchedAt),research:r,notes:acqText(c.notes,500),
-      dnc:dnc(c.dnc),archivedInto:(typeof c.archivedInto==='string'&&/^co-[a-z0-9-]{2,90}$/.test(c.archivedInto))?c.archivedInto:'',createdAt:ptDate(c.createdAt),updatedAt:num(c.updatedAt),archived:arch(c.archived),test:c.test===true});
+      dnc:dnc(c.dnc),archivedInto:(typeof c.archivedInto==='string'&&/^co-[a-z0-9-]{2,90}$/.test(c.archivedInto))?c.archivedInto:'',createdAt:ptDate(c.createdAt),updatedAt:num(c.updatedAt),archived:arch(c.archived),test:c.test===true,routes:routes});
   });
   var coIds={};out.companies.forEach(function(c){coIds[c.id]=1;});
   out.companies.forEach(function(c){if(c.archivedInto&&(!coIds[c.archivedInto]||c.archivedInto===c.id)){c.archivedInto='';}});
@@ -6726,7 +6508,7 @@ function acqNameRestricted(companyName,personName){
 }
 
 // ---- Records ----
-function acqBlankCo(name,id){return {id:id||acqNewId('co'),name:acqText(name,100),website:'',address:'',phone:'',area:'',source:'manual',sourceLinks:[],researchedAt:'',research:null,notes:'',dnc:null,archivedInto:'',createdAt:atlDateStr(),updatedAt:Date.now(),archived:null,test:false};}
+function acqBlankCo(name,id){return {id:id||acqNewId('co'),name:acqText(name,100),website:'',address:'',phone:'',area:'',source:'manual',sourceLinks:[],researchedAt:'',research:null,notes:'',dnc:null,archivedInto:'',createdAt:atlDateStr(),updatedAt:Date.now(),archived:null,test:false,routes:[]};}
 function acqFindCo(st,name){
   var nk=acqNorm(name);if(!nk){return null;}
   for(var i=0;i<st.companies.length;i++){var c=st.companies[i];if(!c.archivedInto&&acqNorm(c.name)===nk){return c;}}
@@ -6934,7 +6716,7 @@ function acqRenderList(){
     var od=opps.filter(function(o){return o.status==='open'&&!acqOppSuppressed(o)&&o.nextAction&&o.nextAction.date<today;}).length;
     return '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);'+(c.id===acqSel?'border-left:3px solid var(--gold);padding-left:8px;':'')+'"><div style="min-width:160px;overflow-wrap:anywhere;"><strong style="font-size:var(--fs-sm);">'+acqE(c.name)+'</strong> '+acqTestBadge(c)+
       (c.dnc?'<span class="mini-badge" style="background:rgba(231,76,60,0.1);border:1px solid rgba(231,76,60,0.4);color:#e74c3c;">Do not contact</span> ':'')+
-      '<span style="font-size:var(--fs-xs);color:var(--muted);">'+acqCtsOf(c).length+' contact'+(acqCtsOf(c).length===1?'':'s')+' &middot; '+open+' open opportunit'+(open===1?'y':'ies')+(od?' &middot; <span style="color:#e74c3c;">'+od+' overdue</span>':'')+(c.researchedAt?'':' &middot; no research')+'</span></div>'+todayBtn('Open','acqOpenCo(\''+c.id+'\')',c.id===acqSel)+'</div>';
+      '<span style="font-size:var(--fs-xs);color:var(--muted);">'+acqCtsOf(c).length+' contact'+(acqCtsOf(c).length===1?'':'s')+' &middot; '+open+' open opportunit'+(open===1?'y':'ies')+(od?' &middot; <span style="color:#e74c3c;">'+od+' overdue</span>':'')+(c.researchedAt?'':' &middot; no research')+(acqPathState(c)==='booker'?'':' &middot; <span style="color:var(--gold);">no booking contact yet</span>')+'</span></div>'+todayBtn('Open','acqOpenCo(\''+c.id+'\')',c.id===acqSel)+'</div>';
   }).join('')+acqArchivedListHtml()+'</div>';
 }
 function acqArchivedListHtml(){
@@ -7054,6 +6836,7 @@ function acqMergeCompanies(keepId,dropId){
   d.sourceLinks.forEach(function(l){acqAddLink(k,l.url,l.label,l.date);});
   if(d.research&&(!k.research||(d.researchedAt||'')>(k.researchedAt||''))){k.research=d.research;k.researchedAt=d.researchedAt;}
   if(!k.dnc&&d.dnc){k.dnc=d.dnc;}
+  d.routes.forEach(function(r){if(k.routes.length<20&&!k.routes.some(function(x){return x.id===r.id;})){k.routes.push(r);}});
   d.archivedInto=k.id;acqTouch(d);acqTouch(k);
   acqLogAct(k.id,'Merged "'+d.name+'" into this company.');
   if(acqSel===d.id){acqSel=k.id;}
@@ -7098,7 +6881,7 @@ function acqRenderDetail(){
   }
   h+='</div>';
   if(co.archived){h+='<div class="card"><div style="font-size:var(--fs-sm);overflow-wrap:anywhere;"><strong>Archived</strong> on '+acqE(co.archived.at)+(co.archived.note?': '+acqE(co.archived.note):'')+'. Contacts, opportunities, quotes, bookings and history are kept and linked. It is out of the active list, Today and open counts.</div><div class="btns" style="margin-top:8px;">'+todayBtn('Restore','acqRestore(\'co\',\''+co.id+'\')',true)+'</div></div>'+acqActivityHtml(co);el.innerHTML=h;return;}
-  h+=acqResearchHtml(co)+acqContactsHtml(co)+acqOppsHtml(co)+acqActivityHtml(co)+acqPipelineHtml(co);
+  h+=acqResearchHtml(co)+acqPathHtml(co)+acqContactsHtml(co)+acqOppsHtml(co)+acqActivityHtml(co)+acqPipelineHtml(co);
   el.innerHTML=h;
 }
 function acqToggleEdit(){acqEditing=!acqEditing;acqRenderDetail();}
@@ -7126,6 +6909,71 @@ function acqResearchHtml(co){
 function acqResearchNow(id){
   var co=acqCo(id);if(!co){return;}
   todayGoTab('radar');rschStart(co.name,co.area||'Atlanta');
+}
+
+// ---- Contact path: which routes were tried to find the person who books ----
+function acqPathState(co){
+  var st='';
+  acqCtsOf(co).forEach(function(c){var l=acqContactLevel(c);if(l==='booker'){st='booker';}else if(l==='contact'&&st!=='booker'){st='contact';}});
+  if(st){return st;}
+  return co.routes.length?'tried':'none';
+}
+function acqPathNext(co){
+  var used={};co.routes.forEach(function(r){used[r.type]=1;});
+  for(var i=0;i<ACQ_ROUTES.length;i++){if(!used[ACQ_ROUTES[i][0]]){return ACQ_ROUTES[i];}}
+  return null;
+}
+function acqPathHtml(co){
+  var st=acqPathState(co),nx=acqPathNext(co),nothing=co.routes.filter(function(r){return r.result==='nothing';}).length;
+  var msg={booker:'Booking contact confirmed.',contact:'A contact is confirmed, but nobody is confirmed as the person who books. Ask who arranges car service.',
+    tried:'No booking contact yet. '+co.routes.length+' route'+(co.routes.length===1?'':'s')+' logged'+(nothing?', '+nothing+' found nothing':'')+'.',none:'No booking contact yet. No route tried.'}[st];
+  var col=st==='booker'?'var(--green)':'var(--gold)';
+  var h='<div class="card" id="acq-path"><div class="sep-title"><span class="mini-badge mb-gold">Contact path</span></div><div style="font-size:var(--fs-sm);color:'+col+';overflow-wrap:anywhere;"><strong>'+acqE(msg)+'</strong></div>';
+  if(st!=='booker'){
+    h+=nx?'<div style="margin-top:8px;font-size:var(--fs-sm);overflow-wrap:anywhere;"><span style="font-size:var(--fs-xs);color:var(--muted);">Try next:</span> <strong>'+acqE(nx[1])+'</strong><div style="font-size:var(--fs-xs);color:var(--muted);">'+acqE(nx[2])+'</div></div>'
+      :'<div style="margin-top:8px;font-size:var(--fs-xs);color:var(--muted);">Every route has been logged. If none found a booking contact, decide whether this company stays active.</div>';
+  }
+  if(co.routes.length){
+    h+='<div style="margin-top:10px;">'+co.routes.map(function(r){
+      return '<div style="padding:6px 0;border-bottom:1px solid var(--border);font-size:var(--fs-sm);overflow-wrap:anywhere;"><strong>'+acqE(acqLabel(ACQ_ROUTES,r.type))+'</strong> &middot; '+acqE(acqLabel(ACQ_ROUTE_RES,r.result))+' <span style="font-size:var(--fs-xs);color:var(--muted);">'+acqE(r.date)+'</span>'+
+        (r.note?'<div style="font-size:var(--fs-xs);color:var(--muted);">'+acqE(r.note)+'</div>':'')+(r.url?'<div style="font-size:var(--fs-xs);"><a href="'+acqE(r.url)+'" target="_blank" rel="noopener noreferrer" style="color:var(--gold);text-decoration:underline;">'+acqE(acqDomain(r.url))+'</a></div>':'')+
+        '<div class="btns" style="margin:4px 0 0 0;">'+todayBtn('Remove','acqRouteRemove(\''+co.id+'\',\''+r.id+'\')')+'</div></div>';
+    }).join('')+'</div>';
+  }
+  h+='<div class="g2" style="margin-top:12px;"><div><label for="acq-rt-type">Route</label><select id="acq-rt-type">'+acqOptions(ACQ_ROUTES.map(function(x){return [x[0],x[1]];}),nx?nx[0]:'')+'</select></div>'+
+    '<div><label for="acq-rt-res">Result</label><select id="acq-rt-res">'+acqOptions(ACQ_ROUTE_RES,'found')+'</select></div></div>'+
+    '<div class="g2">'+acqFieldHtml('What you learned (name, role, answer)','acq-rt-note','',200)+acqFieldHtml('Source link (optional)','acq-rt-url','',500,'text','https://')+'</div>'+
+    '<div class="btns"><button class="btn btn-gold" onclick="acqRouteAdd(\''+co.id+'\')">Log route</button>'+todayBtn('Open search links for this company','acqPathOpenTab(\''+co.id+'\')')+'</div></div>';
+  return h;
+}
+function acqRouteAdd(coId){
+  var co=acqCo(coId);if(!co){return;}
+  var type=acqPick(acqVal('acq-rt-type'),acqKeys(ACQ_ROUTES),''),res=acqPick(acqVal('acq-rt-res'),acqKeys(ACQ_ROUTE_RES),'');
+  if(!type||!res){notify('Choose a route and a result');return;}
+  if(co.routes.length>=20){notify('This company already has 20 routes logged');return;}
+  var url=acqUrl(acqVal('acq-rt-url')),rawUrl=String(acqVal('acq-rt-url')||'').trim();
+  if(rawUrl&&!url){notify('That link does not look right. Start it with https://');return;}
+  var note=acqText(acqVal('acq-rt-note'),200);
+  if(res==='found'&&!note&&!url){notify('Write what you found, or add a source link');return;}
+  var r={id:acqNewId('rt'),type:type,result:res,note:note,url:url,date:atlDateStr()};
+  co.routes.push(r);
+  if(url){acqAddLink(co,url,acqLabel(ACQ_ROUTES,type),r.date);}
+  acqLogAct(co.id,'Contact route: '+acqLabel(ACQ_ROUTES,type)+' ('+acqLabel(ACQ_ROUTE_RES,res)+')'+(note?': '+note:''));
+  acqTouch(co);acqSave();acqRefresh();
+  notify(res==='found'?'Logged. Now add the person under Contacts.':'Route logged');
+}
+function acqRouteRemove(coId,rid){
+  var co=acqCo(coId);if(!co){return;}
+  if(!confirm('Remove this logged route?')){return;}
+  co.routes=co.routes.filter(function(r){return r.id!==rid;});
+  acqTouch(co);acqSave();acqRefresh();
+}
+function acqPathOpenTab(coId){
+  var co=acqCo(coId);if(!co){return;}
+  todayGoTab('gatekeeper');
+  var a=document.getElementById('gk-company'),b=document.getElementById('gk-city');
+  if(a){a.value=co.name;}if(b&&co.area){b.value=co.area;}
+  buildXraySearches();
 }
 
 // ---- Contacts ----
@@ -8108,7 +7956,7 @@ function cloudGateSave(){
 function cloudGateClear(){try{localStorage.removeItem('ob-cloud-gate');}catch(e){}cloudGateRender();}
 
 // ---- Data & Backup: what Full Backup contains, version, last export ----
-var ACQ_RELEASE='1c';
+var ACQ_RELEASE='1d';
 function acqKeyLabel(k){return ({'ob-acq':'Companies, contacts, opportunities, quotes, bookings and activity','ob-pipeline':'Pipeline prospects','ob-gatekeepers':'Gatekeepers','ob-messages':'Saved messages','ob-research':'Company Research results','ob-radar':'Market Radar watchlist and settings','ob-quotes':'Quote log and rate settings'})[k]||(typeof cloudKeyLabel==='function'?cloudKeyLabel(k):k);}
 function acqKeyCount(k){
   var raw=null;try{raw=localStorage.getItem(k);}catch(e){}

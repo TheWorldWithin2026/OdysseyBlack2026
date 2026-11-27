@@ -26,7 +26,7 @@ with sync_playwright() as p:
         pg.on('pageerror',lambda e:errs.append(str(e)))
         pg.route('**/.netlify/functions/perimeter-watch',lambda r:r.fulfill(status=200,content_type='application/json',body=json.dumps(ITEMS)))
         pg.goto('http://localhost:8765/index.html'); pg.evaluate(SEED); pg.reload()
-        t(f'[{w}] app lands on Today',pg.is_visible('#panel-today') and 'active' in pg.get_attribute('.tab:first-child','class'))
+        t(f'[{w}] app lands on Today',pg.is_visible('#panel-today') and 'active' in pg.get_attribute('.tab[onclick*="today"]','class'))
         body=pg.inner_text('#today-body')
         t(f'[{w}] overdue prospect shown with day count','Dana Overdue' in body and 'overdue 4 days' in body.lower())
         t(f'[{w}] due-today prospect shown','Evan Today' in body and 'due today' in body.lower())
@@ -54,7 +54,7 @@ with sync_playwright() as p:
         t(f'[{w}] Tier A research suggestion shown','Research Asbury Automotive Group' in pg.inner_text('#today-body'))
         pg.locator('#today-body >> text=Find gatekeepers').first.click()
         t(f'[{w}] handoff opens Gatekeeper Finder',pg.input_value('#gk-company')=='Asbury Automotive Group')
-        pg.click('.tab:first-child')
+        pg.click('.tab[onclick*="today"]')
         # sprint
         pg.click('#today-body >> text=Start sprint today')
         t(f'[{w}] sprint start shows week 1','Week 1 of 4' in pg.inner_text('#today-body'))
@@ -66,11 +66,11 @@ with sync_playwright() as p:
         if pg.locator('.cc-badge-urgent').count():
             pg.click('.cc-badge-urgent'); t(f'[{w}] Urgent badge opens Pipeline',pg.is_visible('#panel-pipeline'))
         else: t(f'[{w}] Urgent badge (none present; pipeline button check)',True)
-        pg.click('.tab:first-child'); pg.click('.cc-actions button.btn-ghost')
+        pg.click('.tab[onclick*="today"]'); pg.click('.cc-actions button.btn-ghost')
         t(f'[{w}] command-center Pipeline button opens Pipeline',pg.is_visible('#panel-pipeline'))
         t(f'[{w}] no page errors',not errs)
         if w==390:
-            pg.click('.tab:first-child'); pg.screenshot(path='/tmp/today-390.png',full_page=False)
+            pg.click('.tab[onclick*="today"]'); pg.screenshot(path='/tmp/today-390.png',full_page=False)
         pg.close()
     b.close()
 print('FAILS',fails); sys.exit(1 if fails else 0)

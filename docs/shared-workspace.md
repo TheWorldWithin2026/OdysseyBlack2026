@@ -42,3 +42,11 @@ This is the conflict handling the app has today. It applies to Restore (Merge) f
 - A backup that carries a null for a key that already holds a list no longer replaces that list.
 
 What still does not exist: automatic merging of two people's simultaneous edits, per-field merges, or any sync of Companies data between browsers.
+
+## Release 1d: contact path, and what was removed
+
+- **Contact path** on every company page: six ordered routes to find the person who books car service (company line, company website, referral, event or association, free LinkedIn X-ray, email lookup). Each route is logged with a result, a note and an optional source link. The page says "No booking contact yet" until a contact has a recorded check at level "Confirmed booker". The state is worked out from the contacts and routes, not stored, so it cannot disagree with them.
+- Routes are stored on the company (`routes`, at most 20) and travel with Backup, Restore (Merge keeps the newer company copy) and company merges.
+- **Removed:** Company Intel and 90-Day Plan. Both were built on the older Pipeline numbers that Companies replaces. Their stored data key `ob-cal-progress` is still accepted in old backups. The removed code is in git history (Release 1c).
+- **Kept, moved to a Reference group:** War Room and Market Expansion. They hold written strategy and a Google Places search but track nothing. Treat the dollar figures and close rates in them as the author's estimates, not sourced results.
+- **Renamed:** Gatekeeper Finder is now Contact Path. Its stored data (`ob-gatekeepers`) is unchanged.
