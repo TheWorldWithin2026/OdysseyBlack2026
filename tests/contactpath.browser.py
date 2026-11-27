@@ -40,9 +40,9 @@ with sync_playwright() as p:
     t('Gatekeeper Finder is now called Contact Path', any('Contact Path' in x for x in tabs) and not any('Gatekeeper Finder' in x for x in tabs))
     order = [x for x in tabs]
     def idx(s): return [i for i, x in enumerate(order) if s in x][0]
-    t('the win-clients tabs come first: Today, Companies, Contact Path, AI Outreach', idx('Today') < idx('Companies') < idx('Contact Path') < idx('AI Outreach'))
-    t('reference tabs (War Room, Market Expansion) are last', idx('War Room') > idx('Forecast') and idx('Market Expansion') > idx('Forecast'))
-    t('every remaining tab opens its panel without a page error', all([(open_tab(pg, n), ev(pg, "document.getElementById('panel-%s').classList.contains('active')" % n))[1] for n in ['today','companies','gatekeeper','outreach','quotes','results','radar','prospect','import','partners','lookalike','pipeline','script','vendor','forecast','strategy','markets']]) and pg.errs == [])
+    t('the win-clients tabs come first: Today, Companies, Contact Path, Outreach', idx('Today') < idx('Companies') < idx('Contact Path') < idx('Outreach'))
+    t('the tab bar is down to the 8 tabs that win clients', len(tabs) == 8 and not any(x in ' '.join(tabs) for x in ['Radar','Pipeline','Prospect Builder','Lookalikes','Forecast','War Room','Market Expansion','Apollo Import','Results']))
+    t('every remaining tab opens its panel without a page error', all([(open_tab(pg, n), ev(pg, "document.getElementById('panel-%s').classList.contains('active')" % n))[1] for n in ['today','companies','gatekeeper','outreach','script','quotes','vendor','partners']]) and pg.errs == [])
     t('old backup keys are still accepted so nothing in an old backup is lost', ev(pg, "APPROVED_BACKUP_KEYS.indexOf('ob-cal-progress')!==-1"))
 
     # ---- Contact Path tab content

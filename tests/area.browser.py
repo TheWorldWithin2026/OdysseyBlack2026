@@ -35,8 +35,6 @@ with sync_playwright() as p:
     pg.click('#acq-modal button:has-text("Use this area") >> nth=0')  # Buckhead (first non-home)
     t('choosing Buckhead updates the badge and the setting persists', 'Buckhead' in pg.text_content('#area-badge') and json.loads(ev(pg, "localStorage.getItem('ob-areas')"))['active'] == 'ar-buckhead')
     t('Contact Path city follows the area', ev(pg, "document.getElementById('gk-city').value") == 'Atlanta')
-    t('the Market Expansion search is set to Buckhead', ev(pg, "document.getElementById('places-area').value") == 'Buckhead, Atlanta, GA')
-    t('the search area list there matches the saved areas', ev(pg, "document.getElementById('places-area').options.length") == 7)
     ev(pg, "acqModalClose()")
 
     # find companies card

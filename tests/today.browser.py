@@ -44,30 +44,14 @@ with sync_playwright() as p:
         t(f'[{w}] Snooze 3d works',pg.evaluate("JSON.parse(localStorage.getItem('ob-pipeline')).find(function(x){return x.id===2}).followUp")>pg.evaluate('atlDateStr()'))
         pg.locator('#today-body >> text=Gus Concierge').locator('xpath=ancestor::div[contains(@style,"border-left")][1]').locator('text=Log contact').click()
         t(f'[{w}] Gatekeeper log contact clears it','Gus Concierge' not in pg.inner_text('#today-body'))
-        # radar: scan from Today
-        t(f'[{w}] prompts to scan when never scanned','Check for companies moving' in pg.inner_text('#today-body'))
-        pg.click('#today-body >> text=Scan now'); pg.wait_for_selector('#today-body a[href="https://example.com/a"]')
-        t(f'[{w}] scan result appears on Today as unverified lead','unverified lead' in pg.inner_text('#today-body'))
-        t(f'[{w}] hostile headline did not execute',pg.evaluate('window.__xss')is None)
-        t(f'[{w}] scan prompt gone after a fresh scan','Check for companies moving' not in pg.inner_text('#today-body'))
-        # watchlist research prompt + handoff
-        t(f'[{w}] Tier A research suggestion shown','Research Asbury Automotive Group' in pg.inner_text('#today-body'))
-        pg.locator('#today-body >> text=Find gatekeepers').first.click()
-        t(f'[{w}] handoff opens Gatekeeper Finder',pg.input_value('#gk-company')=='Asbury Automotive Group')
-        pg.click('.tab[onclick*="today"]')
-        # sprint
-        pg.click('#today-body >> text=Start sprint today')
-        t(f'[{w}] sprint start shows week 1','Week 1 of 4' in pg.inner_text('#today-body'))
-        n=pg.locator('#today-body button:has-text("Done")').count()
-        pg.locator('#today-body button:has-text("Done")').first.click()
-        t(f'[{w}] sprint Done removes one task',pg.locator('#today-body button:has-text("Done")').count()==n-1)
-        # urgent badge still goes to Pipeline (tab index regression)
+        # the Radar scan and 30-day sprint are gone from Today
+        bt=pg.inner_text('#today-body'); btl=bt.lower()
+        t(f'[{w}] no Radar scan, Tier A research or sprint prompts on Today','check for companies moving' not in btl and 'scan now' not in btl and 'perimeter sprint' not in btl and 'research asbury' not in btl and 'market radar' not in btl)
+        t(f'[{w}] older prospects are labelled and open Companies, not a removed Pipeline tab','older prospects' in btl and 'open pipeline' not in btl)
         pg.evaluate("renderCommandCenter()")
-        if pg.locator('.cc-badge-urgent').count():
-            pg.click('.cc-badge-urgent'); t(f'[{w}] Urgent badge opens Pipeline',pg.is_visible('#panel-pipeline'))
-        else: t(f'[{w}] Urgent badge (none present; pipeline button check)',True)
-        pg.click('.tab[onclick*="today"]'); pg.click('.cc-actions button.btn-ghost')
-        t(f'[{w}] command-center Pipeline button opens Pipeline',pg.is_visible('#panel-pipeline'))
+        hdr=pg.inner_text('#command-center').lower()
+        t(f'[{w}] header shows Companies, Booker found and Due today, not MRR or Pipeline value','companies' in hdr and 'booker found' in hdr and 'due today' in hdr and 'mrr' not in hdr and 'pipeline' not in hdr)
+        t(f'[{w}] due-today count includes the overdue older prospects',int(pg.inner_text('#cc-urgent-num'))>=1)
         t(f'[{w}] no page errors',not errs)
         if w==390:
             pg.click('.tab[onclick*="today"]'); pg.screenshot(path='/tmp/today-390.png',full_page=False)
