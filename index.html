@@ -16,7 +16,7 @@
   --gold-light: #e2c47a;
   --gold-dim: rgba(201,168,76,0.12);
   --text:  #e8e0d0;
-  --muted: #7a7060;
+  --muted: #968c7a;
   --green: #2ecc71;
   --yellow: #f1c40f;
   --blue:  #3498db;
@@ -543,6 +543,14 @@ textarea{resize:vertical;min-height:75px;}
 .vp-paper table{width:100%;border-collapse:collapse;font-size:13px}.vp-paper td,.vp-paper th{border-bottom:1px solid #ddd;padding:5px 6px;text-align:left;vertical-align:top}
 .vp-paper p{font-size:13px;line-height:1.45;margin:4px 0}
 @media print{body>*:not(#vp-print-root){display:none!important}body{background:#fff!important}#vp-print-root{display:block!important}.vp-blank{background:none!important}.vp-paper{padding:0}}
+
+/* Release 1h: touch-friendly sizes. Inputs are 16px so iPhones do not zoom in on tap. */
+@media (max-width:900px){
+  input:not([type=checkbox]):not([type=radio]),select,textarea{font-size:16px!important;}
+  .btn,.tab,.area-badge{min-height:44px;}
+  .btn{display:inline-flex;align-items:center;justify-content:center;}
+  input[type=checkbox],input[type=radio]{width:22px;height:22px;}
+}
 </style>
 </head>
 <body>
@@ -7144,7 +7152,7 @@ function areaApply(){
   if(fa){fa.textContent=acqResearchCityOk(a.city)?'Searching near: '+a.name+'.':'Searching near: '+a.name+'. Company Research only looks in Georgia metro-Atlanta cities, so for this area it searches by company name alone.';}
 }
 areaApply();
-var ACQ_RELEASE='1g';
+var ACQ_RELEASE='1h';
 function acqKeyLabel(k){return ({'ob-acq':'Companies, contacts, opportunities, quotes, bookings and activity','ob-pipeline':'Pipeline prospects','ob-gatekeepers':'Gatekeepers','ob-messages':'Saved messages','ob-research':'Company Research results','ob-radar':'Market Radar watchlist and settings','ob-quotes':'Quote log and rate settings'})[k]||(typeof cloudKeyLabel==='function'?cloudKeyLabel(k):k);}
 function acqKeyCount(k){
   var raw=null;try{raw=localStorage.getItem(k);}catch(e){}
